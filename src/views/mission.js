@@ -28,6 +28,11 @@ registerView('mission', (id) => {
   const linkBtn = m.link
     ? `<a class="btn btn-ghost mt-2" href="${esc(m.link.url)}" target="_blank" rel="noopener">${esc(m.link.label)} ${icon('external-link')}</a>`
     : '';
+  // Missions that reference an in-app builder get a real button to jump there.
+  const goto = ({ j1m6: ['resume', 'Resume Studio'], j8m1: ['resume', 'Resume Studio'],
+    j3m4: ['portfolio', 'Portfolio Builder'], j3m6: ['portfolio', 'Portfolio Builder'],
+    j8m2: ['linkedin', 'LinkedIn Builder'] })[m.id];
+  const gotoBtn = goto ? `<button class="btn btn-ghost mt-2" data-action="nav" data-value="${goto[0]}">${icon('arrow-right')} Open the ${esc(goto[1])}</button>` : '';
 
   root.innerHTML = `
     <div class="stagger">
@@ -45,7 +50,7 @@ registerView('mission', (id) => {
       <div class="card">
         <h3 class="section-label" style="margin-top:0">Today’s mission</h3>
         <ol class="steps">${today}</ol>
-        ${linkBtn}
+        ${linkBtn}${gotoBtn}
       </div>
 
       <div class="card">

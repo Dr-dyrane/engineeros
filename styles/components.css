@@ -19,6 +19,10 @@
   backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
   -webkit-backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
 }
+/* Without backdrop-filter, fall back to a solid surface so bars stay legible. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .material, #topbar { background: var(--surface-1); }
+}
 
 /* ---- Squircle: true continuous-curve mask for square decorative elements - */
 .squircle { -webkit-mask: var(--squircle) center / 100% 100% no-repeat;
@@ -68,7 +72,7 @@
 .btn[disabled] { opacity: .42; pointer-events: none; }
 
 /* Icon button — round, quiet, springs on press. */
-.iconbtn { width: 40px; height: 40px; min-width: 40px; border-radius: var(--r-pill);
+.iconbtn { width: 44px; height: 44px; min-width: 44px; border-radius: var(--r-pill);
   display: grid; place-items: center; color: var(--text); background: var(--fill);
   transition: transform var(--dur-1) var(--ease-emphasized), background var(--dur-2); }
 .iconbtn:active { transform: scale(.9); }

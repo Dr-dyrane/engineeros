@@ -96,3 +96,31 @@ product matures into something people rely on daily.
 
 > The bar: every screen should make a beginner think *"I can do this today,"* and make an employer
 > think *"this person ships."*
+
+---
+
+## Update — post-Resume-Studio re-audit (independent review)
+
+### Shipped since v1.0
+- **Tier 1 foundation**: app identity kit (favicon, app icons, OG share image, PWA manifest), hash routing (refresh-safe, real Back, deep links, per-view titles + focus), `.squircle` applied, Tailwind removed, Lucide pinned.
+- **Resume Studio**: structured entries, live ATS-safe paper preview, strength score, ATS keyword match, action-verb + XYZ coaching, Print→PDF + text/markdown export, auto-migration of old data.
+- **Audit quick-fixes**: fixed an undefined `--green-soft` token (matched ATS chips had no background); `aria-label`s on all Resume fields; streak dates now **local** (was UTC — wrong day in WAT); theme quick-toggle now syncs the Settings segmented control; icon buttons raised to **44px** + `backdrop-filter` fallback + slightly higher glass opacity; **missions now deep-link to their builder** (real "Open the Resume/Portfolio/LinkedIn builder" buttons); **confirm before deleting** a non-empty resume entry; Inter font loads **non-blocking**.
+
+### Still open — prioritized
+
+**High**
+- **Portfolio Studio + LinkedIn Studio** — level them up to the Resume bar. Today they're plain-textarea builders next to a premium Studio: the single biggest consistency gap. *(L)*
+- **Service worker** — manifest/icons exist but nothing caches, so the "installable / works offline" promise is unfulfilled (matters most for the low-connectivity target audience). *(M)*
+
+**Medium**
+- Resources **search + Nigeria-only / Free filters** (the badges/flags already exist to power it). *(M)*
+- **Error boundary** around view renders so a bad state never white-screens. *(M)*
+- Clearer **mobile "Save as PDF"** guidance (the marquee export is weakest on phones). *(M)*
+
+**Low**
+- `refreshIcons(root)` re-scans the whole document (ignores its root arg). *(S)*
+- Guard journey/overall % math against an empty journey (latent). *(S)*
+- Decide whether the **Weekly Review should extend the streak** (currently it does). *(S)*
+- Directional push/pop **page transitions**; richer empty states + completion moments. *(M)*
+- **Progress depth**: streak calendar/heatmap, milestone badges. *(M)*
+- Proactive **backup nudge** (localStorage can be wiped). *(S)*

@@ -56,16 +56,7 @@ function builderView(rootId, key, title, fields, exportAction, intro) {
 
 /* Resume now has its own dedicated module — src/views/resume.js (Resume Studio). */
 
-registerView('portfolio', () => builderView('view-portfolio', 'portfolio', 'Portfolio Builder', [
-  { k:'about', l:'About me', type:'area', p:'One short paragraph: who you are and what you build.', rows:3 },
-  { k:'education', l:'Education', type:'area', p:'Degree, school, year, one highlight.', rows:2 },
-  { k:'project', l:'Final-year project', type:'area', p:'Problem → what you built → result. 3–4 sentences.', rows:4 },
-  { k:'skills', l:'Skills', type:'area', p:'Comma-separated.' },
-  { k:'tools', l:'Tools & software', type:'area', p:'SolidWorks, Fusion 360, Arduino, Python…' },
-  { k:'projects', l:'Other projects', type:'area', p:'List 2–3 with one line each.', rows:4 },
-  { k:'certs', l:'Certifications', type:'area', p:'Optional.', rows:2 },
-  { k:'contact', l:'Contact', type:'area', p:'Email · LinkedIn · GitHub', rows:2 },
-], 'export-portfolio', 'This is your portfolio <em>content</em> — write it before building any website. Done is better than perfect.'));
+/* Portfolio now has its own dedicated module — src/views/portfolio.js (Portfolio Studio). */
 
 registerView('linkedin', () => builderView('view-linkedin', 'linkedin', 'LinkedIn Builder', [
   { k:'headline', l:'Headline', p:'Mechanical Engineer → AI & Robotics | Python · CAD · Arduino', h:'220 characters max. Show who you are + where you are heading.' },

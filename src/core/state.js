@@ -51,8 +51,9 @@ export function replaceState(next) { store.s = deepDefaults(next); saveNow(); }
 export function resetState() { const theme = store.s.theme; store.s = defaultState(); store.s.theme = theme; saveNow(); }
 
 /* ---- small helpers ------------------------------------------------------- */
-export const todayStr = () => new Date().toISOString().slice(0, 10);
-export function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return d.toISOString().slice(0, 10); }
+function localYMD(d = new Date()) { const z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; }
+export const todayStr = () => localYMD();                                  // local date, not UTC
+export function yesterdayStr() { const d = new Date(); d.setDate(d.getDate() - 1); return localYMD(d); }
 export function firstName() { return (store.s.user.name || 'there').trim().split(/\s+/)[0] || 'there'; }
 
 export function flat() {
@@ -115,7 +116,19 @@ export function resumeReady() {
   return Math.round(checks.filter(Boolean).length / checks.length * 100);
 }
 export function linkedinReady() { return pctFilled(store.s.builders.linkedin, LI_KEYS); }
-export function portfolioReady() { return pctFilled(store.s.builders.portfolio, PF_KEYS); }
+export function portfolioReady() {
+  const p = store.s.builders.portfolio; if (!p) return 0;
+  const has = v => v && String(v).trim().length > 1;
+  const csAny = Array.isArray(p.projects) ? p.projects.some(x => x.title || x.approach || x.result) : (has(p.project) || has(p.projects));
+  const checks = [
+    has(p.about),
+    has(p.email) || has(p.linkedin) || has(p.github) || has(p.website) || has(p.contact),
+    csAny,
+    Array.isArray(p.skills) ? p.skills.some(s => has(s.items)) : has(p.skills),
+    has(p.education),
+  ];
+  return Math.round(checks.filter(Boolean).length / checks.length * 100);
+}
 export function githubReady() { const n = GH_MILESTONES.filter(id => store.s.completed[id]).length; return Math.round(n / GH_MILESTONES.length * 100); }
 export function overallPct() { const t = totalMissions(); return t ? Math.round(completedCount() / t * 100) : 0; }
 export function journeysDone() { return JOURNEYS.filter((j, ji) => journeyComplete(ji)).length; }

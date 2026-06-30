@@ -18,6 +18,8 @@ export function applyTheme() {
   // The quick-toggle icon previews the *current* mode (sun in light, moon in dark).
   const el = qs('#themeIcon');
   if (el) { el.setAttribute('data-lucide', isDarkNow() ? 'moon' : 'sun'); refreshIcons(qs('#topbar')); }
+  // keep any visible segmented control (Setup / Settings) in sync with the active theme
+  document.querySelectorAll('[data-theme-set]').forEach(b => b.classList.toggle('is-on', b.dataset.themeSet === store.s.theme));
 }
 
 export function setTheme(t) {

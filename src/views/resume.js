@@ -201,8 +201,8 @@ function refreshDynamic() {
 }
 
 /* ---------- form rendering helpers --------------------------------------- */
-const inp = (path, val, ph, type = 'text') => `<input class="input" data-rs="${path}" type="${type}" placeholder="${esc(ph)}" value="${esc(val || '')}" />`;
-const ta = (path, val, ph) => `<textarea class="textarea" data-rs="${path}" placeholder="${esc(ph)}">${esc(val || '')}</textarea>`;
+const inp = (path, val, ph, type = 'text') => `<input class="input" data-rs="${path}" type="${type}" placeholder="${esc(ph)}" aria-label="${esc(ph)}" value="${esc(val || '')}" />`;
+const ta = (path, val, ph) => `<textarea class="textarea" data-rs="${path}" placeholder="${esc(ph)}" aria-label="${esc(ph)}">${esc(val || '')}</textarea>`;
 function delBtn(action, value) { return `<button class="rs-iconbtn" data-action="${action}" data-value="${value}" aria-label="Remove">${icon('trash-2')}</button>`; }
 function addBtn(action, value, label) { return `<button class="btn btn-ghost btn-sm" data-action="${action}" data-value="${value}">${icon('plus')} ${esc(label)}</button>`; }
 
@@ -351,22 +351,24 @@ function setPanel(p) {
 export function resumeAction(action, value) {
   const r = R();
   const reRender = () => { save(); renderResume(); };
+  const ask = () => (typeof confirm === 'undefined') || confirm('Remove this entry? This can’t be undone.');
+  const filled = o => o && Object.keys(o).some(k => k === 'bullets' ? o.bullets.some(b => b && b.trim()) : String(o[k] || '').trim());
   switch (action) {
     case 'rs-panel': setPanel(value); break;
     case 'rs-add-exp': r.experience.push(emptyExp()); reRender(); break;
-    case 'rs-del-exp': r.experience.splice(+value, 1); if (!r.experience.length) r.experience.push(emptyExp()); reRender(); break;
+    case 'rs-del-exp': { if (filled(r.experience[+value]) && !ask()) break; r.experience.splice(+value, 1); if (!r.experience.length) r.experience.push(emptyExp()); reRender(); break; }
     case 'rs-add-expb': r.experience[+value].bullets.push(''); reRender(); break;
     case 'rs-del-expb': { const [i, j] = value.split('.').map(Number); r.experience[i].bullets.splice(j, 1); if (!r.experience[i].bullets.length) r.experience[i].bullets.push(''); reRender(); break; }
     case 'rs-add-proj': r.projects.push(emptyProj()); reRender(); break;
-    case 'rs-del-proj': r.projects.splice(+value, 1); reRender(); break;
+    case 'rs-del-proj': { if (filled(r.projects[+value]) && !ask()) break; r.projects.splice(+value, 1); reRender(); break; }
     case 'rs-add-projb': r.projects[+value].bullets.push(''); reRender(); break;
     case 'rs-del-projb': { const [i, j] = value.split('.').map(Number); r.projects[i].bullets.splice(j, 1); if (!r.projects[i].bullets.length) r.projects[i].bullets.push(''); reRender(); break; }
     case 'rs-add-edu': r.education.push(emptyEdu()); reRender(); break;
-    case 'rs-del-edu': r.education.splice(+value, 1); reRender(); break;
+    case 'rs-del-edu': { if (filled(r.education[+value]) && !ask()) break; r.education.splice(+value, 1); reRender(); break; }
     case 'rs-add-skill': r.skills.push({ group: '', items: '' }); reRender(); break;
-    case 'rs-del-skill': r.skills.splice(+value, 1); reRender(); break;
+    case 'rs-del-skill': { if (filled(r.skills[+value]) && !ask()) break; r.skills.splice(+value, 1); reRender(); break; }
     case 'rs-add-cert': r.certifications.push({ name: '', issuer: '', year: '' }); reRender(); break;
-    case 'rs-del-cert': r.certifications.splice(+value, 1); reRender(); break;
+    case 'rs-del-cert': { if (filled(r.certifications[+value]) && !ask()) break; r.certifications.splice(+value, 1); reRender(); break; }
     case 'rs-verb': insertVerb(value); break;
     case 'rs-print': try { window.print(); } catch (_) {} break;
     case 'rs-export-md': download(fname('md'), markdown(r)); toast('Markdown downloaded'); break;

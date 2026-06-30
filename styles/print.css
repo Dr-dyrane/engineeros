@@ -4,13 +4,17 @@
   html, body { background: #ffffff !important; }
   body::before { display: none !important; }
   #topbar, #tabbar, #toast, #celebrate, .studio-toolbar, .studio-edit, .no-print { display: none !important; }
-  #views, .view, .view.is-active { padding: 0 !important; margin: 0 !important; max-width: none !important; display: block !important; }
+  /* Only the ACTIVE view prints (non-active views keep their base display:none). */
+  #views { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+  .view { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+  .view.is-active { display: block !important; }
   .studio-preview { display: block !important; }
-  .resume-paper {
+  .resume-paper, .pf-paper {
     box-shadow: none !important; margin: 0 !important; padding: 0 !important;
     max-width: none !important; width: auto !important; border-radius: 0 !important;
     background: #ffffff !important; color: #000000 !important;
   }
-  .resume-paper * { color: #000000 !important; }
-  .resume-paper a { color: #000000 !important; text-decoration: none !important; }
+  .resume-paper *, .pf-paper * { color: #000000 !important; }
+  .resume-paper a, .pf-paper a { color: #000000 !important; text-decoration: none !important; }
+  .pf-result b { color: #000000 !important; }
 }
