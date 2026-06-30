@@ -8,6 +8,7 @@ import { registerView } from '../core/router.js';
 import { download, copyText, toast } from '../core/feedback.js';
 import { meter, pageHeader, strengthLabel } from '../ui/components.js';
 import { ACTION_VERBS, VERB_SET, XYZ, STOPWORDS, SKILL_HINTS } from '../data/resume-assets.js';
+import { reviewResume, draftSummary } from '../core/coach.js';
 
 /* ---------- model + one-time migration from the old flat shape ----------- */
 const emptyExp = () => ({ role:'', org:'', place:'', start:'', end:'', current:false, bullets:[''] });
@@ -85,13 +86,19 @@ function scoreData(r) {
   return { score, tips };
 }
 function scoreHTML(r) {
-  const { score, tips } = scoreData(r);
+  const { score } = scoreData(r);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
+  const review = reviewResume(r);
+  const dot = sev => sev === 'high' ? 'var(--red)' : sev === 'med' ? 'var(--amber)' : 'var(--text-3)';
+  const itemsHTML = review.items.length
+    ? review.items.slice(0, 10).map(it => `<div class="rs-tip">
+        <span style="color:${dot(it.sev)};font-weight:700">•</span>
+        <span><b>${esc(it.where)}.</b> ${esc(it.fix)}</span></div>`).join('')
+    : `<div class="rs-tip ok"><span style="color:var(--green);font-weight:700">✓</span>
+        <span>Looking strong. Now tailor it to each job using the ATS check below.</span></div>`;
   return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
       <div class="t-foot text-3">${score} of 100 · resume strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
-    <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
-      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '•'}</span>
-      <span>${esc(t)}</span></div>`).join('')}</div>`;
+    <div class="mt-3">${itemsHTML}</div>`;
 }
 
 /* ---------- ATS keyword match -------------------------------------------- */
@@ -283,7 +290,8 @@ function renderResume() {
         </div>
 
         <div class="card">
-          <h3 class="section-label" style="margin-top:0">Summary</h3>
+          <div class="row between"><h3 class="section-label" style="margin-top:0">Summary</h3>
+            <button class="btn btn-ghost btn-sm" data-action="rs-draft-summary">${icon('wand-sparkles')} Draft a starter</button></div>
           ${ta('summary', r.summary, 'Two or three lines: who you are, your strengths, where you’re heading.')}
         </div>
 
@@ -313,7 +321,7 @@ function renderResume() {
           ${(r.certifications || []).map(certEntry).join('')}
         </div>
 
-        <div class="card"><h3 class="section-label" style="margin-top:0">Strength</h3><div id="rs-score"></div></div>
+        <div class="card"><h3 class="section-label" style="margin-top:0">Coach</h3><div id="rs-score"></div></div>
 
         <div class="card">
           <h3 class="section-label" style="margin-top:0">ATS keyword match</h3>
@@ -356,6 +364,10 @@ export function resumeAction(action, value) {
   const filled = o => o && Object.keys(o).some(k => k === 'bullets' ? o.bullets.some(b => b && b.trim()) : String(o[k] || '').trim());
   switch (action) {
     case 'rs-panel': setPanel(value); break;
+    case 'rs-draft-summary': {
+      if (r.summary && r.summary.trim() && !((typeof confirm === 'undefined') || confirm('Replace your summary with a fresh starter draft?'))) break;
+      r.summary = draftSummary(r); reRender(); toast('Starter drafted. Now make it yours.', false); break;
+    }
     case 'rs-add-exp': r.experience.push(emptyExp()); reRender(); break;
     case 'rs-del-exp': { if (filled(r.experience[+value]) && !ask()) break; r.experience.splice(+value, 1); if (!r.experience.length) r.experience.push(emptyExp()); reRender(); break; }
     case 'rs-add-expb': r.experience[+value].bullets.push(''); reRender(); break;
