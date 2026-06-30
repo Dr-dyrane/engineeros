@@ -26,7 +26,7 @@ function resultsHTML() {
           ${it.free ? `<span class="badge badge-accent">Free</span>` : ''}</div>
           <div class="ri-d">${esc(it.desc)}</div></div>
         <span class="ri-open">${icon('external-link')}</span></a>`).join('');
-    return `<h3 class="section-label mt-5">${esc(g.group)}</h3><div class="list">${lis}</div>`;
+    return `<h3 class="section-label mt-5">${esc(g.group)}</h3><div class="auto-grid">${lis}</div>`;
   }).join('');
   return any ? html : `<div class="empty" style="padding-top:48px">
     <div class="chip chip-accent" style="margin:0 auto 14px;width:56px;height:56px">${icon('search-x')}</div>

@@ -191,9 +191,8 @@
 @media (min-width: 720px)  { .ready-grid { grid-template-columns: repeat(4, 1fr); } }
 .home-grid { display: grid; gap: var(--s-4); grid-template-columns: 1fr; }
 @media (min-width: 940px)  { .home-grid { grid-template-columns: 1.25fr 1fr; align-items: start; } }
-/* Row lists flow into columns on wider screens. */
-@media (min-width: 760px)  { .list { display: grid; grid-template-columns: repeat(2, 1fr); align-items: start; gap: 8px; } }
-@media (min-width: 1340px) { .view-grid .list { grid-template-columns: repeat(3, 1fr); } }
+/* Lists stay a single, calm column (sequences read top to bottom).
+   Browseable collections use .auto-grid to fill wider screens instead. */
 .stat { background: var(--surface-1); border-radius: var(--r-md); box-shadow: var(--shadow-1); padding: var(--s-4); }
 .stat .n { font-size: 26px; font-weight: var(--fw-heavy); letter-spacing: -0.03em; }
 .stat .l { font-size: var(--fs-caption); color: var(--text-3); font-weight: var(--fw-semibold); margin-top: 2px; }
