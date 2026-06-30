@@ -8,6 +8,29 @@
 <meta name="description" content="EngineerOS by Dyrane Academy — a calm, self-guided career accelerator. One mission at a time." />
 <title>EngineerOS · Dyrane Academy</title>
 
+<!-- App identity: favicon, app icons, PWA manifest -->
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="EngineerOS" />
+
+<!-- Social share (Open Graph + Twitter) -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="EngineerOS · Dyrane Academy" />
+<meta property="og:description" content="A calm, self-guided career accelerator. One mission at a time." />
+<meta property="og:url" content="https://launch.dyrane.tech/" />
+<meta property="og:image" content="https://launch.dyrane.tech/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="EngineerOS · Dyrane Academy" />
+<meta name="twitter:description" content="A calm, self-guided career accelerator. One mission at a time." />
+<meta name="twitter:image" content="https://launch.dyrane.tech/og.png" />
+
 <!-- No-flash theme bootstrap: apply saved manual theme before first paint. -->
 <script>
   try { var s = JSON.parse(localStorage.getItem('engineeros.v1') || '{}');
@@ -20,36 +43,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-<!-- Tailwind (CDN) — preflight OFF so it never reintroduces borders/resets over our system -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    corePlugins: { preflight: false },
-    theme: {
-      extend: {
-        colors: {
-          accent: 'var(--accent)', amber: 'var(--amber)', green: 'var(--green)', danger: 'var(--red)',
-          surface: 'var(--surface-1)', sunken: 'var(--surface-sunken)',
-          ink: 'var(--text)', ink2: 'var(--text-2)', ink3: 'var(--text-3)'
-        },
-        fontFamily: { sans: ['var(--font-sans)'], mono: ['var(--font-mono)'] },
-        borderRadius: { xs:'var(--r-xs)', sm:'var(--r-sm)', md:'var(--r-md)', lg:'var(--r-lg)',
-                        xl:'var(--r-xl)', card:'var(--r-card)', sheet:'var(--r-sheet)' },
-        boxShadow: { e1:'var(--shadow-1)', e2:'var(--shadow-2)', e3:'var(--shadow-3)' },
-        backdropBlur: { glass: '22px' }
-      }
-    }
-  };
-</script>
-
 <!-- Design system (order matters: tokens → base → components → motion) -->
 <link rel="stylesheet" href="./styles/tokens.css" />
 <link rel="stylesheet" href="./styles/base.css" />
 <link rel="stylesheet" href="./styles/components.css" />
+<link rel="stylesheet" href="./styles/studio.css" />
 <link rel="stylesheet" href="./styles/animations.css" />
+<link rel="stylesheet" href="./styles/print.css" />
 
-<!-- Lucide icons (CDN) -->
-<script src="https://unpkg.com/lucide@latest" defer></script>
+<!-- Lucide icons (CDN, pinned) -->
+<script src="https://unpkg.com/lucide@1.22.0/dist/umd/lucide.min.js" defer></script>
 </head>
 
 <body>

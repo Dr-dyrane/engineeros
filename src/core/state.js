@@ -102,7 +102,18 @@ function pctFilled(obj, keys) {
   let n = 0; keys.forEach(k => { if (obj[k] && String(obj[k]).trim().length > 2) n++; });
   return Math.round(n / keys.length * 100);
 }
-export function resumeReady() { return pctFilled(store.s.builders.resume, RESUME_KEYS); }
+export function resumeReady() {
+  const r = store.s.builders.resume; if (!r) return 0;
+  const has = v => v && String(v).trim().length > 1;
+  const bulleted = a => Array.isArray(a) && a.some(e => (e.bullets || []).some(b => b && b.trim()));
+  const checks = [
+    has(r.name), has(r.email), has(r.summary),
+    bulleted(r.experience) || bulleted(r.projects),
+    Array.isArray(r.education) ? r.education.some(e => has(e.degree) || has(e.school)) : has(r.education),
+    Array.isArray(r.skills) ? r.skills.some(s => has(s.items)) : has(r.skills),
+  ];
+  return Math.round(checks.filter(Boolean).length / checks.length * 100);
+}
 export function linkedinReady() { return pctFilled(store.s.builders.linkedin, LI_KEYS); }
 export function portfolioReady() { return pctFilled(store.s.builders.portfolio, PF_KEYS); }
 export function githubReady() { const n = GH_MILESTONES.filter(id => store.s.completed[id]).length; return Math.round(n / GH_MILESTONES.length * 100); }

@@ -78,7 +78,10 @@
 
 /* ---- Chips / pills / badges --------------------------------------------- */
 .chip { width: 46px; height: 46px; min-width: 46px; display: grid; place-items: center;
-  background: var(--fill); color: var(--text); border-radius: var(--r-chip); }
+  background: var(--fill); color: var(--text); border-radius: var(--r-chip);
+  /* true continuous-curve squircle (chips carry no shadow, so masking is safe) */
+  -webkit-mask: var(--squircle) center / 100% 100% no-repeat;
+  mask: var(--squircle) center / 100% 100% no-repeat; }
 .chip .lucide { width: 23px; height: 23px; }
 .chip-sm { width: 38px; height: 38px; min-width: 38px; border-radius: 13px; }
 .chip-accent { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
@@ -207,9 +210,12 @@
 
 /* ---- Hero / logo --------------------------------------------------------- */
 .hero { min-height: calc(100svh - var(--s-9)); display: flex; flex-direction: column; justify-content: center; gap: var(--s-6); padding: var(--s-7) var(--s-1); }
-.logo-mark { width: 76px; height: 76px; display: grid; place-items: center; color: var(--on-accent);
-  background: linear-gradient(150deg, #2b2b2e, #4a4a4f); box-shadow: var(--shadow-3); }
-:root[data-theme="light"] .logo-mark { background: linear-gradient(150deg, #1c1c1e, #3a3a3c); }
+.logo-mark { width: 76px; height: 76px; display: grid; place-items: center; color: #fff;
+  background: linear-gradient(150deg, var(--accent), var(--accent-2)); border-radius: 22px;
+  /* squircle shape + a shadow that follows the squircle silhouette (drop-shadow, not box-shadow) */
+  -webkit-mask: var(--squircle) center / 100% 100% no-repeat;
+  mask: var(--squircle) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 16px 34px color-mix(in srgb, var(--accent) 40%, transparent)); }
 .logo-mark .lucide { width: 40px; height: 40px; }
 
 /* ---- Notice / empty ------------------------------------------------------ */

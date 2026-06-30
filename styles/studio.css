@@ -1,0 +1,78 @@
+/* EngineerOS · Resume Studio
+   Editor + live "paper" preview. The .resume-paper is a *document*, so it may use
+   thin typographic rules — the zero-border law governs app chrome, not printed output. */
+
+.studio-toolbar { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-4); }
+.studio-toolbar .studio-toggle { flex: 1; min-width: 180px; }
+.studio-toolbar .tb-actions { display: flex; gap: var(--s-2); }
+
+.studio { display: block; }
+.studio[data-panel="preview"] .studio-edit { display: none; }
+.studio:not([data-panel="preview"]) .studio-preview { display: none; }
+
+@media (min-width: 1000px) {
+  .studio { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: var(--s-5); align-items: start; }
+  .studio .studio-edit, .studio .studio-preview { display: block !important; }
+  .studio-toggle { display: none; }
+  .studio-preview { position: sticky; top: calc(var(--topbar-h) + var(--s-4)); }
+}
+
+/* Editor */
+.rs-group { margin-bottom: var(--s-5); }
+.rs-group > .rs-group-h { display: flex; align-items: center; justify-content: space-between; margin: 0 2px var(--s-2); }
+.rs-group-h .section-label { margin: 0; }
+.rs-entry { background: var(--surface-sunken); border-radius: var(--r-md); padding: var(--s-4); margin-bottom: var(--s-2); }
+.rs-entry-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s-2); margin-bottom: var(--s-2); }
+.rs-entry-head .t { font-size: var(--fs-foot); font-weight: var(--fw-bold); color: var(--text-3); }
+.rs-two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); }
+.rs-bullet { display: flex; gap: var(--s-2); align-items: flex-start; margin-top: 6px; }
+.rs-bullet .textarea { min-height: 44px; }
+.rs-iconbtn { width: 34px; height: 34px; min-width: 34px; border-radius: 11px; display: grid; place-items: center;
+  background: var(--fill); color: var(--text-2); transition: transform var(--dur-1) var(--ease-emphasized), background var(--dur-2); }
+.rs-iconbtn:active { transform: scale(.9); }
+@media (hover: hover) { .rs-iconbtn:hover { background: var(--fill-strong); } }
+.rs-iconbtn .lucide { width: 16px; height: 16px; }
+
+/* Action-verb helper */
+.rs-verbs { display: flex; flex-wrap: wrap; gap: 6px; }
+.rs-verb { padding: 6px 11px; border-radius: var(--r-pill); background: var(--fill); font-size: 12.5px;
+  font-weight: var(--fw-semibold); color: var(--text-2);
+  transition: transform var(--dur-1) var(--ease-emphasized), background var(--dur-2); }
+.rs-verb:active { transform: scale(.9); }
+@media (hover: hover) { .rs-verb:hover { background: var(--fill-strong); color: var(--text); } }
+.rs-verb-group { font-size: var(--fs-caption); font-weight: var(--fw-bold); color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .04em; margin: var(--s-2) 2px 4px; }
+
+/* Strength score + ATS */
+.rs-score-n { font-size: 30px; font-weight: var(--fw-heavy); letter-spacing: -0.03em; }
+.rs-tip { display: flex; gap: var(--s-2); align-items: flex-start; font-size: 13px; color: var(--text-2); padding: 5px 0; }
+.rs-tip .lucide { width: 15px; height: 15px; margin-top: 2px; color: var(--amber); }
+.rs-tip.ok .lucide { color: var(--green); }
+.rs-kws { display: flex; flex-wrap: wrap; gap: 6px; margin-top: var(--s-2); }
+.rs-kw { padding: 4px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: var(--fw-semibold); }
+.rs-kw.miss { background: color-mix(in srgb, var(--red) 14%, transparent); color: var(--red); }
+.rs-kw.hit { background: var(--green-soft); color: color-mix(in srgb, var(--green) 72%, #0a3d18); }
+:root[data-theme="dark"] .rs-kw.hit { color: var(--text); }
+
+/* ---- The resume "paper" -------------------------------------------------- */
+.resume-paper { background: #ffffff; color: #15171a; width: 100%; padding: 30px 34px;
+  border-radius: 16px; box-shadow: var(--shadow-2);
+  font-family: "Inter", Arial, Helvetica, sans-serif; font-size: 12.5px; line-height: 1.46; }
+.rp-name { font-size: 23px; font-weight: 800; letter-spacing: -0.01em; color: #0b0c0e; }
+.rp-title { font-size: 13px; font-weight: 600; color: #0a6ae0; margin-top: 2px; }
+.rp-contact { font-size: 11px; color: #50555c; margin-top: 7px; display: flex; flex-wrap: wrap; gap: 3px 12px; }
+.rp-section { margin-top: 16px; }
+.rp-h { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: #0b0c0e;
+  border-bottom: 1.5px solid #e2e5ea; padding-bottom: 3px; margin-bottom: 7px; }
+.rp-item { margin-bottom: 9px; }
+.rp-row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.rp-role { font-weight: 700; color: #15171a; }
+.rp-org { font-weight: 600; color: #2a2d33; }
+.rp-meta { color: #5a5f66; font-size: 11px; white-space: nowrap; }
+.rp-ul { margin: 4px 0 0; padding-left: 16px; }
+.rp-ul li { margin: 2px 0; }
+.rp-skline { margin: 2px 0; }
+.rp-skline b { color: #0b0c0e; }
+.rp-summary { margin-top: 4px; }
+.rp-empty { color: #b3b8bf; font-style: italic; }
+.resume-paper a { color: #0a6ae0; text-decoration: none; }

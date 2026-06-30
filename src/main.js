@@ -4,7 +4,7 @@
 
 import { store, save, saveNow, touchStreak, md, findMission, todaysMission, firstName,
          replaceState, resetState } from './core/state.js';
-import { go, back } from './core/router.js';
+import { go, back, initRouter } from './core/router.js';
 import { applyTheme, setTheme, cycleTheme, watchSystemTheme } from './core/theme.js';
 import { toast, celebrate, download } from './core/feedback.js';
 import { qs, refreshIcons } from './core/dom.js';
@@ -18,6 +18,7 @@ import './views/progress.js';
 import { saveReview } from './views/review.js';
 import './views/resources.js';
 import { renderSettings } from './views/settings.js';
+import { resumeInput, resumeAction } from './views/resume.js';
 
 let missionFrom = 'journey';
 
@@ -39,7 +40,7 @@ function completeMission(id) {
 function exportJSON() { download('engineeros-progress.json', JSON.stringify(store.s, null, 2), 'application/json'); toast('Backup downloaded'); }
 function resetAll() {
   if (confirm('Reset everything? This clears all progress, reflections and builders on this device. Export a backup first if unsure.')) {
-    resetState(); applyTheme(); go('welcome'); toast('Fresh start', false);
+    resetState(); applyTheme(); go('welcome', null, { replace: true }); toast('Fresh start', false);
   }
 }
 
@@ -49,11 +50,12 @@ document.addEventListener('click', (e) => {
   if (themeBtn) { setTheme(themeBtn.dataset.themeSet); return; }
   const t = e.target.closest('[data-action]'); if (!t) return;
   const a = t.dataset.action, v = t.dataset.value;
+  if (a && a.indexOf('rs-') === 0) { resumeAction(a, v); return; }   // Resume Studio actions
   switch (a) {
     case 'to-setup': go('setup'); break;
     case 'finish-setup': {
       const n = qs('#nameInput'); store.s.user.name = (n && n.value.trim()) || '';
-      store.s.onboarded = true; touchStreak(); saveNow(); go('home'); toast('Welcome aboard, ' + firstName());
+      store.s.onboarded = true; touchStreak(); saveNow(); go('home', null, { replace: true }); toast('Welcome aboard, ' + firstName());
       break;
     }
     case 'nav': go(v); break;
@@ -82,6 +84,7 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('change', (e) => {
+  const rsc = e.target.closest('[data-rs-check]'); if (rsc) { resumeInput(rsc.dataset.rsCheck, e.target.checked); return; }
   const c = e.target.closest('[data-check]');
   if (c) {
     const [id, i] = c.dataset.check.split(':');
@@ -92,6 +95,7 @@ document.addEventListener('change', (e) => {
 });
 
 document.addEventListener('input', (e) => {
+  const rs = e.target.closest('[data-rs]'); if (rs) { resumeInput(rs.dataset.rs, e.target.value); return; }
   const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); return; }
   const n = e.target.closest('[data-notes]'); if (n) { md(n.dataset.notes).notes = n.value; save(); return; }
   const b = e.target.closest('[data-builder]'); if (b) {
@@ -122,6 +126,6 @@ function init() {
   applyTheme();
   watchSystemTheme();
   refreshIcons();
-  if (store.s.onboarded) go('home'); else go('welcome');
+  initRouter();   // reads the URL hash → refresh-safe, deep-linkable, real Back
 }
 init();

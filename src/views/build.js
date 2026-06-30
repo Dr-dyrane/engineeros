@@ -54,18 +54,7 @@ function builderView(rootId, key, title, fields, exportAction, intro) {
   </div>`;
 }
 
-registerView('resume', () => builderView('view-resume', 'resume', 'Resume Builder', [
-  { k:'name', l:'Full name', p:'Adaeze Okafor' },
-  { k:'email', l:'Email', p:'firstname.lastname@gmail.com', type:'email' },
-  { k:'phone', l:'Phone', p:'+234 …', type:'tel' },
-  { k:'location', l:'Location', p:'Lagos, Nigeria' },
-  { k:'summary', l:'Professional summary', type:'area', p:'Mechanical Engineering graduate building toward AI & robotics…', h:'2–3 lines. Who you are + where you are heading.' },
-  { k:'education', l:'Education', type:'area', p:'B.Eng Mechanical Engineering — University of …, 2025', rows:3 },
-  { k:'skills', l:'Skills', type:'area', p:'SolidWorks, Python (basic), Arduino, technical writing…', h:'Comma-separated. Mix tools + soft skills.' },
-  { k:'projects', l:'Projects', type:'area', p:'Final-year project: … — what it did, your role, the result.', rows:4 },
-  { k:'experience', l:'Experience (optional)', type:'area', p:'Internship / SIWES / volunteer / leadership…', rows:3 },
-  { k:'certifications', l:'Certifications (optional)', type:'area', p:'Course names + year', rows:2 },
-], 'export-resume', 'Fill what you can today. A half-done resume beats none. Export anytime.'));
+/* Resume now has its own dedicated module — src/views/resume.js (Resume Studio). */
 
 registerView('portfolio', () => builderView('view-portfolio', 'portfolio', 'Portfolio Builder', [
   { k:'about', l:'About me', type:'area', p:'One short paragraph: who you are and what you build.', rows:3 },
