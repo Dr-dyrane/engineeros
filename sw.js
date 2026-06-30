@@ -83,3 +83,23 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
+/* Daily reminder, best-effort. Fires only where Periodic Background Sync is
+   supported (Chrome with the app installed); a quiet no-op everywhere else. */
+self.addEventListener('periodicsync', (e) => {
+  if (e.tag === 'daily-nudge') {
+    e.waitUntil(self.registration.showNotification('EngineerOS', {
+      body: 'One small win today keeps your streak alive.',
+      icon: '/icon-192.png', badge: '/favicon-32.png', tag: 'engineeros-daily',
+    }));
+  }
+});
+
+/* Tapping a notification focuses the open app, or opens it if it is closed. */
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cs) => {
+    for (const c of cs) { if ('focus' in c) return c.focus(); }
+    if (self.clients.openWindow) return self.clients.openWindow('/');
+  }));
+});

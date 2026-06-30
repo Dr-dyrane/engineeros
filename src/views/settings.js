@@ -30,6 +30,25 @@ export function renderSettings() {
       </div>
     </div>
 
+    <h3 class="section-label mt-5">Reminders</h3>
+    <div class="card">
+      <div class="row between">
+        <div class="grow"><div class="fw-semibold">Win notifications</div>
+          <div class="t-foot text-3">A gentle alert when you finish a journey or keep a streak alive. Turn it off anytime.</div></div>
+        <button class="switch ${store.s.flags.notify ? 'is-on' : ''}" data-action="toggle-notify" aria-label="Toggle reminders">
+          <span class="knob"></span>
+        </button>
+      </div>
+      <p class="t-foot text-3 mt-3">Alerts when the app is fully closed need a server, which this app does not use. The surest nudge is to open EngineerOS once a day.</p>
+    </div>
+
+    <h3 class="section-label mt-5">Feedback</h3>
+    <div class="card">
+      <button class="btn btn-ghost" data-action="send-feedback">${icon('message-circle')} Send feedback</button>
+      <button class="btn btn-ghost mt-3" data-action="suggest-feature">${icon('lightbulb')} Suggest a feature</button>
+      <p class="t-foot text-3 mt-3">This opens your email app. Tell us what would make EngineerOS more useful.</p>
+    </div>
+
     <h3 class="section-label mt-5">Your data</h3>
     <div class="card">
       <button class="btn btn-ghost" data-action="export-json">${icon('download')} Export progress (JSON)</button>

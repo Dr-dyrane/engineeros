@@ -1,7 +1,8 @@
 /* EngineerOS · Home dashboard */
 
 import { store, todaysMission, totalMissions, completedCount, overallPct,
-         liveStreak, resumeReady, linkedinReady, portfolioReady, githubReady, firstName } from '../core/state.js';
+         liveStreak, resumeReady, linkedinReady, portfolioReady, githubReady, firstName,
+         todayStr, yesterdayStr } from '../core/state.js';
 import { qs, esc, icon } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { statTile, readyTile } from '../ui/components.js';
@@ -14,6 +15,14 @@ registerView('home', () => {
   const h = new Date().getHours();
   const greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const streak = liveStreak();
+
+  // A calm streak nudge: only once there is something to protect, and a mission left to do.
+  let streakBanner = '';
+  if (done > 0 && tm) {
+    const last = store.s.streak.last;
+    if (last === yesterdayStr()) streakBanner = `<div class="notice notice-amber">${icon('flame')} <b>${streak}-day streak.</b> Finish today’s mission to keep it alive.</div>`;
+    else if (last !== todayStr()) streakBanner = `<div class="notice notice-accent">${icon('sparkles')} <b>Welcome back.</b> One mission today restarts your streak.</div>`;
+  }
 
   let todayCard;
   if (tm) {
@@ -47,6 +56,7 @@ registerView('home', () => {
         <div class="eyebrow">${esc(greet)}</div>
         <h1 class="t-display" style="margin-top:6px">${esc(firstName())}.</h1>
       </header>
+      ${streakBanner}
       <div class="home-grid">
         <div class="stack">
           ${todayCard}

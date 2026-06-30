@@ -3,10 +3,10 @@
    delegation and boots the app. */
 
 import { store, save, saveNow, touchStreak, md, findMission, todaysMission, firstName,
-         replaceState, resetState, completedCount } from './core/state.js';
+         replaceState, resetState, completedCount, journeyComplete } from './core/state.js';
 import { go, back, initRouter } from './core/router.js';
 import { applyTheme, setTheme, cycleTheme, watchSystemTheme } from './core/theme.js';
-import { toast, celebrate, download } from './core/feedback.js';
+import { toast, celebrate, download, notify, haptic, enableNotifications, disableNotifications } from './core/feedback.js';
 import { qs, refreshIcons } from './core/dom.js';
 
 import './views/onboarding.js';
@@ -27,11 +27,15 @@ let missionFrom = 'journey';
 
 /* ---- Mission completion -------------------------------------------------- */
 function completeMission(id) {
+  const found = findMission(id);
   if (!store.s.completed[id]) {
     store.s.completed[id] = true;
-    touchStreak(); saveNow(); celebrate(); toast('Today’s win saved');
+    touchStreak(); saveNow(); celebrate(); haptic([10, 40, 16]);
+    const streak = store.s.streak.count;
+    if (found && journeyComplete(found.ji)) notify('Journey complete', 'You finished ' + found.j.title + '. That is real, visible progress.');
+    else if ([3, 7, 14, 30].indexOf(streak) !== -1) notify(streak + '-day streak', 'You showed up again. This is how a career gets built.');
+    else toast('Today’s win saved');
   }
-  const found = findMission(id);
   setTimeout(() => {
     const tm = todaysMission();
     if (!tm) return go('home');
@@ -41,6 +45,9 @@ function completeMission(id) {
 }
 
 function exportJSON() { download('engineeros-progress.json', JSON.stringify(store.s, null, 2), 'application/json'); toast('Backup downloaded'); }
+function openMail(subject, body) {
+  window.location.href = 'mailto:halodyrane@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body + '\n\n');
+}
 function resetAll() {
   if (confirm('Reset everything? This clears all progress, reflections and builders on this device. Export a backup first if unsure.')) {
     resetState(); applyTheme(); go('welcome', null, { replace: true }); toast('Fresh start', false);
@@ -80,6 +87,12 @@ document.addEventListener('click', (e) => {
     case 'toggle-freenav':
       store.s.freeNav = !store.s.freeNav; save(); renderSettings(); refreshIcons(qs('#view-settings'));
       toast(store.s.freeNav ? 'All unlocked' : 'Guided mode', false); break;
+    case 'toggle-notify':
+      if (store.s.flags.notify) { disableNotifications(); renderSettings(); refreshIcons(qs('#view-settings')); }
+      else { enableNotifications().then(() => { renderSettings(); refreshIcons(qs('#view-settings')); }); }
+      break;
+    case 'send-feedback': openMail('EngineerOS feedback', 'What is working, what is not, and anything you wish it did:'); break;
+    case 'suggest-feature': openMail('EngineerOS idea', 'I would love it if EngineerOS could:'); break;
   }
 });
 
@@ -88,7 +101,7 @@ document.addEventListener('change', (e) => {
   const c = e.target.closest('[data-check]');
   if (c) {
     const [id, i] = c.dataset.check.split(':');
-    const d = md(id); d.checks[i] = c.checked; save();
+    const d = md(id); d.checks[i] = c.checked; save(); haptic(c.checked ? 10 : 6);
     const fm = findMission(id), bar = qs('#checkbar');
     if (fm && bar) bar.style.width = checkPct(fm.m, d) + '%';
   }
