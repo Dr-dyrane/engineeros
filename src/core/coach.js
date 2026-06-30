@@ -69,3 +69,115 @@ export function draftSummary(r) {
   const aim = ' Looking for a role where I can keep building, documenting, and learning.';
   return `${role}${skline}.${evidence}${aim}`.replace(/\s+/g, ' ').trim();
 }
+
+/* ---- Portfolio ------------------------------------------------------------ */
+export function reviewPortfolio(p) {
+  const items = []; const add = (sev, where, fix) => items.push({ sev, where, fix });
+  if (!p.about || p.about.trim().length < 25) add('med', 'About', 'Write a short About: who you are and what you build. Tap "Draft a starter".');
+  if (!p.email && !p.linkedin && !p.github && !p.website) add('high', 'Contact', 'Add a way to reach you: an email or a link.');
+  const projs = (p.projects || []).filter(x => x.title || x.problem || x.approach || x.result);
+  if (!projs.length) add('high', 'Projects', 'Add your first case study.');
+  projs.forEach((x, i) => {
+    const label = x.title || ('Project ' + (i + 1));
+    if (!x.title) add('low', label, 'Give this project a clear title.');
+    if (!x.problem) add('med', label, 'Add the Problem: what needed solving?');
+    if (!x.approach) add('med', label, 'Add the Approach: what you designed, built, or tested.');
+    if (!x.result) add('high', label, 'Add the Result: the outcome.');
+    else if (!/\d/.test(x.result)) add('high', label, 'Put a number in the Result. That is what makes employers believe you.');
+  });
+  if (projs.length === 1) add('low', 'Projects', 'Aim for two or three strong case studies.');
+  if (!(p.skills || []).some(s => s.items && s.items.trim())) add('med', 'Skills', 'List your skills.');
+  const order = { high: 0, med: 1, low: 2 }; items.sort((a, b) => order[a.sev] - order[b.sev]);
+  return { items };
+}
+export function draftAbout(p) {
+  const name = (p.name || '').split(/\s+/)[0] || '';
+  const title = (p.title || 'engineer').trim().toLowerCase();
+  const skills = (p.skills || []).flatMap(s => (s.items || '').split(',')).map(x => x.trim()).filter(Boolean);
+  const proj = (p.projects || []).find(x => x.title && x.title.trim());
+  const skline = skills.length ? ` I work with ${skills.slice(0, 3).join(', ')}.` : '';
+  const projline = proj ? ` Recently I built ${proj.title.trim()}${proj.tech ? ` using ${proj.tech.trim()}` : ''}.` : '';
+  return `I am ${name ? name + ', ' : ''}a ${title}.${skline}${projline} I learn by building, and I document everything I make.`.replace(/\s+/g, ' ').trim();
+}
+
+/* ---- LinkedIn ------------------------------------------------------------- */
+export function reviewLinkedin(l) {
+  const items = []; const add = (sev, where, fix) => items.push({ sev, where, fix });
+  const hl = (l.headline || '').trim();
+  if (!hl) add('high', 'Headline', 'Write a headline: your role, where you are heading, and key skills. Tap "Draft".');
+  else if (hl.length < 40) add('low', 'Headline', 'Make the headline fuller. Add where you are heading and a skill or two.');
+  else if (hl.length > 220) add('med', 'Headline', 'Trim the headline to 220 characters.');
+  const ab = (l.about || '').trim();
+  if (!ab) add('high', 'About', 'Write an About: a hook, what you do, and a clear next step. Tap "Draft".');
+  else if (ab.length < 150) add('med', 'About', 'Make the About a few sentences longer. Add a hook and a call to action.');
+  if (!(l.featured || []).some(f => f.title || f.blurb)) add('med', 'Featured', 'Feature at least one project.');
+  const skn = (l.skills || '').split(',').map(x => x.trim()).filter(Boolean).length;
+  if (skn < 5) add('med', 'Skills', `Add ${Math.max(0, 5 - skn)} more skills. LinkedIn allows up to 50.`);
+  if (!l.post || !l.post.trim()) add('low', 'First post', 'Draft a first post. Share something you built or learned. Tap "Draft".');
+  const order = { high: 0, med: 1, low: 2 }; items.sort((a, b) => order[a.sev] - order[b.sev]);
+  return { items };
+}
+export function draftHeadline(l) {
+  const role = (l.role || 'Mechanical Engineer').trim();
+  const skills = (l.skills || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 3);
+  const skpart = skills.length ? ` | ${skills.join(' · ')}` : '';
+  return `${role}, moving into AI and Robotics${skpart}`.slice(0, 220);
+}
+export function draftLinkedinAbout(l) {
+  const name = (l.name || '').split(/\s+/)[0] || '';
+  const skills = (l.skills || '').split(',').map(x => x.trim()).filter(Boolean);
+  const skline = skills.length ? ` I work with ${skills.slice(0, 4).join(', ')}.` : '';
+  return `I am ${name ? name + ', ' : ''}an engineer who learns by building.${skline}\n\nI am growing toward AI and robotics, one project at a time, and I document what I make so others can learn from it.\n\nIf you are building something interesting, or hiring, I would love to connect.`;
+}
+export function draftPost() {
+  return `This week I worked on [what].\n\nThe problem: [what needed solving].\nWhat I did: [your approach].\nThe result: [outcome with a number].\n\nNext, I want to [next step].\n\nWhat would you add?`;
+}
+
+/* ---- Home / Progress / Reflection / Review / Earn ------------------------- */
+const READY_LABELS = { resume: 'resume', portfolio: 'portfolio', linkedin: 'LinkedIn profile', github: 'GitHub' };
+const READY_ACTIONS = {
+  resume: 'open the Resume Studio and add one bullet with a number',
+  portfolio: 'open the Portfolio Studio and finish one case study',
+  linkedin: 'open the LinkedIn Studio and write your headline',
+  github: 'create a GitHub account and publish one project',
+};
+function weakest(readiness) {
+  return ['resume', 'portfolio', 'linkedin', 'github'].reduce((w, k) => readiness[k] < readiness[w] ? k : w, 'resume');
+}
+export function homeNudge(profile) {
+  const r = profile.readiness, w = weakest(r);
+  if (r[w] >= 80) return 'You are in great shape across the board. Keep your streak going.';
+  return `Your biggest gap right now is your ${READY_LABELS[w]}. The fastest win: ${READY_ACTIONS[w]}.`;
+}
+export function progressInsight(profile) {
+  const r = profile.readiness;
+  if (profile.completed === 0) return { strength: 'You are just getting started.', gap: '', action: 'Do today’s mission. One small win.' };
+  const strong = ['resume', 'portfolio', 'linkedin', 'github'].reduce((s, k) => r[k] > r[s] ? k : s, 'resume');
+  const w = weakest(r);
+  const L = { resume: 'Resume', portfolio: 'Portfolio', linkedin: 'LinkedIn', github: 'GitHub' };
+  return { strength: `Strongest: your ${L[strong]}.`, gap: `Biggest gap: your ${L[w]}.`, action: `This week, ${READY_ACTIONS[w]}.` };
+}
+export function reflectionReply(text) {
+  const t = (text || '').trim(); if (t.length < 12) return '';
+  const low = t.toLowerCase(), words = t.split(/\s+/).length;
+  if (/confus|stuck|hard|difficult|don.?t (get|understand)|struggl|lost/.test(low))
+    return 'It is okay to find this hard. Note exactly where you got stuck, and that becomes tomorrow’s first small step.';
+  if (/proud|great|easy|enjoy|love|fun|good|excit|happy/.test(low))
+    return 'Good. Hold on to that feeling. Momentum like this is what carries you through the harder days.';
+  if (words < 6) return 'A start. Try one more sentence: what was the hardest part, or what surprised you?';
+  return 'Well captured. Writing it down is how today’s work becomes something you can talk about in an interview.';
+}
+export function weekSummary(profile) {
+  const c = profile.completed, s = profile.streak;
+  if (c === 0) return 'A fresh page. Pick one mission and make this week count.';
+  return `So far you have finished ${c} mission${c === 1 ? '' : 's'}, and you are on a ${s}-day streak. That is real progress. Keep it gentle and steady.`;
+}
+export function earnPicks(profile) {
+  const sk = profile.skills.map(s => s.toLowerCase());
+  const hasCAD = sk.some(x => /cad|solidworks|fusion|autocad|3d|model|inventor|catia/.test(x));
+  const hasCode = sk.some(x => /python|code|javascript|programming|matlab|script/.test(x));
+  if (hasCAD) return 'You listed CAD skills, so the fastest path for you is freelance CAD and 3D modelling on Fiverr or Upwork. Turn a Journey 6 project into a sample, and create one gig this week.';
+  if (hasCode) return 'You listed coding skills, so try AI-training tasks on Outlier or DataAnnotation, plus small Python gigs on Upwork.';
+  return 'A good first step: AI-training tasks like Remotasks or DataAnnotation. They need no portfolio, just a laptop and consistency. As your skills grow, add freelance gigs.';
+}
+

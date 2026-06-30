@@ -12,7 +12,7 @@ import { qs, refreshIcons } from './core/dom.js';
 import './views/onboarding.js';
 import './views/home.js';
 import './views/journeys.js';
-import { checkPct } from './views/mission.js';
+import { checkPct, onReflect } from './views/mission.js';
 import './views/build.js';
 import './views/progress.js';
 import { saveReview } from './views/review.js';
@@ -98,7 +98,7 @@ document.addEventListener('input', (e) => {
   const rs = e.target.closest('[data-rs]'); if (rs) { resumeInput(rs.dataset.rs, e.target.value); return; }
   const pf = e.target.closest('[data-pf]'); if (pf) { portfolioInput(pf.dataset.pf, e.target.value); return; }
   const li = e.target.closest('[data-li]'); if (li) { linkedinInput(li.dataset.li, e.target.value); return; }
-  const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); return; }
+  const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); onReflect(r.value); return; }
   const n = e.target.closest('[data-notes]'); if (n) { md(n.dataset.notes).notes = n.value; save(); return; }
   const rsch = e.target.closest('[data-res-search]'); if (rsch) { resourceSearch(rsch.value); return; }
   const sn = e.target.closest('#set-name'); if (sn) { store.s.user.name = sn.value; save(); }

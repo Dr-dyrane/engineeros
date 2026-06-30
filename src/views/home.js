@@ -5,6 +5,8 @@ import { store, todaysMission, totalMissions, completedCount, overallPct,
 import { qs, esc, icon } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { statTile, readyTile } from '../ui/components.js';
+import { userProfile } from '../core/context.js';
+import { homeNudge } from '../core/coach.js';
 
 registerView('home', () => {
   const tm = todaysMission();
@@ -64,6 +66,7 @@ registerView('home', () => {
             ${statTile(done, 'Missions done')}
             ${statTile(streak + (streak > 0 ? ' 🔥' : ''), 'Day streak')}
           </div>
+          <div class="notice notice-accent">${esc(homeNudge(userProfile()))}</div>
           <div>
             <h3 class="section-label" style="margin-top:2px">Your readiness</h3>
             <div class="grid-2">

@@ -8,6 +8,7 @@ import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { copyText, download, toast } from '../core/feedback.js';
 import { pageHeader, strengthLabel } from '../ui/components.js';
+import { reviewLinkedin, draftHeadline, draftLinkedinAbout, draftPost } from '../core/coach.js';
 
 const LIMITS = { headline: 220, about: 2600, post: 3000 };
 const emptyFeat = () => ({ title: '', link: '', blurb: '' });
@@ -70,13 +71,16 @@ function scoreData(l) {
   return { score, tips };
 }
 function scoreHTML(l) {
-  const { score, tips } = scoreData(l);
+  const { score } = scoreData(l);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
+  const review = reviewLinkedin(l);
+  const dot = sev => sev === 'high' ? 'var(--red)' : sev === 'med' ? 'var(--amber)' : 'var(--text-3)';
+  const itemsHTML = review.items.length
+    ? review.items.slice(0, 10).map(it => `<div class="rs-tip"><span style="color:${dot(it.sev)};font-weight:700">•</span><span><b>${esc(it.where)}.</b> ${esc(it.fix)}</span></div>`).join('')
+    : `<div class="rs-tip ok"><span style="color:var(--green);font-weight:700">✓</span><span>Looking great. Copy each block into LinkedIn.</span></div>`;
   return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
       <div class="t-foot text-3">${score} of 100 · profile strength</div></div><div style="width:120px"><div class="meter ${tone}"><i style="width:${score}%"></i></div></div></div>
-    <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
-      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '•'}</span>
-      <span>${esc(t)}</span></div>`).join('')}</div>`;
+    <div class="mt-3">${itemsHTML}</div>`;
 }
 
 /* ---------- preview ------------------------------------------------------- */
@@ -159,14 +163,14 @@ function renderLinkedIn() {
         </div>
 
         <div class="card">
-          <div class="row between"><h3 class="section-label" style="margin-top:0">Headline</h3>${copyBtn('headline')}</div>
+          <div class="row between"><h3 class="section-label" style="margin-top:0">Headline</h3><div class="row-tight" style="gap:6px"><button class="btn btn-ghost btn-sm" data-action="li-draft-headline">${icon('wand-sparkles')} Draft</button>${copyBtn('headline')}</div></div>
           ${ta('headline', l.headline, 'Mechanical Engineer, AI & Robotics | Python · CAD · Arduino', 2)}
           ${counter('headline', l.headline)}
           <p class="hint">Formula: who you are, where you’re heading | your strongest skills.</p>
         </div>
 
         <div class="card">
-          <div class="row between"><h3 class="section-label" style="margin-top:0">About</h3>${copyBtn('about')}</div>
+          <div class="row between"><h3 class="section-label" style="margin-top:0">About</h3><div class="row-tight" style="gap:6px"><button class="btn btn-ghost btn-sm" data-action="li-draft-about">${icon('wand-sparkles')} Draft</button>${copyBtn('about')}</div></div>
           ${ta('about', l.about, 'Start with one strong line (a hook). Then what you do and build, your skills, and what you’re looking for. End with how to reach you.', 6)}
           ${counter('about', l.about)}
           <p class="hint">Hook, what you do, skills, a clear call to action.</p>
@@ -185,14 +189,14 @@ function renderLinkedIn() {
         </div>
 
         <div class="card">
-          <div class="row between"><h3 class="section-label" style="margin-top:0">First post</h3>${copyBtn('post')}</div>
+          <div class="row between"><h3 class="section-label" style="margin-top:0">First post</h3><div class="row-tight" style="gap:6px"><button class="btn btn-ghost btn-sm" data-action="li-draft-post">${icon('wand-sparkles')} Draft</button>${copyBtn('post')}</div></div>
           <div class="li-templates">${POST_TEMPLATES.map((t, i) => `<button class="rs-verb" data-action="li-template" data-value="${i}">${esc(t.label)}</button>`).join('')}</div>
           ${ta('post', l.post, 'Share something you built or learned this week. Keep it human. End with a question.', 6)}
           ${counter('post', l.post)}
           <p class="hint">Sweet spot ≈ 1,300 characters. Tap a template to start.</p>
         </div>
 
-        <div class="card"><h3 class="section-label" style="margin-top:0">Strength</h3><div id="li-score"></div></div>
+        <div class="card"><h3 class="section-label" style="margin-top:0">Coach</h3><div id="li-score"></div></div>
       </div>
 
       <div class="studio-preview">
@@ -217,6 +221,9 @@ export function linkedinAction(action, value) {
   const ask = () => (typeof confirm === 'undefined') || confirm('Replace your current draft?');
   switch (action) {
     case 'li-panel': setPanel(value); break;
+    case 'li-draft-headline': { if (l.headline && l.headline.trim() && !ask()) break; l.headline = draftHeadline(l); reRender(); toast('Headline drafted. Now make it yours.', false); break; }
+    case 'li-draft-about': { if (l.about && l.about.trim() && !ask()) break; l.about = draftLinkedinAbout(l); reRender(); toast('About drafted. Now make it yours.', false); break; }
+    case 'li-draft-post': { if (l.post && l.post.trim() && !ask()) break; l.post = draftPost(); reRender(); toast('Post drafted. Now make it yours.', false); break; }
     case 'li-add-feat': l.featured.push(emptyFeat()); reRender(); break;
     case 'li-del-feat': { const f = l.featured[+value]; if ((f.title || f.blurb) && !((typeof confirm === 'undefined') || confirm('Remove this featured item?'))) break; l.featured.splice(+value, 1); if (!l.featured.length) l.featured.push(emptyFeat()); reRender(); break; }
     case 'li-template': { if (l.post && l.post.trim() && !ask()) break; l.post = POST_TEMPLATES[+value].text; reRender(); break; }

@@ -8,6 +8,7 @@ import { registerView } from '../core/router.js';
 import { download, copyText, toast } from '../core/feedback.js';
 import { meter, pageHeader, strengthLabel } from '../ui/components.js';
 import { ACTION_VERBS } from '../data/resume-assets.js';
+import { reviewPortfolio, draftAbout } from '../core/coach.js';
 
 const emptyProj = () => ({ title: '', role: '', tech: '', link: '', problem: '', approach: '', result: '' });
 
@@ -71,13 +72,16 @@ function scoreData(p) {
   return { score, tips };
 }
 function scoreHTML(p) {
-  const { score, tips } = scoreData(p);
+  const { score } = scoreData(p);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
+  const review = reviewPortfolio(p);
+  const dot = sev => sev === 'high' ? 'var(--red)' : sev === 'med' ? 'var(--amber)' : 'var(--text-3)';
+  const itemsHTML = review.items.length
+    ? review.items.slice(0, 10).map(it => `<div class="rs-tip"><span style="color:${dot(it.sev)};font-weight:700">•</span><span><b>${esc(it.where)}.</b> ${esc(it.fix)}</span></div>`).join('')
+    : `<div class="rs-tip ok"><span style="color:var(--green);font-weight:700">✓</span><span>Strong portfolio. Export the one-pager and host it.</span></div>`;
   return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
       <div class="t-foot text-3">${score} of 100 · portfolio strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
-    <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
-      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '•'}</span>
-      <span>${esc(t)}</span></div>`).join('')}</div>`;
+    <div class="mt-3">${itemsHTML}</div>`;
 }
 
 /* ---------- one-pager ----------------------------------------------------- */
@@ -202,7 +206,8 @@ function renderPortfolio() {
           ${inp('name', p.name, 'Full name')}
           <div class="rs-two mt-2">${inp('title', p.title, 'Title (Mechanical, AI & Robotics)')}${inp('tagline', p.tagline, 'One-line tagline')}</div>
         </div>
-        <div class="card"><h3 class="section-label" style="margin-top:0">About</h3>
+        <div class="card"><div class="row between"><h3 class="section-label" style="margin-top:0">About</h3>
+          <button class="btn btn-ghost btn-sm" data-action="pf-draft-about">${icon('wand-sparkles')} Draft a starter</button></div>
           ${ta('about', p.about, 'A short paragraph: who you are, what you build, where you’re heading.')}</div>
         <div class="card"><h3 class="section-label" style="margin-top:0">Contact</h3>
           <div class="rs-two">${inp('email', p.email, 'Email')}${inp('website', p.website, 'Website (optional)')}</div>
@@ -228,7 +233,7 @@ function renderPortfolio() {
           ${(p.certifications || []).map(certEntry).join('')}
         </div>
 
-        <div class="card"><h3 class="section-label" style="margin-top:0">Strength</h3><div id="pf-score"></div></div>
+        <div class="card"><h3 class="section-label" style="margin-top:0">Coach</h3><div id="pf-score"></div></div>
       </div>
 
       <div class="studio-preview">
@@ -264,6 +269,10 @@ export function portfolioAction(action, value) {
   const filled = o => o && Object.keys(o).some(k => String(o[k] || '').trim());
   switch (action) {
     case 'pf-panel': setPanel(value); break;
+    case 'pf-draft-about': {
+      if (p.about && p.about.trim() && !((typeof confirm === 'undefined') || confirm('Replace your About with a fresh starter draft?'))) break;
+      p.about = draftAbout(p); reRender(); toast('Starter drafted. Now make it yours.', false); break;
+    }
     case 'pf-add-proj': p.projects.push(emptyProj()); reRender(); break;
     case 'pf-del-proj': { if (filled(p.projects[+value]) && !ask()) break; p.projects.splice(+value, 1); if (!p.projects.length) p.projects.push(emptyProj()); reRender(); break; }
     case 'pf-add-skill': p.skills.push({ group: '', items: '' }); reRender(); break;

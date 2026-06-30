@@ -3,6 +3,7 @@
 import { findMission, md, store } from '../core/state.js';
 import { qs, esc, icon } from '../core/dom.js';
 import { registerView } from '../core/router.js';
+import { reflectionReply } from '../core/coach.js';
 
 export function checkPct(m, data) {
   const n = m.checklist.length; if (!n) return 0;
@@ -30,8 +31,8 @@ registerView('mission', (id) => {
     : '';
   // Missions that reference an in-app builder get a real button to jump there.
   const goto = ({ j1m6: ['resume', 'Resume Studio'], j8m1: ['resume', 'Resume Studio'],
-    j3m4: ['portfolio', 'Portfolio Builder'], j3m6: ['portfolio', 'Portfolio Builder'],
-    j8m2: ['linkedin', 'LinkedIn Builder'] })[m.id];
+    j3m4: ['portfolio', 'Portfolio Studio'], j3m6: ['portfolio', 'Portfolio Studio'],
+    j8m2: ['linkedin', 'LinkedIn Studio'] })[m.id];
   const gotoBtn = goto ? `<button class="btn btn-ghost mt-2" data-action="nav" data-value="${goto[0]}">${icon('arrow-right')} Open the ${esc(goto[1])}</button>` : '';
 
   root.innerHTML = `
@@ -63,6 +64,7 @@ registerView('mission', (id) => {
         <h3 class="section-label" style="margin-top:0">Reflection</h3>
         <p class="t-foot text-3 mb-2">${esc(m.reflection)}</p>
         <textarea class="textarea" data-reflect="${m.id}" placeholder="Write a sentence or two…">${esc(data.reflection)}</textarea>
+        <div id="mission-coach"></div>
         <details class="mt-3"><summary class="t-foot text-3" style="cursor:pointer">+ Private notes</summary>
           <textarea class="textarea mt-2" data-notes="${m.id}" placeholder="Anything you want to remember…">${esc(data.notes)}</textarea>
         </details>
@@ -75,6 +77,14 @@ registerView('mission', (id) => {
         <p class="t-foot text-3 center mt-3">It does not have to be perfect. Save it now, and improve it later.</p>
       </div>
     </div>`;
+  onReflect(data.reflection);
 });
 
 function badgeDone() { return `<span class="badge badge-green">${icon('check')} Done</span>`; }
+
+/* Reflection coach: a calm, templated reply that appears as the user writes. */
+export function onReflect(value) {
+  const el = qs('#mission-coach'); if (!el) return;
+  const reply = reflectionReply(value);
+  el.innerHTML = reply ? `<div class="notice notice-accent mt-2" style="font-size:13.5px">${esc(reply)}</div>` : '';
+}

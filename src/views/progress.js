@@ -5,6 +5,8 @@ import { store, totalMissions, completedCount, overallPct, liveStreak, journeyCo
 import { qs, esc, icon } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { ring, statTile, meter, pageHeader } from '../ui/components.js';
+import { userProfile } from '../core/context.js';
+import { progressInsight } from '../core/coach.js';
 
 registerView('progress', () => {
   const total = totalMissions(), done = completedCount();
@@ -21,6 +23,7 @@ registerView('progress', () => {
 
   qs('#view-progress').innerHTML = `<div class="stagger">
     ${pageHeader('Your progress', 'Look how far you’ve come.')}
+    ${(() => { const ins = progressInsight(userProfile()); return `<div class="card"><div class="row"><div class="chip chip-accent">${icon('compass')}</div><div class="grow"><div class="fw-semibold">${esc(ins.strength)}</div>${(ins.gap || ins.action) ? `<div class="t-foot text-2 mt-1">${esc([ins.gap, ins.action].filter(Boolean).join(' '))}</div>` : ''}</div></div></div>`; })()}
     <div class="card center"><div style="display:grid;place-items:center;padding:6px 0">${ring(overallPct(), 132)}</div>
       <div class="t-foot text-3">${done} of ${total} missions</div></div>
     <div class="grid-3 mt-4">

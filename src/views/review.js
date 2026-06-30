@@ -5,6 +5,8 @@ import { qs, esc, icon } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { celebrate, toast } from '../core/feedback.js';
 import { pageHeader, badge, emptyState } from '../ui/components.js';
+import { userProfile } from '../core/context.js';
+import { weekSummary } from '../core/coach.js';
 
 export function renderReview() {
   const past = (store.s.reviews || []).slice().reverse().map(r => `
@@ -18,6 +20,7 @@ export function renderReview() {
 
   qs('#view-review').innerHTML = `<div class="stagger">
     ${pageHeader('Sunday ritual', 'Weekly review', 'Five minutes. Five questions. Then close the laptop.')}
+    <div class="notice notice-accent mb-4">${esc(weekSummary(userProfile()))}</div>
     <div class="card">
       <div class="field"><label>What did I complete?</label><textarea class="textarea" id="rv-done" placeholder="Missions, tasks, applications…"></textarea></div>
       <div class="field"><label>What did I learn?</label><textarea class="textarea" id="rv-learned" placeholder="One or two things."></textarea></div>
