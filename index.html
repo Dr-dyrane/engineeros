@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0" />
+<meta name="theme-color" content="#f5f5f7" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+<meta name="description" content="EngineerOS by Dyrane Academy — a calm, self-guided career accelerator. One day. One mission. One visible win." />
+<title>EngineerOS · Dyrane Academy</title>
+<style>
+/* =========================================================================
+   EngineerOS — Design System
+   A single-file, Apple-HIG inspired career operating system.
+   Sections: 1) Tokens  2) Base  3) Layout  4) Components  5) Views
+             6) Animations  7) Responsive  8) Reduced motion
+   ========================================================================= */
+
+/* ----- 1) Design Tokens ------------------------------------------------- */
+:root{
+  /* Light theme (default) */
+  --bg:           #f5f5f7;
+  --bg-grad-1:    #ffffff;
+  --bg-grad-2:    #eef1f5;
+  --surface:      #ffffff;
+  --card:         rgba(255,255,255,0.72);
+  --card-solid:   #ffffff;
+  --card-border:  rgba(0,0,0,0.07);
+  --hairline:     rgba(0,0,0,0.08);
+  --text:         #1d1d1f;
+  --text-2:       #565659;
+  --text-3:       #86868b;
+  --fill:         rgba(120,120,128,0.10);
+  --fill-2:       rgba(120,120,128,0.16);
+
+  --accent:       #0a84ff;   /* refined blue  */
+  --accent-2:     #00b4d8;   /* cyan          */
+  --amber:        #ff9f0a;   /* active mission */
+  --amber-soft:   rgba(255,159,10,0.14);
+  --green:        #34c759;   /* success        */
+  --green-soft:   rgba(52,199,89,0.16);
+  --red:          #ff3b30;   /* error          */
+  --graphite:     #1d1d1f;
+
+  --on-accent:    #ffffff;
+  --on-graphite:  #ffffff;
+
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06);
+  --shadow-2: 0 2px 6px rgba(0,0,0,0.06), 0 18px 40px rgba(0,0,0,0.10);
+  --shadow-pop: 0 10px 30px rgba(0,0,0,0.14);
+
+  --r-xl: 28px;
+  --r-lg: 22px;
+  --r-md: 16px;
+  --r-sm: 12px;
+  --r-pill: 999px;
+
+  --gap: 16px;
+  --pad: 20px;
+  --maxw: 720px;
+
+  --ease: cubic-bezier(.22,1,.36,1);
+  --ease-soft: cubic-bezier(.4,0,.2,1);
+  --t-fast: .18s;
+  --t: .34s;
+  --t-slow: .6s;
+
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+
+  --tabbar-h: 64px;
+  --topbar-h: 52px;
+  color-scheme: light;
+}
+
+/* System dark — only when the user has NOT chosen a manual theme */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]):not([data-theme="dark"]){
+    --bg:           #000000;
+    --bg-grad-1:    #1a1a1c;
+    --bg-grad-2:    #0a0a0b;
+    --surface:      #1c1c1e;
+    --card:         rgba(28,28,30,0.66);
+    --card-solid:   #1c1c1e;
+    --card-border:  rgba(255,255,255,0.10);
+    --hairline:     rgba(255,255,255,0.12);
+    --text:         #f5f5f7;
+    --text-2:       #aeaeb2;
+    --text-3:       #8e8e93;
+    --fill:         rgba(120,120,128,0.20);
+    --fill-2:       rgba(120,120,128,0.28);
+    --accent:       #0a84ff;
+    --accent-2:     #40c8e0;
+    --amber:        #ff9f0a;
+    --amber-soft:   rgba(255,159,10,0.18);
+    --green:        #30d158;
+    --green-soft:   rgba(48,209,88,0.20);
+    --red:          #ff453a;
+    --graphite:     #f5f5f7;
+    --on-graphite:  #000000;
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.4), 0 8px 22px rgba(0,0,0,0.5);
+    --shadow-2: 0 2px 8px rgba(0,0,0,0.5), 0 20px 44px rgba(0,0,0,0.6);
+    --shadow-pop: 0 12px 34px rgba(0,0,0,0.6);
+    color-scheme: dark;
+  }
+}
+
+/* Manual dark */
+[data-theme="dark"]{
+  --bg:#000000; --bg-grad-1:#1a1a1c; --bg-grad-2:#0a0a0b;
+  --surface:#1c1c1e; --card:rgba(28,28,30,0.66); --card-solid:#1c1c1e;
+  --card-border:rgba(255,255,255,0.10); --hairline:rgba(255,255,255,0.12);
+  --text:#f5f5f7; --text-2:#aeaeb2; --text-3:#8e8e93;
+  --fill:rgba(120,120,128,0.20); --fill-2:rgba(120,120,128,0.28);
+  --accent:#0a84ff; --accent-2:#40c8e0; --amber:#ff9f0a; --amber-soft:rgba(255,159,10,0.18);
+  --green:#30d158; --green-soft:rgba(48,209,88,0.20); --red:#ff453a;
+  --graphite:#f5f5f7; --on-graphite:#000000;
+  --shadow-1:0 1px 2px rgba(0,0,0,0.4),0 8px 22px rgba(0,0,0,0.5);
+  --shadow-2:0 2px 8px rgba(0,0,0,0.5),0 20px 44px rgba(0,0,0,0.6);
+  --shadow-pop:0 12px 34px rgba(0,0,0,0.6);
+  color-scheme: dark;
+}
+/* Manual light (explicit, overrides system dark) */
+[data-theme="light"]{ color-scheme: light; }
+
+/* ----- 2) Base ---------------------------------------------------------- */
+*{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body{ margin:0; padding:0; }
+html{ -webkit-text-size-adjust:100%; }
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.45;
+  letter-spacing:-0.01em;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+/* ambient background wash */
+body::before{
+  content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:
+    radial-gradient(60% 50% at 18% 0%, var(--bg-grad-1) 0%, transparent 60%),
+    radial-gradient(70% 60% at 100% 8%, color-mix(in srgb, var(--accent) 9%, transparent) 0%, transparent 55%),
+    radial-gradient(80% 70% at 50% 100%, var(--bg-grad-2) 0%, transparent 60%);
+  opacity:.9;
+}
+h1,h2,h3,h4,p{ margin:0; }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; }
+input,textarea,select{ font-family:inherit; font-size:16px; color:var(--text); }
+a{ color:var(--accent); text-decoration:none; }
+::selection{ background:color-mix(in srgb, var(--accent) 26%, transparent); }
+:focus-visible{ outline:2.5px solid var(--accent); outline-offset:2px; border-radius:8px; }
+
+/* ----- 3) Layout -------------------------------------------------------- */
+#app{ min-height:100vh; display:flex; flex-direction:column; }
+
+#topbar{
+  position:sticky; top:0; z-index:50; height:var(--topbar-h);
+  display:flex; align-items:center; gap:8px;
+  padding:0 14px; padding-top:env(safe-area-inset-top);
+  background:color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid transparent;
+  transition:border-color var(--t);
+}
+#topbar.scrolled{ border-bottom-color:var(--hairline); }
+.brand{ display:flex; flex-direction:column; line-height:1; }
+.brand .b1{ font-size:15px; font-weight:700; letter-spacing:-0.02em; }
+.brand .b2{ font-size:10px; font-weight:600; color:var(--text-3); letter-spacing:.04em; text-transform:uppercase; margin-top:2px; }
+#topbar .spacer{ flex:1; }
+
+.icon-btn{
+  width:38px; height:38px; border-radius:var(--r-pill);
+  display:grid; place-items:center; color:var(--text);
+  background:var(--fill); transition:transform var(--t-fast) var(--ease), background var(--t-fast);
+}
+.icon-btn:hover{ background:var(--fill-2); }
+.icon-btn:active{ transform:scale(.92); }
+.icon-btn svg{ width:19px; height:19px; }
+#backBtn{ background:transparent; }
+#backBtn:hover{ background:var(--fill); }
+
+#views{ flex:1; width:100%; }
+.view{ display:none; width:100%; max-width:var(--maxw); margin:0 auto;
+  padding:18px var(--pad) calc(var(--tabbar-h) + 90px); }
+.view.active{ display:block; }
+
+/* tab bar */
+#tabbar{
+  position:fixed; left:0; right:0; bottom:0; z-index:50;
+  display:flex; justify-content:center;
+  padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+  pointer-events:none;
+}
+#tabbar .tabwrap{
+  pointer-events:auto;
+  display:flex; gap:2px; padding:6px;
+  background:var(--card); border:1px solid var(--card-border);
+  border-radius:var(--r-pill);
+  box-shadow:var(--shadow-2);
+  backdrop-filter:saturate(180%) blur(22px); -webkit-backdrop-filter:saturate(180%) blur(22px);
+  max-width:100%;
+}
+.tab{
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:8px 14px; border-radius:var(--r-pill); color:var(--text-3);
+  font-size:10.5px; font-weight:600; letter-spacing:.01em;
+  transition:color var(--t-fast), background var(--t-fast), transform var(--t-fast) var(--ease);
+  min-width:58px;
+}
+.tab svg{ width:22px; height:22px; }
+.tab:active{ transform:scale(.9); }
+.tab.active{ color:var(--accent); }
+.tab.active .tabglow{ background:color-mix(in srgb,var(--accent) 14%, transparent); }
+.tabglow{ width:100%; height:100%; }
+
+/* onboarding hides chrome */
+#app.onboarding #topbar,
+#app.onboarding #tabbar{ display:none; }
+#app.onboarding #views .view{ padding-bottom:40px; }
+
+/* ----- 4) Components ---------------------------------------------------- */
+.eyebrow{ font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--accent); }
+.h-large{ font-size:clamp(28px,7vw,34px); font-weight:760; letter-spacing:-0.03em; line-height:1.08; }
+.h-title{ font-size:23px; font-weight:720; letter-spacing:-0.02em; }
+.h-sec{ font-size:13px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:var(--text-3); margin:6px 2px 12px; }
+.muted{ color:var(--text-2); }
+.tiny{ font-size:12.5px; color:var(--text-3); }
+.center{ text-align:center; }
+
+.card{
+  background:var(--card); border:1px solid var(--card-border);
+  border-radius:var(--r-lg); padding:var(--pad);
+  box-shadow:var(--shadow-1);
+  backdrop-filter:saturate(160%) blur(14px); -webkit-backdrop-filter:saturate(160%) blur(14px);
+  transition:transform var(--t) var(--ease), box-shadow var(--t) var(--ease), border-color var(--t);
+}
+.card + .card{ margin-top:var(--gap); }
+.tap{ cursor:pointer; }
+.tap:hover{ transform:translateY(-2px); box-shadow:var(--shadow-2); }
+.tap:active{ transform:translateY(0) scale(.992); }
+
+.row{ display:flex; align-items:center; gap:14px; }
+.col{ display:flex; flex-direction:column; }
+.between{ justify-content:space-between; }
+.wrap{ flex-wrap:wrap; }
+.grow{ flex:1; }
+.stack > * + *{ margin-top:var(--gap); }
+
+/* buttons */
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  height:52px; padding:0 22px; border-radius:var(--r-md);
+  font-size:17px; font-weight:600; letter-spacing:-0.01em;
+  background:var(--fill); color:var(--text);
+  transition:transform var(--t-fast) var(--ease), background var(--t-fast), box-shadow var(--t-fast), opacity var(--t-fast);
+  width:100%;
+}
+.btn:hover{ background:var(--fill-2); }
+.btn:active{ transform:scale(.97); }
+.btn-primary{ background:var(--accent); color:var(--on-accent); box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 34%, transparent); }
+.btn-primary:hover{ background:color-mix(in srgb,var(--accent) 90%, #000); }
+.btn-graphite{ background:var(--graphite); color:var(--on-graphite); }
+.btn-amber{ background:var(--amber); color:#3a2600; box-shadow:0 6px 18px color-mix(in srgb,var(--amber) 36%, transparent); }
+.btn-ghost{ background:transparent; border:1.5px solid var(--card-border); }
+.btn-sm{ height:42px; font-size:15px; padding:0 16px; width:auto; }
+.btn-row{ display:flex; gap:10px; }
+.btn[disabled]{ opacity:.45; pointer-events:none; }
+
+/* pills / badges */
+.pill{ display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px;
+  border-radius:var(--r-pill); background:var(--fill); font-size:12.5px; font-weight:600; color:var(--text-2); }
+.badge{ display:inline-flex; align-items:center; gap:5px; padding:3px 9px; border-radius:var(--r-pill);
+  font-size:11px; font-weight:700; letter-spacing:.02em; }
+.badge-amber{ background:var(--amber-soft); color:#b06d00; }
+.badge-green{ background:var(--green-soft); color:#1c7a36; }
+.badge-accent{ background:color-mix(in srgb,var(--accent) 15%, transparent); color:var(--accent); }
+.badge-ng{ background:color-mix(in srgb,var(--green) 16%, transparent); color:#1c7a36; }
+[data-theme="dark"] .badge-amber,[data-theme="dark"] .badge-green,[data-theme="dark"] .badge-ng{ color:var(--text); }
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .badge-amber,
+  :root:not([data-theme="light"]) .badge-green,:root:not([data-theme="light"]) .badge-ng{ color:var(--text);} }
+
+/* journey/mission icon chip */
+.chip{ width:46px; height:46px; min-width:46px; border-radius:14px; display:grid; place-items:center;
+  background:var(--fill); color:var(--text); }
+.chip svg{ width:24px; height:24px; }
+.chip.accent{ background:color-mix(in srgb,var(--accent) 16%, transparent); color:var(--accent); }
+.chip.amber{ background:var(--amber-soft); color:var(--amber); }
+.chip.green{ background:var(--green-soft); color:var(--green); }
+.chip.locked{ opacity:.5; }
+
+/* progress ring */
+.ring{ --p:0; width:120px; height:120px; position:relative; display:grid; place-items:center; }
+.ring svg{ transform:rotate(-90deg); width:100%; height:100%; }
+.ring .track{ fill:none; stroke:var(--fill-2); stroke-width:10; }
+.ring .bar{ fill:none; stroke:url(#ringgrad); stroke-width:10; stroke-linecap:round;
+  stroke-dasharray:var(--circ); stroke-dashoffset:var(--circ);
+  transition:stroke-dashoffset 1s var(--ease); }
+.ring .label{ position:absolute; text-align:center; }
+.ring .label .pct{ font-size:30px; font-weight:760; letter-spacing:-0.03em; }
+.ring .label .cap{ font-size:11px; color:var(--text-3); font-weight:600; }
+
+/* thin progress bar */
+.bar-track{ height:8px; border-radius:var(--r-pill); background:var(--fill-2); overflow:hidden; }
+.bar-fill{ height:100%; border-radius:var(--r-pill);
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  width:0; transition:width .8s var(--ease); }
+.bar-fill.amber{ background:linear-gradient(90deg,var(--amber),#ffd60a); }
+.bar-fill.green{ background:linear-gradient(90deg,var(--green),#a0f0b0); }
+
+/* stat tiles */
+.stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.stat{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--r-md);
+  padding:14px; box-shadow:var(--shadow-1); }
+.stat .n{ font-size:26px; font-weight:760; letter-spacing:-0.03em; }
+.stat .l{ font-size:11.5px; color:var(--text-3); font-weight:600; margin-top:2px; }
+
+/* readiness grid */
+.ready-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.ready{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--r-md); padding:14px; box-shadow:var(--shadow-1); }
+.ready .rt{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.ready .rt .name{ font-size:13.5px; font-weight:700; }
+.ready .rt .v{ font-size:13px; font-weight:700; color:var(--text-2); }
+
+/* checklist */
+.check{ display:flex; align-items:flex-start; gap:12px; padding:13px 4px; cursor:pointer;
+  border-bottom:1px solid var(--hairline); transition:opacity var(--t-fast); }
+.check:last-child{ border-bottom:none; }
+.check input{ position:absolute; opacity:0; width:0; height:0; }
+.box{ width:25px; height:25px; min-width:25px; border-radius:50%; border:2px solid var(--text-3);
+  display:grid; place-items:center; transition:all var(--t-fast) var(--ease); margin-top:1px; }
+.box svg{ width:14px; height:14px; stroke:#fff; opacity:0; transform:scale(.4); transition:all var(--t-fast) var(--ease); }
+.check input:checked + .box{ background:var(--green); border-color:var(--green); }
+.check input:checked + .box svg{ opacity:1; transform:scale(1); }
+.check .ctext{ font-size:15.5px; line-height:1.35; padding-top:2px; }
+.check input:checked ~ .ctext{ color:var(--text-3); text-decoration:line-through; text-decoration-color:var(--text-3); }
+
+/* numbered today list */
+.steps{ counter-reset:s; list-style:none; padding:0; margin:0; }
+.steps li{ counter-increment:s; position:relative; padding:11px 0 11px 40px; font-size:15.5px; line-height:1.4;
+  border-bottom:1px solid var(--hairline); }
+.steps li:last-child{ border-bottom:none; }
+.steps li::before{ content:counter(s); position:absolute; left:0; top:9px;
+  width:26px; height:26px; border-radius:50%; background:var(--fill-2); color:var(--text-2);
+  font-size:13px; font-weight:700; display:grid; place-items:center; }
+
+/* forms */
+.field{ margin-bottom:14px; }
+.field label{ display:block; font-size:13px; font-weight:700; color:var(--text-2); margin:0 2px 6px; }
+.input, .textarea, select.input{
+  width:100%; padding:13px 14px; border-radius:var(--r-sm);
+  background:var(--surface); border:1.5px solid var(--card-border); color:var(--text);
+  transition:border-color var(--t-fast), box-shadow var(--t-fast), background var(--t-fast); resize:vertical;
+}
+.input:focus, .textarea:focus{ outline:none; border-color:var(--accent);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%, transparent); }
+.textarea{ min-height:96px; line-height:1.5; }
+.hint{ font-size:12px; color:var(--text-3); margin:5px 2px 0; }
+
+/* segmented control */
+.seg{ display:inline-flex; background:var(--fill); border-radius:var(--r-sm); padding:3px; gap:2px; width:100%; }
+.seg button{ flex:1; padding:9px 10px; border-radius:10px; font-size:14px; font-weight:600; color:var(--text-2);
+  transition:all var(--t-fast) var(--ease); }
+.seg button.on{ background:var(--card-solid); color:var(--text); box-shadow:var(--shadow-1); }
+
+/* list rows */
+.list-card{ background:var(--card); border:1px solid var(--card-border); border-radius:var(--r-lg);
+  box-shadow:var(--shadow-1); overflow:hidden; }
+.lrow{ display:flex; align-items:center; gap:14px; padding:15px 16px; border-bottom:1px solid var(--hairline);
+  transition:background var(--t-fast); }
+.lrow:last-child{ border-bottom:none; }
+.lrow.tap:hover{ background:var(--fill); transform:none; box-shadow:none; }
+.lrow .lt{ flex:1; min-width:0; }
+.lrow .lt .t1{ font-size:16px; font-weight:650; }
+.lrow .lt .t2{ font-size:13px; color:var(--text-3); margin-top:1px; }
+.lrow .chev{ color:var(--text-3); }
+.lrow .chev svg{ width:18px; height:18px; }
+
+/* resource item */
+.res-item{ display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-bottom:1px solid var(--hairline); }
+.res-item:last-child{ border-bottom:none; }
+.res-item .ri-t{ font-size:15.5px; font-weight:650; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.res-item .ri-d{ font-size:13px; color:var(--text-2); margin-top:2px; }
+.res-item .ri-open{ color:var(--accent); margin-top:1px; }
+.res-item .ri-open svg{ width:18px; height:18px; }
+
+/* hero / welcome */
+.hero{ min-height:calc(100vh - 40px); display:flex; flex-direction:column; justify-content:center; gap:24px; padding:30px 4px; }
+.logo-mark{ width:74px; height:74px; border-radius:20px; display:grid; place-items:center;
+  background:linear-gradient(150deg,var(--graphite),#3a3a3c); color:var(--on-graphite);
+  box-shadow:var(--shadow-pop); }
+[data-theme="dark"] .logo-mark{ background:linear-gradient(150deg,#2c2c2e,#48484a); }
+.logo-mark svg{ width:40px; height:40px; }
+
+/* empty state */
+.empty{ text-align:center; padding:48px 20px; color:var(--text-3); }
+.empty .chip{ margin:0 auto 14px; width:56px; height:56px; }
+
+/* toast */
+#toast{ position:fixed; left:50%; bottom:calc(var(--tabbar-h) + 26px); transform:translate(-50%,20px);
+  z-index:90; background:var(--graphite); color:var(--on-graphite);
+  padding:12px 18px; border-radius:var(--r-pill); font-size:14px; font-weight:600;
+  box-shadow:var(--shadow-pop); opacity:0; pointer-events:none; transition:all var(--t) var(--ease);
+  display:flex; align-items:center; gap:8px; max-width:90vw; }
+#toast.show{ opacity:1; transform:translate(-50%,0); }
+#toast svg{ width:16px; height:16px; color:var(--green); }
+
+/* celebrate overlay */
+#celebrate{ position:fixed; inset:0; z-index:80; display:none; place-items:center; pointer-events:none; }
+#celebrate.show{ display:grid; }
+.celebrate-mark{ width:108px; height:108px; border-radius:50%; background:var(--green);
+  display:grid; place-items:center; box-shadow:0 18px 50px color-mix(in srgb,var(--green) 50%, transparent);
+  animation:pop .5s var(--ease); }
+.celebrate-mark svg{ width:54px; height:54px; stroke:#fff; }
+.confetti{ position:absolute; width:9px; height:14px; border-radius:2px; opacity:0; }
+
+/* divider */
+.hr{ height:1px; background:var(--hairline); margin:18px 0; border:none; }
+
+/* notice */
+.notice{ background:var(--amber-soft); border:1px solid color-mix(in srgb,var(--amber) 30%, transparent);
+  border-radius:var(--r-md); padding:13px 15px; font-size:14px; }
+.notice.accent{ background:color-mix(in srgb,var(--accent) 10%, transparent);
+  border-color:color-mix(in srgb,var(--accent) 28%, transparent); }
+
+/* lock */
+.lockmsg{ display:flex; align-items:center; gap:8px; color:var(--text-3); font-size:13.5px; }
+.lockmsg svg{ width:15px; height:15px; }
+
+/* ----- 6) Animations ---------------------------------------------------- */
+@keyframes viewIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:translateY(0);} }
+.view.active.enter{ animation:viewIn var(--t) var(--ease); }
+.stagger > *{ opacity:0; animation:viewIn var(--t) var(--ease) forwards; }
+.stagger > *:nth-child(1){ animation-delay:.02s; }
+.stagger > *:nth-child(2){ animation-delay:.07s; }
+.stagger > *:nth-child(3){ animation-delay:.12s; }
+.stagger > *:nth-child(4){ animation-delay:.17s; }
+.stagger > *:nth-child(5){ animation-delay:.22s; }
+.stagger > *:nth-child(6){ animation-delay:.27s; }
+.stagger > *:nth-child(7){ animation-delay:.32s; }
+.stagger > *:nth-child(8){ animation-delay:.37s; }
+.stagger > *:nth-child(n+9){ animation-delay:.4s; }
+@keyframes pop{ 0%{ transform:scale(0); opacity:0;} 60%{ transform:scale(1.12);} 100%{ transform:scale(1); opacity:1;} }
+@keyframes fall{ 0%{ opacity:1; transform:translateY(-10px) rotate(0);} 100%{ opacity:0; transform:translateY(70vh) rotate(540deg);} }
+
+/* ----- 7) Responsive ---------------------------------------------------- */
+@media (min-width:680px){
+  .ready-grid{ grid-template-columns:repeat(4,1fr); }
+  .tab{ flex-direction:row; gap:7px; font-size:13px; padding:9px 18px; }
+  .tab svg{ width:19px; height:19px; }
+}
+@media (min-width:780px){
+  .view{ padding-top:26px; }
+}
+
+/* ----- 8) Reduced motion ----------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important;
+     transition-duration:.001ms !important; scroll-behavior:auto !important; }
+  .tap:hover{ transform:none; }
+}
+</style>
+</head>
+<body>
+<div id="app" class="onboarding">
+
+  <!-- Top bar -->
+  <header id="topbar" aria-label="Top bar">
+    <button id="backBtn" class="icon-btn" data-action="back" aria-label="Go back" style="display:none">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="brand">
+      <span class="b1">EngineerOS</span>
+      <span class="b2">Dyrane Academy</span>
+    </div>
+    <div class="spacer"></div>
+    <button class="icon-btn" data-action="toggle-theme" aria-label="Toggle theme" id="themeQuick">
+      <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.8 4.8l1.7 1.7M17.5 17.5l1.7 1.7M19.2 4.8l-1.7 1.7M6.5 17.5l-1.7 1.7"/></svg>
+    </button>
+    <button class="icon-btn" data-action="open-settings" aria-label="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.2A1.7 1.7 0 0 0 7 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2A1.7 1.7 0 0 0 4.6 7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H10a1.7 1.7 0 0 0 1-1.6V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V10a1.7 1.7 0 0 0 1.6 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.4 1z"/></svg>
+    </button>
+  </header>
+
+  <!-- Views are rendered by JS -->
+  <main id="views">
+    <section class="view" id="view-welcome"></section>
+    <section class="view" id="view-setup"></section>
+    <section class="view" id="view-home"></section>
+    <section class="view" id="view-journeys"></section>
+    <section class="view" id="view-journey"></section>
+    <section class="view" id="view-mission"></section>
+    <section class="view" id="view-progress"></section>
+    <section class="view" id="view-build"></section>
+    <section class="view" id="view-portfolio"></section>
+    <section class="view" id="view-resume"></section>
+    <section class="view" id="view-linkedin"></section>
+    <section class="view" id="view-review"></section>
+    <section class="view" id="view-resources"></section>
+    <section class="view" id="view-settings"></section>
+  </main>
+
+  <!-- Tab bar -->
+  <nav id="tabbar" aria-label="Primary">
+    <div class="tabwrap">
+      <button class="tab" data-action="nav" data-value="home" aria-label="Today">
+        <span class="tabglow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5"/></svg></span>
+        <span>Today</span>
+      </button>
+      <button class="tab" data-action="nav" data-value="journeys" aria-label="Journeys">
+        <span class="tabglow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 4 6v14l5-2 6 2 5-2V4l-5 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg></span>
+        <span>Journeys</span>
+      </button>
+      <button class="tab" data-action="nav" data-value="build" aria-label="Build">
+        <span class="tabglow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5.5 18 9 8.5 18.5 4 20l1.5-4.5L15 6"/><path d="m13 7 4 4"/></svg></span>
+        <span>Build</span>
+      </button>
+      <button class="tab" data-action="nav" data-value="review" aria-label="Review">
+        <span class="tabglow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M3.5 9h17M8 3v3M16 3v3"/><path d="m9 14 2 2 4-4"/></svg></span>
+        <span>Review</span>
+      </button>
+      <button class="tab" data-action="nav" data-value="resources" aria-label="Resources">
+        <span class="tabglow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h7v18H6a2 2 0 0 1-2-2Z"/><path d="M13 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></svg></span>
+        <span>Resources</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="celebrate" aria-hidden="true"></div>
+<input type="file" id="importFile" accept="application/json" hidden />
+
+<script>
+/* =========================================================================
+   EngineerOS — Application logic (vanilla JS, no dependencies)
+   ========================================================================= */
+"use strict";
+
+/* ---------- Icon library (inline SVG) ---------------------------------- */
+const I = {
+  chevron:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  open:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M9 7h8v8"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17l-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/></svg>',
+  /* journey icons */
+  identity:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>',
+  story:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-4 3v-3H4Z"/><path d="M8 9h8M8 12h5"/></svg>',
+  portfolio:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5A2 2 0 0 1 10.5 3.5h3A2 2 0 0 1 15.5 5.5V7M3 12.5h18"/></svg>',
+  ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M18 14l.9 2.1L21 17l-2.1.9L18 20l-.9-2.1L15 17l2.1-.9z"/></svg>',
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.5 6l-3 12"/></svg>',
+  project:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 3.5 7.5v9L12 21l8.5-4.5v-9Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg>',
+  robot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 4v4M9 13h.01M15 13h.01M9 16h6M3.5 12v3M20.5 12v3"/></svg>',
+  rocket:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2"/><path d="M14.5 4.5c3.5 1 4.5 4 4.5 4s-3 1-4 4.5l-5 1-1.5-1.5 1-5c3.5-1 5-3.5 5-3.5Z"/><circle cx="14.5" cy="9.5" r="1.3"/></svg>',
+  logo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></svg>',
+  flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4s2-1 5 0 5 1 8 0v9c-3 1-5 0-8-1s-5 0-5 0"/></svg>',
+  download:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 11l5 5 5-5M5 21h14"/></svg>',
+  copy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2.5"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>',
+};
+
+/* ---------- Journey & Resource data (filled below markers) ------------- */
+const JOURNEYS = [
+{ id:'j1', title:'Become Discoverable', icon:'identity',
+  tagline:'Build a professional identity people can actually find.',
+  goal:'Set up the basics employers look for first — a clean email, an organised career folder, a photo, LinkedIn, GitHub and a first resume draft.',
+  missions:[
+    { id:'j1m1', title:'Create Your Professional Email', time:'15 min',
+      why:'Your email is the first identity employers and platforms see. It should look simple, mature, and professional — not a nickname from secondary school.',
+      today:['Create or pick a Gmail address using your real name.','Use a clean format like firstname.lastname@gmail.com.','Avoid nicknames, slang, numbers or jokes.','Add a simple signature with your name.'],
+      checklist:['Professional email created','Password saved somewhere safe','Email noted in my career folder'],
+      reflection:'What email did you choose, and why does it feel professional?',
+      link:{label:'Open Gmail', url:'https://mail.google.com'} },
+    { id:'j1m2', title:'Build Your Career Folder', time:'20 min',
+      why:'A tidy folder means you never lose a file before an application deadline. One home for everything you build.',
+      today:['Open Google Drive (or your laptop).','Create a folder called "Career".','Inside it add: Resume, Portfolio, Projects, Certificates, Photos.','Move any files you already have into the right place.'],
+      checklist:['"Career" folder created','5 subfolders added','At least one file moved in'],
+      reflection:'Where will your career folder live so you always find it?',
+      link:{label:'Open Google Drive', url:'https://drive.google.com'} },
+    { id:'j1m3', title:'Get a Clean Professional Photo', time:'20 min',
+      why:'A simple, friendly headshot makes your LinkedIn and CV feel trustworthy. You do not need a studio — a phone and a plain wall is enough.',
+      today:['Wear something simple and tidy.','Stand near a plain wall in soft daylight.','Take 10 photos, face and shoulders, slight smile.','Pick the best one and save it to your Photos folder.'],
+      checklist:['Took photos in good light','Chose the best one','Saved it to my career folder'],
+      reflection:'Which photo did you pick? Does it look calm and approachable?' },
+    { id:'j1m4', title:'Claim Your LinkedIn Profile', time:'25 min',
+      why:'LinkedIn is where recruiters look for you. Even an empty profile with your name and photo makes you findable today.',
+      today:['Create a LinkedIn account (or log in).','Add your professional photo.','Add your name, city and "Mechanical Engineer".','Save your profile link in your career folder.'],
+      checklist:['Account created','Photo + basic info added','Profile link saved'],
+      reflection:'What does your LinkedIn headline say right now?',
+      link:{label:'Open LinkedIn', url:'https://www.linkedin.com'} },
+    { id:'j1m5', title:'Create Your GitHub Account', time:'20 min',
+      why:'GitHub is where engineers keep their projects. Starting it now means every future project has a home and a public record.',
+      today:['Sign up at github.com with your professional email.','Pick a clean username (your name is best).','Add your photo and a one-line bio.','Save your GitHub link in your career folder.'],
+      checklist:['GitHub account created','Username is clean and professional','Profile link saved'],
+      reflection:'What username did you choose, and is it easy to share out loud?',
+      link:{label:'Open GitHub', url:'https://github.com'} },
+    { id:'j1m6', title:'Write Your First Resume Draft', time:'45 min',
+      why:'A rough resume today beats a perfect one "later". You will improve it many times — but only if it exists.',
+      today:['Open the Build tab → Resume Builder.','Fill in your name, contact and education.','Add your skills and your final-year project.','Export it as Markdown to your career folder.'],
+      checklist:['Resume Builder started','Education + skills filled','Draft exported and saved'],
+      reflection:'What is one thing on your resume you are proud of?' },
+    { id:'j1m7', title:'Save Your Logins Safely', time:'15 min',
+      why:'You just created several accounts. Losing access to them later is a quiet career killer. Protect them now.',
+      today:['Install a free password manager, or use your browser/Google password store.','Save your email, LinkedIn and GitHub logins.','Turn on 2-step verification for your email.','Note recovery details somewhere safe.'],
+      checklist:['Passwords stored safely','2-step verification on for email','Recovery info noted'],
+      reflection:'How will you keep your accounts safe going forward?' },
+  ] },
+{ id:'j2', title:'Tell Your Story', icon:'story',
+  tagline:'Put your qualifications and direction into clear words.',
+  goal:'Be able to explain who you are, what you studied, what you built, and where you are heading — in writing and out loud.',
+  missions:[
+    { id:'j2m1', title:'Write Your One-Line Intro', time:'15 min',
+      why:'People decide fast. One clear line tells them who you are and where you are going, before they read anything else.',
+      today:['Fill the blank: "I am a ___ becoming a ___."','Keep it under 15 words.','Read it aloud — does it sound like you?','Save it in your career folder.'],
+      checklist:['Wrote a one-line intro','Said it out loud once','Saved it'],
+      reflection:'What is your one-line intro today?' },
+    { id:'j2m2', title:'Describe Your Final-Year Project', time:'40 min',
+      why:'Your project is your strongest proof that you can do real engineering. Most graduates never describe it well — you will.',
+      today:['Write the problem your project solved (2 sentences).','Write what you actually built or tested.','Write the result, with a number if you have one.','Write what you would improve next time.'],
+      checklist:['Problem written','What I built written','Result + next step written'],
+      reflection:'In one sentence, why did your project matter?' },
+    { id:'j2m3', title:'List Your Real Skills', time:'20 min',
+      why:'You know more than you think. Naming your skills makes them usable in resumes, profiles and interviews.',
+      today:['List software you have touched (CAD, Excel, etc.).','List hands-on skills (measuring, prototyping, testing).','List soft skills (teamwork, writing, presenting).','Mark each as Beginner, Okay, or Strong.'],
+      checklist:['Software listed','Hands-on skills listed','Honest levels marked'],
+      reflection:'Which skill do you most want to grow this year?' },
+    { id:'j2m4', title:'Write Your Short Bio', time:'25 min',
+      why:'A short bio is reusable everywhere — LinkedIn, portfolio, applications, email. Write it once, use it for years.',
+      today:['Write 3–4 sentences in the third person ("Adaeze is…").','Cover: who you are, what you studied, what you build, what you want.','Keep it warm and simple.','Save a short and a slightly longer version.'],
+      checklist:['Short bio written','Reads naturally aloud','Saved to career folder'],
+      reflection:'Does your bio sound like a real person or a textbook? Adjust until it sounds human.' },
+    { id:'j2m5', title:'Name Your Career Direction', time:'20 min',
+      why:'You do not need your whole life planned. You need a direction so today’s small steps point somewhere.',
+      today:['Write where you want to be in 2–3 years.','Name the field: AI, robotics, design, manufacturing…','Write one reason it excites you.','Write the first skill it needs.'],
+      checklist:['2–3 year direction written','Field named','First skill identified'],
+      reflection:'What pulled you toward this direction?' },
+    { id:'j2m6', title:'Record Your Elevator Pitch', time:'25 min',
+      why:'Saying your story out loud is a skill. Practising it now means you will not freeze when it matters.',
+      today:['Write a 30-second spoken version of your intro + project + goal.','Practise it twice.','Record yourself on your phone.','Listen once and note one improvement.'],
+      checklist:['Pitch written','Recorded myself','Noted one thing to improve'],
+      reflection:'How did it feel to hear yourself? What will you change?' },
+    { id:'j2m7', title:'Write Your "About Me"', time:'30 min',
+      why:'This is the longer story that ties everything together for your portfolio and LinkedIn About section.',
+      today:['Start with one strong opening line.','Add your background and what you build.','Add where you are heading and why.','End with how to reach you.'],
+      checklist:['Strong opening line','Background + direction written','Contact line added'],
+      reflection:'Which sentence are you most proud of?' },
+  ] },
+{ id:'j3', title:'Build Your Portfolio', icon:'portfolio',
+  tagline:'Create the content first — the website comes later.',
+  goal:'Turn your projects and story into clear, written portfolio content you can drop into any website.',
+  missions:[
+    { id:'j3m1', title:'Pick Your Best 3 Projects', time:'20 min',
+      why:'A focused portfolio beats a long one. Three strong projects tell your story better than ten weak ones.',
+      today:['List every project, assignment or build you have done.','Circle the 3 you are most proud of.','For each, write one line on why it matters.','Save the shortlist.'],
+      checklist:['All projects listed','Best 3 chosen','One line written for each'],
+      reflection:'Why did these three make the cut?' },
+    { id:'j3m2', title:'Write One Project Case Study', time:'45 min',
+      why:'A case study shows how you think, not just what you made. This is the single most convincing thing in a portfolio.',
+      today:['Pick your strongest project.','Write: Background, Problem, What I did, Result.','Add one challenge and what you learned.','Save it in your Projects folder.'],
+      checklist:['Project chosen','All sections written','Saved as a document'],
+      reflection:'What part of this project are you proudest of?' },
+    { id:'j3m3', title:'Gather Your Visuals', time:'30 min',
+      why:'People skim. A photo, sketch or CAD render makes your work instantly believable.',
+      today:['Find photos, sketches, screenshots or CAD images of your projects.','Take new photos if you have physical work.','Crop them so they look tidy.','Save them named clearly (project-1-front.jpg).'],
+      checklist:['Visuals collected','Cropped and tidy','Named clearly'],
+      reflection:'Which single image best represents your work?' },
+    { id:'j3m4', title:'Write Skills & Tools', time:'15 min',
+      why:'A clear skills list helps both humans and search filters understand what you can do.',
+      today:['Open the Build tab → Portfolio Builder.','Fill the Skills field.','Fill the Tools & Software field.','Keep it honest and specific.'],
+      checklist:['Skills filled','Tools filled','Saved automatically'],
+      reflection:'Any tool you listed that you want to get stronger at?' },
+    { id:'j3m5', title:'Write Your Contact Block', time:'10 min',
+      why:'A portfolio with no clear way to reach you wastes every visit. Make it effortless.',
+      today:['Add your professional email.','Add your LinkedIn link.','Add your GitHub link.','Paste them into the Portfolio Builder Contact field.'],
+      checklist:['Email added','LinkedIn + GitHub added','Saved in builder'],
+      reflection:'Is your contact info something you can share comfortably in public?' },
+    { id:'j3m6', title:'Assemble Your Portfolio Doc', time:'40 min',
+      why:'Before any website, you want one clean document with everything. It becomes the source for your site.',
+      today:['Open the Portfolio Builder.','Fill every section you can.','Export it as Markdown.','Read it top to bottom once.'],
+      checklist:['All sections attempted','Exported as Markdown','Read it through once'],
+      reflection:'What gap did you notice while reading it back?' },
+    { id:'j3m7', title:'Plan Your Portfolio Website', time:'30 min',
+      why:'You do not need to code a site today. You need a simple plan so building it later feels easy.',
+      today:['Decide a free home: Carrd, GitHub Pages, or Notion.','Sketch the pages: Home, Projects, About, Contact.','Note which content fills each page.','Bookmark the tool you will use.'],
+      checklist:['Platform chosen','Page plan sketched','Tool bookmarked'],
+      reflection:'Which platform fits how you like to work?',
+      link:{label:'See Carrd (simple sites)', url:'https://carrd.co'} },
+  ] },
+{ id:'j4', title:'Learn AI as a Tool', icon:'ai',
+  tagline:'Use AI to research, write, learn and solve — responsibly.',
+  goal:'Become fluent with everyday AI tools and learn to verify their answers, so AI makes your engineering work faster and better.',
+  missions:[
+    { id:'j4m1', title:'Meet Your AI Assistants', time:'25 min',
+      why:'AI is the most powerful learning tool you have ever had — if you know how to use it. Today you simply meet the main ones.',
+      today:['Open ChatGPT and Claude in your browser.','Create free accounts.','Ask each the same question and compare answers.','Bookmark both.'],
+      checklist:['Accounts created','Asked the same question to both','Bookmarked them'],
+      reflection:'Which assistant felt more useful to you, and why?',
+      link:{label:'Open Claude', url:'https://claude.ai'} },
+    { id:'j4m2', title:'Write Your First Good Prompt', time:'20 min',
+      why:'A vague prompt gives vague answers. Clear prompts are a skill that multiplies everything else you do with AI.',
+      today:['Pick a real task (e.g. explain a concept from your project).','Give the AI a role, context, and what you want.','Ask it to explain like you are a beginner.','Save the prompt that worked best.'],
+      checklist:['Wrote a detailed prompt','Got a useful answer','Saved a reusable prompt'],
+      reflection:'What made your best prompt work better than your first?' },
+    { id:'j4m3', title:'Research with Perplexity', time:'25 min',
+      why:'Perplexity answers with sources, so you can check where information came from — vital for engineering.',
+      today:['Open Perplexity.','Ask a research question from your field.','Click through to two of its sources.','Note one fact you confirmed.'],
+      checklist:['Asked a research question','Checked two sources','Noted a confirmed fact'],
+      reflection:'Did the sources actually support the answer?',
+      link:{label:'Open Perplexity', url:'https://www.perplexity.ai'} },
+    { id:'j4m4', title:'Improve Your Writing with AI', time:'20 min',
+      why:'AI is a brilliant editor. Use it to make your bio, emails and reports clearer — without losing your own voice.',
+      today:['Paste your short bio into an AI tool.','Ask it to make it clearer and more professional.','Keep only the changes that still sound like you.','Update your saved bio.'],
+      checklist:['Got edit suggestions','Kept my own voice','Updated my bio'],
+      reflection:'What did the AI improve that you would not have spotted?' },
+    { id:'j4m5', title:'Study Smarter with NotebookLM', time:'30 min',
+      why:'NotebookLM lets you load your own notes or PDFs and ask questions about them. It turns any document into a tutor.',
+      today:['Open NotebookLM and create a notebook.','Upload a lecture note, datasheet or paper.','Ask it to summarise the key points.','Ask it one question you were unsure about.'],
+      checklist:['Notebook created','Document uploaded','Asked it questions'],
+      reflection:'How could this change the way you study?',
+      link:{label:'Open NotebookLM', url:'https://notebooklm.google.com'} },
+    { id:'j4m6', title:'Catch AI Mistakes', time:'25 min',
+      why:'AI sometimes invents facts confidently — called hallucinations. An engineer always verifies. This habit protects your reputation.',
+      today:['Ask an AI a factual engineering question.','Ask it for its sources.','Verify one claim with a trusted site.','Note any error you found.'],
+      checklist:['Asked for sources','Verified a claim independently','Understood what a hallucination is'],
+      reflection:'Where will you always double-check AI before trusting it?' },
+    { id:'j4m7', title:'Solve an Engineering Problem with AI', time:'35 min',
+      why:'This is where it gets real: using AI as a thinking partner on actual engineering work.',
+      today:['Pick a small problem (a calc, a concept, a design choice).','Work through it with AI, asking it to show steps.','Check the result yourself.','Write down the final answer and how you verified it.'],
+      checklist:['Worked through a real problem','Checked the result myself','Recorded the verified answer'],
+      reflection:'Did AI speed you up, or did checking it take longer? What is the balance?' },
+    { id:'j4m8', title:'Build a Daily AI Habit', time:'15 min',
+      why:'Small daily use builds real fluency. The goal is for AI to become a natural part of how you learn and build.',
+      today:['Decide one daily AI use (learn, write, or plan).','Set a simple trigger ("after breakfast").','Save 3 prompts you will reuse.','Try it once now.'],
+      checklist:['Chose a daily AI habit','Saved reusable prompts','Tried it today'],
+      reflection:'What is the one AI habit you will keep?' },
+  ] },
+{ id:'j5', title:'Learn Python Slowly', icon:'code',
+  tagline:'Python for engineering — practical, not abstract.',
+  goal:'Get comfortable writing small Python scripts that do real engineering work, one gentle step at a time.',
+  missions:[
+    { id:'j5m1', title:'Open Python (Use Colab)', time:'20 min',
+      why:'You can write Python in your browser with zero setup using Google Colab. No installs, no stress — just start.',
+      today:['Open Google Colab.','Create a new notebook.','Type print("Hello, engineering") and run it.','Save the notebook to your Drive.'],
+      checklist:['Colab notebook created','Ran my first line','Saved to Drive'],
+      reflection:'How did it feel to run your first line of code?',
+      link:{label:'Open Google Colab', url:'https://colab.research.google.com'} },
+    { id:'j5m2', title:'Your First Script', time:'25 min',
+      why:'Variables let the computer remember values. This is the foundation of every program you will ever write.',
+      today:['Create variables for your name and age.','Print a sentence using them.','Change a value and run again.','Add a comment explaining one line.'],
+      checklist:['Used variables','Printed a sentence','Added a comment'],
+      reflection:'What is a variable, in your own words?' },
+    { id:'j5m3', title:'Numbers & Engineering Math', time:'30 min',
+      why:'Engineers calculate constantly. Python is a calculator that never makes arithmetic slips.',
+      today:['Calculate the area of a circle from a radius.','Use a variable for pi (3.14159).','Try +, -, *, / and ** (power).','Print the result with a label.'],
+      checklist:['Did a real calculation','Used a power (**)','Printed a labelled result'],
+      reflection:'What engineering formula would you love to automate?' },
+    { id:'j5m4', title:'Lists & Loops', time:'35 min',
+      why:'Lists hold many values; loops repeat work. Together they let you process lots of data without copy-paste.',
+      today:['Make a list of 5 numbers (e.g. measurements).','Loop through and print each.','Calculate their sum and average.','Print the average with a label.'],
+      checklist:['Created a list','Looped through it','Computed sum + average'],
+      reflection:'Where in engineering would looping over data help you?' },
+    { id:'j5m5', title:'Functions', time:'35 min',
+      why:'A function is a reusable recipe. Write it once, use it forever — the heart of clean code.',
+      today:['Write a function that converts mm to inches.','Call it with three values.','Add a second function (e.g. Celsius to Fahrenheit).','Print the results.'],
+      checklist:['Wrote a function','Called it several times','Wrote a second function'],
+      reflection:'Why are functions better than repeating code?' },
+    { id:'j5m6', title:'Read a Data File', time:'35 min',
+      why:'Real engineering data lives in files. Reading a CSV is the bridge between Python and your actual work.',
+      today:['Create a small CSV (or upload one) with numbers.','Read it in Python.','Print the values.','Calculate one statistic from them.'],
+      checklist:['Loaded a data file','Printed the data','Computed a statistic'],
+      reflection:'What dataset from your studies could you load next?' },
+    { id:'j5m7', title:'Draw Your First Chart', time:'30 min',
+      why:'A chart turns numbers into insight. Plotting is how engineers communicate results.',
+      today:['Install/import matplotlib in Colab.','Plot your list of numbers.','Add a title and axis labels.','Save the chart as an image.'],
+      checklist:['Made a plot','Added labels','Saved the image'],
+      reflection:'What did the chart reveal that raw numbers did not?' },
+    { id:'j5m8', title:'Build a Tiny Engineering Tool', time:'60 min',
+      why:'Now you combine everything into one small, useful tool — your first real Python project.',
+      today:['Pick a simple calc (beam load, unit converter, cost estimator).','Use variables, a function and a printed result.','Add comments so others understand it.','Save it and note it as a project for Journey 6.'],
+      checklist:['Built a small working tool','Commented the code','Saved it as a project'],
+      reflection:'What would make this tool even more useful?' },
+  ] },
+{ id:'j6', title:'Think in Projects', icon:'project',
+  tagline:'Turn everything you learn into small, documented projects.',
+  goal:'Learn one repeatable project framework, then run a real mini-project from idea to a published GitHub repo.',
+  missions:[
+    { id:'j6m1', title:'Learn the Project Framework', time:'20 min',
+      why:'Every strong project follows the same shape. Learn it once and you can build — and explain — anything.',
+      today:['Read the framework: Background, Problem, Requirements, Build, Test, Results, Lessons.','Write each heading in a blank doc.','Note one sentence under each from any past work.','Save the template.'],
+      checklist:['Framework understood','Template created','Filled it once roughly'],
+      reflection:'Which step do you usually skip — and why does it matter?' },
+    { id:'j6m2', title:'Choose a Small Project', time:'20 min',
+      why:'Small and finished beats big and abandoned. A tiny project you complete teaches more than a huge one you do not.',
+      today:['List 3 small project ideas.','Pick one you can finish this week.','Write why it interests you.','Write what "done" looks like.'],
+      checklist:['Three ideas listed','One chosen','Definition of done written'],
+      reflection:'What makes this project small enough to actually finish?' },
+    { id:'j6m3', title:'Define Problem & Requirements', time:'30 min',
+      why:'Clear requirements prevent wasted effort. Knowing what success means keeps you focused.',
+      today:['Write the problem in one paragraph.','List 3–5 requirements it must meet.','List any constraints (time, parts, budget).','Save it as your project brief.'],
+      checklist:['Problem written','Requirements listed','Constraints noted'],
+      reflection:'Which requirement is the hardest, and why?' },
+    { id:'j6m4', title:'Build Version One', time:'90 min',
+      why:'Version one is meant to be rough. The point is to have something real you can improve.',
+      today:['Build the simplest version that works.','Do not aim for perfect — aim for working.','Save your progress often.','Note anything that surprised you.'],
+      checklist:['Built a first version','It does something','Saved my progress'],
+      reflection:'What worked, and what fought back?' },
+    { id:'j6m5', title:'Test & Record Results', time:'40 min',
+      why:'Testing turns a hobby into engineering. Recording results gives you proof and content for your portfolio.',
+      today:['Test your project against your requirements.','Write down what passed and what failed.','Capture a photo, screenshot or output.','Note one improvement for next time.'],
+      checklist:['Tested against requirements','Recorded results','Captured a visual'],
+      reflection:'Did it meet your definition of done? Be honest.' },
+    { id:'j6m6', title:'Write a README', time:'35 min',
+      why:'A README explains your project to the world (and future you). It is the first thing anyone reads on GitHub.',
+      today:['Create a README file.','Add: what it is, why, how to use it, results.','Add one image if you can.','Save it with your project.'],
+      checklist:['README written','Covers what/why/how','Includes a visual'],
+      reflection:'Could a stranger understand your project from the README alone?',
+      link:{label:'How to write a README', url:'https://www.makeareadme.com'} },
+    { id:'j6m7', title:'Publish to GitHub', time:'40 min',
+      why:'Publishing makes your work visible and real. A public repo is proof you can ship.',
+      today:['Create a new repository on GitHub.','Upload your project files and README.','Make sure it is public.','Copy the link into your portfolio.'],
+      checklist:['Repository created','Files + README uploaded','Link saved to portfolio'],
+      reflection:'How does it feel to have public, visible work?',
+      link:{label:'Open GitHub', url:'https://github.com/new'} },
+    { id:'j6m8', title:'Share It on LinkedIn', time:'20 min',
+      why:'Sharing what you build grows your network and credibility. Quiet work helps no one find you.',
+      today:['Write a short post: what you built and learned.','Add one image.','Link your GitHub repo.','Post it, and end with a question.'],
+      checklist:['Post written','Image + link added','Published'],
+      reflection:'What reaction surprised you, if any?' },
+  ] },
+{ id:'j7', title:'Robotics Foundations', icon:'robot',
+  tagline:'Arduino, sensors, motors and embedded thinking — from zero.',
+  goal:'Understand the building blocks of robotics and make a virtual circuit react to the world, no expensive kit required.',
+  missions:[
+    { id:'j7m1', title:'Electronics in Plain English', time:'30 min',
+      why:'Robotics sits on electronics. Voltage, current and resistance are simpler than school made them feel.',
+      today:['Learn voltage = push, current = flow, resistance = restriction.','Watch one short beginner video.','Write each idea in your own words.','Note one everyday example of each.'],
+      checklist:['Understood V, I, R simply','Wrote my own definitions','Found everyday examples'],
+      reflection:'Explain voltage to a 12-year-old in one sentence.' },
+    { id:'j7m2', title:'Meet the Arduino', time:'25 min',
+      why:'Arduino is the friendliest way into embedded systems and robotics. It is the brain you will program.',
+      today:['Read what an Arduino is and what it does.','Look at the board: pins, USB, power.','Understand input vs output pins.','Bookmark the Arduino site.'],
+      checklist:['Know what an Arduino does','Understand inputs vs outputs','Bookmarked Arduino'],
+      reflection:'What would you want an Arduino to control first?',
+      link:{label:'Arduino — Getting Started', url:'https://www.arduino.cc/en/Guide'} },
+    { id:'j7m3', title:'Blink Your First LED (Simulator)', time:'35 min',
+      why:'"Blink" is the robotics equivalent of "Hello World". You can do it free in a browser simulator — no hardware.',
+      today:['Open Wokwi or Tinkercad Circuits.','Place an Arduino and an LED.','Use the Blink example code.','Run the simulation and watch it blink.'],
+      checklist:['Built a circuit in a simulator','Loaded blink code','Saw the LED blink'],
+      reflection:'What changed when you altered the delay time?',
+      link:{label:'Open Wokwi simulator', url:'https://wokwi.com'} },
+    { id:'j7m4', title:'Read a Sensor', time:'40 min',
+      why:'Sensors are how a robot perceives the world. Reading one is the start of every smart system.',
+      today:['In the simulator, add a sensor (e.g. potentiometer or temperature).','Read its value in code.','Print the value to the serial monitor.','Change the input and watch the number move.'],
+      checklist:['Added a sensor','Read its value','Saw values change live'],
+      reflection:'What real-world thing could this sensor measure?' },
+    { id:'j7m5', title:'Spin a Motor', time:'40 min',
+      why:'Motors are how a robot acts on the world. Controlling one is the other half of robotics.',
+      today:['Add a motor (or LED brightness) to your circuit.','Write code to control its speed.','Test slow and fast.','Note how code maps to movement.'],
+      checklist:['Added an actuator','Controlled its speed','Tested different levels'],
+      reflection:'How does changing code change physical behaviour?' },
+    { id:'j7m6', title:'Make It React (Sensor → Action)', time:'50 min',
+      why:'Sense, decide, act — that loop is the soul of robotics. Today you connect input to output.',
+      today:['Combine your sensor and your motor/LED.','Write an "if" rule: if sensor high, act.','Test by changing the sensor.','Watch your circuit respond on its own.'],
+      checklist:['Linked sensor to action','Wrote an if-rule','Saw it react automatically'],
+      reflection:'You just built a tiny autonomous system. What rule would you add next?' },
+    { id:'j7m7', title:'Think Like an Embedded Engineer', time:'30 min',
+      why:'Embedded systems run with tiny memory and must be reliable. The mindset matters as much as the wiring.',
+      today:['Learn what "embedded" means vs a normal computer.','Read about microcontrollers (Arduino, ESP32, Raspberry Pi Pico).','Note one trade-off (power, cost, speed).','Pick which you would learn next.'],
+      checklist:['Understand embedded vs PC','Know three microcontrollers','Chose one to explore'],
+      reflection:'Why must embedded code be careful with memory and power?' },
+    { id:'j7m8', title:'Sketch a Small Robot', time:'45 min',
+      why:'Designing on paper first is how real robots begin. This becomes a project for your portfolio.',
+      today:['Pick a simple robot idea (line follower, sensor alarm).','Sketch its parts: brain, sensors, motors, power.','List what each part does.','Save it as a future project brief.'],
+      checklist:['Robot idea chosen','Parts sketched','Brief saved'],
+      reflection:'What is the one feature that makes your robot useful?' },
+  ] },
+{ id:'j8', title:'Career Launch', icon:'rocket',
+  tagline:'Internships, networking, real applications — and a system to track them.',
+  goal:'Put your identity, story, projects and skills to work: apply, network, and become genuinely interview-ready.',
+  missions:[
+    { id:'j8m1', title:'Make Your Resume ATS-Ready', time:'40 min',
+      why:'Many companies filter resumes with software (ATS) before a human sees them. A clean, keyworded resume gets through.',
+      today:['Open your resume draft.','Use a simple layout, standard headings, no images.','Add keywords from a job you want.','Export a clean PDF/Markdown copy.'],
+      checklist:['Simple ATS-safe layout','Relevant keywords added','Clean copy exported'],
+      reflection:'Which keywords did you add from real job posts?' },
+    { id:'j8m2', title:'Polish Your LinkedIn', time:'30 min',
+      why:'A complete LinkedIn profile quietly works for you 24/7. Recruiters search it daily.',
+      today:['Open the Build tab → LinkedIn Builder.','Write a strong headline and About section.','Add skills and feature a project.','Copy each block into LinkedIn.'],
+      checklist:['Headline + About done','Skills added','A project featured'],
+      reflection:'What does your profile now say about where you are heading?' },
+    { id:'j8m3', title:'Build a Job Tracker', time:'25 min',
+      why:'Applications get lost without a system. A simple tracker keeps you organised and motivated.',
+      today:['Create a spreadsheet (Google Sheets).','Add columns: Role, Company, Link, Date, Status.','Add 3 roles you are interested in.','Bookmark the sheet in your career folder.'],
+      checklist:['Tracker created','Columns set up','First 3 roles added'],
+      reflection:'What status stages will you track (applied, replied, interview)?',
+      link:{label:'Open Google Sheets', url:'https://sheets.google.com'} },
+    { id:'j8m4', title:'Find Roles (Nigeria + Global)', time:'40 min',
+      why:'Opportunities are everywhere once you know where to look. Today you build a habit of finding them.',
+      today:['Search Jobberman and MyJobMag for entry roles.','Check LinkedIn Jobs with filters.','Look for internships, graduate trainee and remote roles.','Add 5 to your tracker.'],
+      checklist:['Searched 2+ platforms','Found suitable roles','Added 5 to my tracker'],
+      reflection:'Which type of role excites you most right now?',
+      link:{label:'Open Jobberman', url:'https://www.jobberman.com/jobs/internship-graduate'} },
+    { id:'j8m5', title:'Send a Cold Email', time:'35 min',
+      why:'A thoughtful email can open a door no application can. Most graduates never try — your advantage.',
+      today:['Find one engineer or company you admire.','Write a short, specific, polite email.','Say who you are, why them, and one clear ask.','Send it (or save a draft to send tomorrow).'],
+      checklist:['Found a real person/company','Wrote a short tailored email','Sent or scheduled it'],
+      reflection:'What made your email worth replying to?' },
+    { id:'j8m6', title:'Grow Your Network', time:'30 min',
+      why:'Most opportunities come through people. A small, genuine network beats hundreds of cold applications.',
+      today:['Connect with 5 people in your field on LinkedIn.','Add a one-line note with each request.','Comment thoughtfully on 2 posts.','Follow 3 companies you would join.'],
+      checklist:['5 connections with notes','Commented on 2 posts','Followed 3 companies'],
+      reflection:'Who is one person you would love to learn from?' },
+    { id:'j8m7', title:'Earn with AI Tasks (Optional)', time:'30 min',
+      why:'Platforms pay people to train and check AI — useful income and exposure while you build your career. Always research a platform before joining.',
+      today:['Read about Outlier, DataAnnotation and Remotasks.','Check requirements and how they pay (e.g. Payoneer).','Note which fit your skills.','Bookmark one to explore properly.'],
+      checklist:['Researched 2+ platforms','Understood how payment works','Bookmarked one'],
+      reflection:'Does this fit your time and goals right now? It is optional, not required.',
+      link:{label:'Outlier AI', url:'https://outlier.ai'} },
+    { id:'j8m8', title:'Get Interview-Ready', time:'45 min',
+      why:'Confidence comes from preparation. Practising your answers turns nerves into calm.',
+      today:['Write answers to: Tell me about yourself, your project, a challenge you solved.','Practise them aloud or record them.','Prepare 2 questions to ask them.','Use AI to mock-interview you.'],
+      checklist:['Key answers written','Practised aloud','Questions to ask prepared'],
+      reflection:'Which answer still needs work before a real interview?' },
+  ] },
+];
+const RESOURCES = [
+  { group:'AI Tools', items:[
+    { name:'ChatGPT', desc:'General AI assistant for learning, writing and debugging.', url:'https://chatgpt.com', free:true },
+    { name:'Claude', desc:'Thoughtful AI for writing, analysis and long documents.', url:'https://claude.ai', free:true },
+    { name:'Perplexity', desc:'Research assistant that answers with real, clickable sources.', url:'https://www.perplexity.ai', free:true },
+    { name:'NotebookLM', desc:'Upload your notes or PDFs and ask questions — a personal tutor.', url:'https://notebooklm.google.com', free:true },
+    { name:'Google Gemini', desc:'Google’s AI, strong for research and everyday tasks.', url:'https://gemini.google.com', free:true },
+  ]},
+  { group:'Learn Python', items:[
+    { name:'Google Colab', desc:'Write and run Python in your browser — no installation.', url:'https://colab.research.google.com', free:true },
+    { name:'Python.org Beginners Guide', desc:'The official starting point for the language.', url:'https://www.python.org/about/gettingstarted/', free:true },
+    { name:'freeCodeCamp', desc:'Free, hands-on Python and data courses with projects.', url:'https://www.freecodecamp.org', free:true },
+    { name:'Kaggle Learn', desc:'Short, practical Python and data-science micro-courses.', url:'https://www.kaggle.com/learn', free:true },
+    { name:'VS Code', desc:'The code editor most engineers use, free and cross-platform.', url:'https://code.visualstudio.com', free:true },
+  ]},
+  { group:'Robotics & Electronics', items:[
+    { name:'Wokwi', desc:'Free online Arduino & ESP32 simulator — build circuits in your browser.', url:'https://wokwi.com', free:true },
+    { name:'Tinkercad Circuits', desc:'Beginner-friendly circuit and Arduino simulator by Autodesk.', url:'https://www.tinkercad.com/circuits', free:true },
+    { name:'Arduino — Getting Started', desc:'Official guides, examples and reference for Arduino.', url:'https://www.arduino.cc/en/Guide', free:true },
+    { name:'ROS (Robot Operating System)', desc:'The standard framework for serious robotics software.', url:'https://www.ros.org', free:true },
+    { name:'Raspberry Pi Projects', desc:'Free beginner electronics and computing projects.', url:'https://projects.raspberrypi.org', free:true },
+  ]},
+  { group:'Engineering & CAD Software', items:[
+    { name:'Autodesk Fusion 360', desc:'Free for students & hobbyists — CAD, CAM and simulation.', url:'https://www.autodesk.com/products/fusion-360/personal', free:true },
+    { name:'Onshape', desc:'Cloud CAD that runs in a browser; free plan for makers.', url:'https://www.onshape.com', free:true },
+    { name:'FreeCAD', desc:'Open-source parametric 3D CAD modeller.', url:'https://www.freecad.org', free:true },
+    { name:'KiCad', desc:'Free, professional PCB and circuit design software.', url:'https://www.kicad.org', free:true },
+    { name:'GNU Octave', desc:'Free, MATLAB-compatible language for engineering maths.', url:'https://octave.org', free:true },
+  ]},
+  { group:'Find Work — Nigeria', items:[
+    { name:'Jobberman', desc:'Nigeria’s largest job site — internships and graduate roles.', url:'https://www.jobberman.com/jobs/internship-graduate', ng:true },
+    { name:'MyJobMag Nigeria', desc:'Wide range of entry-level and internship listings.', url:'https://www.myjobmag.com', ng:true },
+    { name:'Prosple Nigeria', desc:'Engineering internships and graduate programs in Nigeria.', url:'https://ng.prosple.com/engineering-internships-nigeria', ng:true },
+    { name:'Indeed Nigeria', desc:'Large search engine for jobs across Nigeria.', url:'https://ng.indeed.com', ng:true },
+    { name:'HotNigerianJobs', desc:'Daily graduate-trainee and internship postings.', url:'https://www.hotnigerianjobs.com', ng:true },
+  ]},
+  { group:'Find Work — Global & Remote', items:[
+    { name:'LinkedIn Jobs', desc:'Search global roles and let recruiters find you.', url:'https://www.linkedin.com/jobs', free:true },
+    { name:'Wellfound (AngelList)', desc:'Startup and remote-friendly roles worldwide.', url:'https://wellfound.com', free:true },
+    { name:'RemoteOK', desc:'Remote engineering and tech jobs you can do from anywhere.', url:'https://remoteok.com', free:true },
+    { name:'Prolific', desc:'Get paid for research studies and AI tasks (global).', url:'https://www.prolific.com', free:true },
+  ]},
+  { group:'Earn with AI Tasks', items:[
+    { name:'Outlier AI', desc:'Paid AI-training tasks; uses your subject expertise. Research before joining.', url:'https://outlier.ai', free:true },
+    { name:'DataAnnotation', desc:'Paid AI data and annotation work, popular with Nigerian contributors.', url:'https://www.dataannotation.tech', free:true },
+    { name:'Remotasks', desc:'Beginner-friendly annotation tasks (by Scale AI).', url:'https://www.remotasks.com', free:true },
+    { name:'Payoneer', desc:'Receive international payments and convert to Naira.', url:'https://www.payoneer.com', ng:true },
+  ]},
+  { group:'Grow in Nigeria — Training & Community', items:[
+    { name:'AltSchool Africa', desc:'Structured, affordable tech programs with mentorship and projects.', url:'https://altschoolafrica.com', ng:true },
+    { name:'Stutern', desc:'Lagos-based skills training and job placement for young talent.', url:'https://www.stutern.com', ng:true },
+    { name:'Ingressive for Good (I4G)', desc:'Free tech training, community and scholarships for Africans.', url:'https://ingressiveforgood.org', ng:true },
+    { name:'Opportunity Desk', desc:'Scholarships, fellowships and grants — updated daily.', url:'https://opportunitydesk.org', ng:true },
+  ]},
+  { group:'Keep Learning (Free)', items:[
+    { name:'Khan Academy', desc:'Free maths, physics and engineering foundations.', url:'https://www.khanacademy.org', free:true },
+    { name:'MIT OpenCourseWare', desc:'Real MIT engineering courses, free to study.', url:'https://ocw.mit.edu', free:true },
+    { name:'Coursera', desc:'University courses; audit many for free.', url:'https://www.coursera.org', free:true },
+    { name:'edX', desc:'Free courses from top universities worldwide.', url:'https://www.edx.org', free:true },
+    { name:'GitHub', desc:'Where your projects live and grow your engineering proof.', url:'https://github.com', free:true },
+  ]},
+];
+
+/* ---------- State ------------------------------------------------------- */
+const STORAGE_KEY = 'engineeros.v1';
+function defaultState(){
+  return {
+    version:1, onboarded:false,
+    user:{ name:'' },
+    theme:'system',             // system | light | dark
+    freeNav:false,              // unlock everything
+    completed:{},               // missionId -> true
+    missionData:{},             // missionId -> { checks:{i:true}, reflection, notes }
+    streak:{ count:0, best:0, last:'' },
+    builders:{ portfolio:{}, resume:{}, linkedin:{} },
+    reviews:[]                  // [{date, done, learned, confused, built, next}]
+  };
+}
+let state = loadState();
+function loadState(){
+  try{ const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ const p = JSON.parse(raw); return deepDefaults(p); } }catch(e){}
+  return defaultState();
+}
+function deepDefaults(p){
+  const d = defaultState();
+  const s = Object.assign(d, p);
+  s.user = Object.assign(d.user, p.user||{});
+  s.streak = Object.assign(d.streak, p.streak||{});
+  s.builders = Object.assign(d.builders, p.builders||{});
+  s.completed = p.completed||{};
+  s.missionData = p.missionData||{};
+  s.reviews = p.reviews||[];
+  return s;
+}
+let saveTimer=null;
+function save(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }, 120); }
+function saveNow(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
+
+/* ---------- Small helpers ---------------------------------------------- */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = (s='')=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const todayStr = ()=> new Date().toISOString().slice(0,10);
+function yesterdayStr(){ const d=new Date(); d.setDate(d.getDate()-1); return d.toISOString().slice(0,10); }
+function firstName(){ return (state.user.name||'there').trim().split(/\s+/)[0] || 'there'; }
+function flat(){ const out=[]; JOURNEYS.forEach((j,ji)=>j.missions.forEach((m,mi)=>out.push({j,ji,m,mi}))); return out; }
+function totalMissions(){ return flat().length; }
+function completedCount(){ return Object.keys(state.completed).filter(k=>state.completed[k]).length; }
+function md(id){ return state.missionData[id] || (state.missionData[id]={checks:{},reflection:'',notes:''}); }
+
+/* ---------- Unlock logic (progressive disclosure) ---------------------- */
+function journeyComplete(ji){ const j=JOURNEYS[ji]; return j && j.missions.every(m=>state.completed[m.id]); }
+function isJourneyUnlocked(ji){ return state.freeNav || ji===0 || journeyComplete(ji-1); }
+function isMissionUnlocked(ji,mi){
+  if(state.freeNav) return true;
+  if(!isJourneyUnlocked(ji)) return false;
+  if(mi===0) return true;
+  return !!state.completed[JOURNEYS[ji].missions[mi-1].id];
+}
+/* The single "today" mission: first unlocked + uncompleted */
+function todaysMission(){
+  for(const {j,ji,m,mi} of flat()){
+    if(isMissionUnlocked(ji,mi) && !state.completed[m.id]) return {j,ji,m,mi};
+  }
+  return null;
+}
+function findMission(id){ return flat().find(x=>x.m.id===id) || null; }
+
+/* ---------- Streak ------------------------------------------------------ */
+function liveStreak(){
+  const t=todayStr(), y=yesterdayStr();
+  if(state.streak.last===t||state.streak.last===y) return state.streak.count;
+  return 0; /* broken streak shows 0 until next win */
+}
+function touchStreak(){
+  const t=todayStr();
+  if(state.streak.last===t) return;
+  if(state.streak.last===yesterdayStr()) state.streak.count+=1;
+  else state.streak.count=1;
+  state.streak.last=t;
+  if(state.streak.count>state.streak.best) state.streak.best=state.streak.count;
+}
+
+/* ---------- Readiness --------------------------------------------------- */
+function pctFilled(obj, keys){
+  if(!obj) return 0;
+  let n=0; keys.forEach(k=>{ if(obj[k] && String(obj[k]).trim().length>2) n++; });
+  return Math.round(n/keys.length*100);
+}
+const RESUME_KEYS=['name','email','phone','location','summary','education','skills','projects','experience','certifications'];
+const LI_KEYS=['headline','about','education','skills','featured','post'];
+const PF_KEYS=['about','education','project','skills','tools','projects','certs','contact'];
+const GH_MILESTONES=['j1m5','j6m6','j6m7','j6m8'];
+function resumeReady(){ return pctFilled(state.builders.resume, RESUME_KEYS); }
+function linkedinReady(){ return pctFilled(state.builders.linkedin, LI_KEYS); }
+function portfolioReady(){ return pctFilled(state.builders.portfolio, PF_KEYS); }
+function githubReady(){ let n=GH_MILESTONES.filter(id=>state.completed[id]).length; return Math.round(n/GH_MILESTONES.length*100); }
+function overallPct(){ const t=totalMissions(); return t? Math.round(completedCount()/t*100):0; }
+
+/* ---------- Router ------------------------------------------------------ */
+let currentView='welcome';
+let viewParam=null;
+const NAV_VIEWS={ home:1, journeys:1, build:1, review:1, resources:1 };
+const RENDER={};   /* viewName -> render fn (assigned later) */
+function go(view, param=null, dir='f'){
+  viewParam=param;
+  if(RENDER[view]) RENDER[view](param);
+  const el=$('#view-'+view);
+  document.querySelectorAll('.view').forEach(v=>{ v.classList.remove('active','enter'); });
+  el.classList.add('active');
+  void el.offsetWidth;            /* reflow to restart animation */
+  el.classList.add('enter');
+  currentView=view;
+  window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
+  $('#topbar').classList.remove('scrolled');
+  updateChrome();
+}
+/* Which views show a back button, and where back goes */
+const BACK_TO={ journey:'journeys', mission:()=>backFromMission(), progress:'home',
+  portfolio:'build', resume:'build', linkedin:'build', settings:'home' };
+let missionFrom='journey';
+function backFromMission(){ return missionFrom==='home'?'home':'journey'; }
+function updateChrome(){
+  const onboarding = currentView==='welcome'||currentView==='setup';
+  $('#app').classList.toggle('onboarding', onboarding);
+  const back=$('#backBtn');
+  back.style.display = BACK_TO[currentView] ? 'grid':'none';
+  /* tab highlight */
+  document.querySelectorAll('.tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.value===currentView);
+  });
+}
+function handleBack(){
+  let to=BACK_TO[currentView];
+  if(typeof to==='function') to=to();
+  if(currentView==='journey') return go('journeys');
+  if(currentView==='mission') return go(missionFrom==='home'?'home':'journey', missionFrom==='home'?null:currentJourneyIndex);
+  go(to||'home');
+}
+
+/* ---------- Theme ------------------------------------------------------- */
+function applyTheme(){
+  const t=state.theme;
+  const root=document.documentElement;
+  if(t==='system') root.removeAttribute('data-theme');
+  else root.setAttribute('data-theme', t);
+  /* update quick toggle icon: show what you'll get next */
+  const dark = t==='dark' || (t==='system' && matchMedia('(prefers-color-scheme:dark)').matches);
+  $('#themeIcon').outerHTML = dark
+    ? '<svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"/></svg>'
+    : '<svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.8 4.8l1.7 1.7M17.5 17.5l1.7 1.7M19.2 4.8l-1.7 1.7M6.5 17.5l-1.7 1.7"/></svg>';
+}
+function cycleTheme(){
+  state.theme = state.theme==='light' ? 'dark' : state.theme==='dark' ? 'system' : 'light';
+  applyTheme(); save();
+  toast(`Theme: ${state.theme}`);
+}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{ if(state.theme==='system') applyTheme(); });
+
+/* ---------- Toast & celebrate ------------------------------------------ */
+let toastTimer=null;
+function toast(msg, withCheck=true){
+  const el=$('#toast');
+  el.innerHTML=(withCheck?I.check:'')+'<span>'+esc(msg)+'</span>';
+  el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('show'),2200);
+}
+function celebrate(){
+  const el=$('#celebrate');
+  el.innerHTML='<div class="celebrate-mark">'+I.check+'</div>';
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(!reduce){
+    const colors=['#0a84ff','#34c759','#ff9f0a','#00b4d8','#ff453a'];
+    for(let i=0;i<26;i++){
+      const c=document.createElement('span'); c.className='confetti';
+      c.style.background=colors[i%colors.length];
+      c.style.left=(50+(Math.random()*60-30))+'%';
+      c.style.top='40%';
+      c.style.animation=`fall ${0.9+Math.random()*0.8}s var(--ease) ${Math.random()*0.2}s forwards`;
+      el.appendChild(c);
+    }
+  }
+  el.classList.add('show');
+  setTimeout(()=>{ el.classList.remove('show'); el.innerHTML=''; }, 1300);
+}
+
+/* ---------- Download / copy -------------------------------------------- */
+function download(filename, text, type='text/markdown;charset=utf-8'){
+  const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); toast('Copied to clipboard'); }
+  catch(e){
+    const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); toast('Copied to clipboard'); }catch(_){ toast('Copy failed',false); }
+    ta.remove();
+  }
+}
+
+/* =======================================================================
+   RENDERERS
+   ======================================================================= */
+
+/* ----- Welcome & Setup -------------------------------------------------- */
+RENDER.welcome=()=>{
+  $('#view-welcome').innerHTML=`
+    <div class="hero stagger">
+      <div class="logo-mark">${I.logo}</div>
+      <div>
+        <div class="eyebrow">Dyrane Academy</div>
+        <h1 class="h-large" style="margin-top:8px">Welcome to<br>EngineerOS.</h1>
+      </div>
+      <p class="muted" style="font-size:18px; max-width:30ch">A calm, self-guided career system for becoming visible, skilled, and employable.</p>
+      <div class="card" style="background:var(--card)">
+        <div class="row" style="gap:12px"><div class="chip accent">${I.spark}</div>
+          <div><div style="font-weight:650">One mission at a time</div><div class="tiny">One day. One mission. One visible win.</div></div></div>
+      </div>
+      <div>
+        <button class="btn btn-primary" data-action="to-setup">Let's begin</button>
+        <p class="tiny center" style="margin-top:12px">No account. No pressure. Everything saves on this device.</p>
+      </div>
+    </div>`;
+};
+RENDER.setup=()=>{
+  $('#view-setup').innerHTML=`
+    <div class="hero stagger">
+      <div>
+        <div class="eyebrow">Setup · 1 of 1</div>
+        <h1 class="h-large" style="margin-top:8px">What should we<br>call you?</h1>
+        <p class="muted" style="font-size:17px; margin-top:10px">Just a first name is perfect.</p>
+      </div>
+      <div class="field">
+        <input class="input" id="nameInput" placeholder="Your name" autocomplete="given-name"
+          value="${esc(state.user.name)}" style="font-size:19px; padding:16px" />
+      </div>
+      <div class="field">
+        <label>Appearance</label>
+        <div class="seg" id="setupTheme">
+          <button data-theme-set="system" class="${state.theme==='system'?'on':''}">System</button>
+          <button data-theme-set="light" class="${state.theme==='light'?'on':''}">Light</button>
+          <button data-theme-set="dark" class="${state.theme==='dark'?'on':''}">Dark</button>
+        </div>
+      </div>
+      <button class="btn btn-primary" data-action="finish-setup">Start my journey</button>
+    </div>`;
+  setTimeout(()=>{ const n=$('#nameInput'); if(n) n.focus(); },120);
+};
+
+/* ----- Home dashboard --------------------------------------------------- */
+let currentJourneyIndex=0;
+RENDER.home=()=>{
+  const tm=todaysMission();
+  const total=totalMissions(), done=completedCount();
+  const hour=new Date().getHours();
+  const greet = hour<12?'Good morning':hour<18?'Good afternoon':'Good evening';
+  const streak=liveStreak();
+  let todayCard;
+  if(tm){
+    currentJourneyIndex=tm.ji;
+    todayCard=`
+      <div class="card tap" data-action="open-mission" data-value="${tm.m.id}" data-from="home" style="border:1px solid color-mix(in srgb,var(--amber) 34%, transparent); background:linear-gradient(180deg, var(--amber-soft), var(--card))">
+        <div class="row between" style="margin-bottom:14px">
+          <span class="badge badge-amber">${I.spark} Today's mission</span>
+          <span class="pill">${esc(tm.m.time)}</span>
+        </div>
+        <div class="tiny" style="font-weight:700; color:var(--amber)">${esc(tm.j.title).toUpperCase()}</div>
+        <h2 class="h-title" style="margin:4px 0 8px">${esc(tm.m.title)}</h2>
+        <p class="muted" style="font-size:14.5px">${esc(tm.m.why).split('. ')[0]}.</p>
+        <button class="btn btn-amber" style="margin-top:16px" data-action="open-mission" data-value="${tm.m.id}" data-from="home">Start today's win</button>
+      </div>`;
+  } else if(total>0){
+    todayCard=`
+      <div class="card center" style="background:linear-gradient(180deg,var(--green-soft),var(--card)); border-color:color-mix(in srgb,var(--green) 30%,transparent)">
+        <div class="chip green" style="margin:0 auto 12px; width:54px; height:54px">${I.check}</div>
+        <h2 class="h-title">Every mission complete.</h2>
+        <p class="muted" style="margin-top:6px">You built a real body of work. Revisit anything, or polish your portfolio.</p>
+        <button class="btn btn-primary" style="margin-top:16px" data-action="nav" data-value="build">Open Build Studio</button>
+      </div>`;
+  } else {
+    todayCard=`<div class="empty"><div class="chip accent">${I.spark}</div><p>Your missions are loading.</p></div>`;
+  }
+
+  $('#view-home').innerHTML=`
+    <div class="stagger">
+      <div style="margin:4px 2px 18px">
+        <div class="eyebrow">${esc(greet)}</div>
+        <h1 class="h-large" style="margin-top:6px">${esc(firstName())}.</h1>
+      </div>
+
+      ${todayCard}
+
+      <div class="stats" style="margin-top:18px">
+        <div class="stat"><div class="n">${overallPct()}<span style="font-size:15px">%</span></div><div class="l">Progress</div></div>
+        <div class="stat"><div class="n">${done}</div><div class="l">Missions done</div></div>
+        <div class="stat"><div class="n">${streak}${streak>0?'🔥':''}</div><div class="l">Day streak</div></div>
+      </div>
+
+      <h3 class="h-sec" style="margin-top:24px">Your readiness</h3>
+      <div class="ready-grid">
+        ${readyTile('Resume', resumeReady(),'amber')}
+        ${readyTile('LinkedIn', linkedinReady(),'')}
+        ${readyTile('Portfolio', portfolioReady(),'green')}
+        ${readyTile('GitHub', githubReady(),'')}
+      </div>
+
+      <div class="card tap" style="margin-top:18px" data-action="open-progress">
+        <div class="row between">
+          <div><div style="font-weight:650">See your full progress</div><div class="tiny">Journeys, streak and milestones</div></div>
+          <span class="chev" style="color:var(--text-3)">${I.chevron}</span>
+        </div>
+      </div>
+    </div>`;
+};
+function readyTile(name,val,tone){
+  return `<div class="ready">
+    <div class="rt"><span class="name">${name}</span><span class="v">${val}%</span></div>
+    <div class="bar-track"><div class="bar-fill ${tone}" style="width:${val}%"></div></div>
+  </div>`;
+}
+
+/* ----- Journeys list ---------------------------------------------------- */
+RENDER.journeys=()=>{
+  const cards=JOURNEYS.map((j,ji)=>{
+    const unlocked=isJourneyUnlocked(ji);
+    const done=j.missions.filter(m=>state.completed[m.id]).length;
+    const tot=j.missions.length;
+    const isDone=done===tot;
+    const pct=Math.round(done/tot*100);
+    const chipCls=isDone?'green':unlocked?'accent':'locked';
+    const icon=isDone?I.check:(unlocked?I[j.icon]:I.lock);
+    return `<div class="card tap" data-action="open-journey" data-value="${ji}" style="${unlocked?'':'opacity:.62'}">
+      <div class="row" style="gap:14px">
+        <div class="chip ${chipCls}">${icon}</div>
+        <div class="grow">
+          <div class="row between">
+            <div class="tiny" style="font-weight:700; color:var(--text-3)">JOURNEY ${ji+1}</div>
+            ${isDone?'<span class="badge badge-green">Complete</span>':unlocked?`<span class="tiny">${done}/${tot}</span>`:`<span class="lockmsg">${I.lock} Locked</span>`}
+          </div>
+          <div style="font-size:17px; font-weight:680; margin:2px 0 3px">${esc(j.title)}</div>
+          <div class="tiny" style="color:var(--text-2)">${esc(j.tagline)}</div>
+          ${unlocked?`<div class="bar-track" style="margin-top:12px"><div class="bar-fill ${isDone?'green':''}" style="width:${pct}%"></div></div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  $('#view-journeys').innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 16px"><div class="eyebrow">The path</div>
+        <h1 class="h-large" style="margin-top:6px">Journeys</h1>
+        <p class="muted" style="margin-top:8px">Eight journeys, one at a time. Finish a journey to open the next.</p></div>
+      ${cards}
+    </div>`;
+};
+
+/* ----- Journey detail --------------------------------------------------- */
+RENDER.journey=(ji)=>{
+  ji = ji==null?currentJourneyIndex:ji; currentJourneyIndex=ji;
+  const j=JOURNEYS[ji]; if(!j){ $('#view-journey').innerHTML='<div class="empty">Not found.</div>'; return; }
+  const done=j.missions.filter(m=>state.completed[m.id]).length;
+  const rows=j.missions.map((m,mi)=>{
+    const unlocked=isMissionUnlocked(ji,mi);
+    const isDone=!!state.completed[m.id];
+    const cls=isDone?'green':unlocked?'accent':'locked';
+    const icon=isDone?I.check:(unlocked?`<span style="font-weight:760">${mi+1}</span>`:I.lock);
+    return `<div class="lrow ${unlocked?'tap':''}" ${unlocked?`data-action="open-mission" data-value="${m.id}" data-from="journey"`:''} style="${unlocked?'':'opacity:.55'}">
+      <div class="chip ${cls}" style="width:38px;height:38px;border-radius:11px">${icon}</div>
+      <div class="lt"><div class="t1">${esc(m.title)}</div><div class="t2">${isDone?'Complete · ':''}${esc(m.time)}${!unlocked?' · Locked':''}</div></div>
+      ${unlocked?`<span class="chev">${I.chevron}</span>`:`<span class="chev">${I.lock}</span>`}
+    </div>`;
+  }).join('');
+  $('#view-journey').innerHTML=`
+    <div class="stagger">
+      <div class="row" style="gap:14px; margin:2px 2px 16px">
+        <div class="chip accent" style="width:54px;height:54px">${I[j.icon]}</div>
+        <div><div class="eyebrow">Journey ${ji+1} · ${done}/${j.missions.length}</div>
+          <h1 class="h-title" style="margin-top:4px; font-size:25px">${esc(j.title)}</h1></div>
+      </div>
+      <div class="notice accent" style="margin-bottom:16px"><strong>Goal.</strong> ${esc(j.goal)}</div>
+      <div class="list-card">${rows}</div>
+    </div>`;
+};
+
+/* ----- Mission view ----------------------------------------------------- */
+RENDER.mission=(id)=>{
+  const found=findMission(id); const root=$('#view-mission');
+  if(!found){ root.innerHTML='<div class="empty">Mission not found.</div>'; return; }
+  const {j,ji,m,mi}=found; currentJourneyIndex=ji;
+  const data=md(m.id);
+  const isDone=!!state.completed[m.id];
+  const checks=m.checklist.map((c,i)=>`
+    <label class="check">
+      <input type="checkbox" data-check="${m.id}:${i}" ${data.checks[i]?'checked':''} />
+      <span class="box">${I.check}</span>
+      <span class="ctext">${esc(c)}</span>
+    </label>`).join('');
+  const today=m.today.map(t=>`<li>${esc(t)}</li>`).join('');
+  const linkBtn = m.link ? `<a class="btn btn-ghost" href="${esc(m.link.url)}" target="_blank" rel="noopener" style="margin-top:4px">${esc(m.link.label)} ${I.open}</a>`:'';
+  root.innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 14px">
+        <div class="tiny" style="font-weight:700;color:var(--text-3)">JOURNEY ${ji+1} · ${esc(j.title)} · MISSION ${mi+1}</div>
+        <h1 class="h-large" style="font-size:28px; margin-top:8px">${esc(m.title)}</h1>
+        <div class="row" style="gap:8px; margin-top:10px"><span class="pill">${esc(m.time)}</span>${isDone?'<span class="badge badge-green">'+I.check+' Done</span>':''}</div>
+      </div>
+
+      <div class="card">
+        <h3 class="h-sec" style="margin-top:0">Why this matters</h3>
+        <p style="font-size:16px; line-height:1.5">${esc(m.why)}</p>
+      </div>
+
+      <div class="card">
+        <h3 class="h-sec" style="margin-top:0">Today's mission</h3>
+        <ol class="steps">${today}</ol>
+        ${linkBtn}
+      </div>
+
+      <div class="card">
+        <h3 class="h-sec" style="margin-top:0">Done checklist</h3>
+        <div id="checks">${checks}</div>
+        <div class="bar-track" style="margin-top:14px"><div class="bar-fill green" id="checkbar" style="width:${checkPct(m,data)}%"></div></div>
+      </div>
+
+      <div class="card">
+        <h3 class="h-sec" style="margin-top:0">Reflection</h3>
+        <p class="tiny" style="margin-bottom:8px">${esc(m.reflection)}</p>
+        <textarea class="textarea" data-reflect="${m.id}" placeholder="Write a sentence or two…">${esc(data.reflection)}</textarea>
+        <details style="margin-top:10px"><summary class="tiny" style="cursor:pointer">+ Private notes</summary>
+          <textarea class="textarea" data-notes="${m.id}" placeholder="Anything you want to remember…" style="margin-top:8px">${esc(data.notes)}</textarea>
+        </details>
+      </div>
+
+      <div style="margin-top:6px">
+        <button class="btn ${isDone?'btn-ghost':'btn-primary'}" data-action="${isDone?'reopen-mission':'complete-mission'}" data-value="${m.id}">
+          ${isDone?'Mark as not done':'Mark complete'}
+        </button>
+        <p class="tiny center" style="margin-top:10px">Done is better than perfect. Save it, improve it later.</p>
+      </div>
+    </div>`;
+};
+function checkPct(m,data){ const n=m.checklist.length; if(!n) return 0; let c=0; for(let i=0;i<n;i++) if(data.checks[i]) c++; return Math.round(c/n*100); }
+
+/* ----- Progress --------------------------------------------------------- */
+RENDER.progress=()=>{
+  const total=totalMissions(), done=completedCount(), pct=overallPct();
+  const circ=2*Math.PI*54;
+  const offset=circ*(1-pct/100);
+  const jlist=JOURNEYS.map((j,ji)=>{
+    const d=j.missions.filter(m=>state.completed[m.id]).length, t=j.missions.length;
+    const p=Math.round(d/t*100); const full=d===t;
+    return `<div class="lrow">
+      <div class="chip ${full?'green':d>0?'accent':''}" style="width:36px;height:36px;border-radius:10px">${full?I.check:I[j.icon]}</div>
+      <div class="lt"><div class="t1" style="font-size:15px">${esc(j.title)}</div>
+        <div class="bar-track" style="margin-top:8px"><div class="bar-fill ${full?'green':''}" style="width:${p}%"></div></div></div>
+      <div class="tiny" style="font-weight:700">${d}/${t}</div>
+    </div>`;
+  }).join('');
+  $('#view-progress').innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 18px"><div class="eyebrow">Your progress</div>
+        <h1 class="h-large" style="margin-top:6px">Look how far<br>you've come.</h1></div>
+
+      <div class="card center">
+        <div class="ring" style="margin:6px auto 4px; --circ:${circ}">
+          <svg viewBox="0 0 120 120">
+            <defs><linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="var(--accent)"/><stop offset="1" stop-color="var(--accent-2)"/></linearGradient></defs>
+            <circle class="track" cx="60" cy="60" r="54"/>
+            <circle class="bar" cx="60" cy="60" r="54" style="stroke-dasharray:${circ}; stroke-dashoffset:${offset}"/>
+          </svg>
+          <div class="label"><div class="pct">${pct}%</div><div class="cap">${done} of ${total}</div></div>
+        </div>
+      </div>
+
+      <div class="stats" style="margin-top:16px">
+        <div class="stat"><div class="n">${liveStreak()}</div><div class="l">Current streak</div></div>
+        <div class="stat"><div class="n">${state.streak.best||0}</div><div class="l">Best streak</div></div>
+        <div class="stat"><div class="n">${JOURNEYS.filter((j,ji)=>journeyComplete(ji)).length}</div><div class="l">Journeys done</div></div>
+      </div>
+
+      <h3 class="h-sec" style="margin-top:24px">By journey</h3>
+      <div class="list-card">${jlist}</div>
+    </div>`;
+};
+
+/* ----- Build hub -------------------------------------------------------- */
+RENDER.build=()=>{
+  const tiles=[
+    ['resume','Resume Builder','A clean, ATS-friendly draft you can export.','amber',resumeReady(),I.portfolio],
+    ['portfolio','Portfolio Builder','Your projects and story, ready to publish.','green',portfolioReady(),I.project],
+    ['linkedin','LinkedIn Builder','Headline, About and a first post that lands.','',linkedinReady(),I.identity],
+  ].map(([v,t,d,tone,val,icon])=>`
+    <div class="card tap" data-action="nav" data-value="${v}">
+      <div class="row" style="gap:14px">
+        <div class="chip ${tone||'accent'}">${icon}</div>
+        <div class="grow"><div style="font-size:17px;font-weight:680">${t}</div><div class="tiny" style="margin-top:2px">${d}</div></div>
+        <span class="chev" style="color:var(--text-3)">${I.chevron}</span>
+      </div>
+      <div class="bar-track" style="margin-top:14px"><div class="bar-fill ${tone}" style="width:${val}%"></div></div>
+    </div>`).join('');
+  $('#view-build').innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 16px"><div class="eyebrow">Build Studio</div>
+        <h1 class="h-large" style="margin-top:6px">Turn work into<br>evidence.</h1>
+        <p class="muted" style="margin-top:8px">Fill a little at a time. Everything exports when you're ready.</p></div>
+      ${tiles}
+    </div>`;
+};
+
+/* ----- Generic builder form factory ------------------------------------ */
+function builderView(rootId, store, title, eyebrow, fields, exportName, exportFn, intro){
+  const b=state.builders[store];
+  const html=fields.map(f=>{
+    const val=esc(b[f.k]||'');
+    if(f.type==='area') return `<div class="field"><label>${f.l}</label>
+      <textarea class="textarea" data-builder="${store}:${f.k}" placeholder="${esc(f.p||'')}" ${f.rows?`style="min-height:${f.rows*24}px"`:''}>${val}</textarea>
+      ${f.h?`<div class="hint">${f.h}</div>`:''}</div>`;
+    return `<div class="field"><label>${f.l}</label>
+      <input class="input" data-builder="${store}:${f.k}" placeholder="${esc(f.p||'')}" value="${val}" ${f.type==='email'?'type="email"':f.type==='tel'?'type="tel"':''} />
+      ${f.h?`<div class="hint">${f.h}</div>`:''}</div>`;
+  }).join('');
+  $('#'+rootId).innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 14px"><div class="eyebrow">${eyebrow}</div>
+        <h1 class="h-large" style="margin-top:6px; font-size:30px">${title}</h1></div>
+      ${intro?`<div class="notice accent" style="margin-bottom:16px">${intro}</div>`:''}
+      <div class="card">${html}</div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-primary" data-action="${exportName}">${I.download} Export Markdown</button>
+        <button class="btn btn-ghost btn-sm" data-action="${exportName}-copy" style="width:auto">${I.copy} Copy</button>
+      </div>
+      <p class="tiny center" style="margin-top:10px">Saved automatically on this device as you type.</p>
+    </div>`;
+}
+
+RENDER.resume=()=>builderView('view-resume','resume','Resume Builder','Build Studio',[
+  {k:'name',l:'Full name',p:'Adaeze Okafor'},
+  {k:'email',l:'Email',p:'firstname.lastname@gmail.com',type:'email'},
+  {k:'phone',l:'Phone',p:'+234 …',type:'tel'},
+  {k:'location',l:'Location',p:'Lagos, Nigeria'},
+  {k:'summary',l:'Professional summary',type:'area',p:'Mechanical Engineering graduate building toward AI & robotics…',h:'2–3 lines. Who you are + where you are heading.'},
+  {k:'education',l:'Education',type:'area',p:'B.Eng Mechanical Engineering — University of …, 2025',rows:3},
+  {k:'skills',l:'Skills',type:'area',p:'SolidWorks, Python (basic), Arduino, technical writing…',h:'Comma-separated. Mix tools + soft skills.'},
+  {k:'projects',l:'Projects',type:'area',p:'Final-year project: … — what it did, your role, the result.',rows:4},
+  {k:'experience',l:'Experience (optional)',type:'area',p:'Internship / SIWES / volunteer / leadership…',rows:3},
+  {k:'certifications',l:'Certifications (optional)',type:'area',p:'Course names + year',rows:2},
+],'export-resume',null,'Fill what you can today. A half-done resume beats none. Export anytime.');
+
+RENDER.portfolio=()=>builderView('view-portfolio','portfolio','Portfolio Builder','Build Studio',[
+  {k:'about',l:'About me',type:'area',p:'One short paragraph: who you are and what you build.',rows:3},
+  {k:'education',l:'Education',type:'area',p:'Degree, school, year, one highlight.',rows:2},
+  {k:'project',l:'Final-year project',type:'area',p:'Problem → what you built → result. 3–4 sentences.',rows:4},
+  {k:'skills',l:'Skills',type:'area',p:'Comma-separated.'},
+  {k:'tools',l:'Tools & software',type:'area',p:'SolidWorks, Fusion 360, Arduino, Python…'},
+  {k:'projects',l:'Other projects',type:'area',p:'List 2–3 with one line each.',rows:4},
+  {k:'certs',l:'Certifications',type:'area',p:'Optional.',rows:2},
+  {k:'contact',l:'Contact',type:'area',p:'Email · LinkedIn · GitHub',rows:2},
+],'export-portfolio',null,'This is your portfolio <em>content</em> — write it before building any website. Done is better than perfect.');
+
+RENDER.linkedin=()=>builderView('view-linkedin','linkedin','LinkedIn Builder','Build Studio',[
+  {k:'headline',l:'Headline',p:'Mechanical Engineer → AI & Robotics | Python · CAD · Arduino',h:'220 characters max. Show who you are + where you are heading.'},
+  {k:'about',l:'About section',type:'area',p:'Start with one strong line. Then your focus, skills and what you want next.',rows:5},
+  {k:'education',l:'Education',type:'area',p:'Degree, school, year.',rows:2},
+  {k:'skills',l:'Skills (add up to 50 on LinkedIn)',type:'area',p:'SolidWorks, Python, Robotics, ROS, Technical Writing…'},
+  {k:'featured',l:'Featured projects',type:'area',p:'2–3 links or titles to pin on your profile.',rows:3},
+  {k:'post',l:'First post draft',type:'area',p:'Share something you built or learned this week. Keep it human.',rows:5,h:'Tip: end with one question to invite comments.'},
+],'export-linkedin',null,'Copy each block straight into LinkedIn. Small, real updates beat a perfect profile you never publish.');
+
+/* ----- Weekly Review ---------------------------------------------------- */
+RENDER.review=()=>{
+  const past=(state.reviews||[]).slice().reverse().map(r=>`
+    <div class="card">
+      <div class="row between" style="margin-bottom:8px"><span class="badge badge-accent">${esc(r.date)}</span></div>
+      ${r.done?`<p style="font-size:14.5px"><strong>Completed:</strong> ${esc(r.done)}</p>`:''}
+      ${r.learned?`<p style="font-size:14.5px;margin-top:6px"><strong>Learned:</strong> ${esc(r.learned)}</p>`:''}
+      ${r.built?`<p style="font-size:14.5px;margin-top:6px"><strong>Built:</strong> ${esc(r.built)}</p>`:''}
+      ${r.next?`<p style="font-size:14.5px;margin-top:6px"><strong>Next:</strong> ${esc(r.next)}</p>`:''}
+    </div>`).join('');
+  $('#view-review').innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 14px"><div class="eyebrow">Sunday ritual</div>
+        <h1 class="h-large" style="margin-top:6px">Weekly review</h1>
+        <p class="muted" style="margin-top:8px">Five minutes. Five questions. Then close the laptop.</p></div>
+      <div class="card">
+        <div class="field"><label>What did I complete?</label><textarea class="textarea" id="rv-done" placeholder="Missions, tasks, applications…"></textarea></div>
+        <div class="field"><label>What did I learn?</label><textarea class="textarea" id="rv-learned" placeholder="One or two things."></textarea></div>
+        <div class="field"><label>What confused me?</label><textarea class="textarea" id="rv-confused" placeholder="Name it so you can tackle it."></textarea></div>
+        <div class="field"><label>What did I build?</label><textarea class="textarea" id="rv-built" placeholder="A script, a doc, a post, a circuit…"></textarea></div>
+        <div class="field"><label>What will I do next week?</label><textarea class="textarea" id="rv-next" placeholder="Keep it small and real."></textarea></div>
+        <button class="btn btn-primary" data-action="save-review">Save this week</button>
+      </div>
+      ${past?`<h3 class="h-sec" style="margin-top:24px">Past reviews</h3>${past}`:`<div class="empty" style="padding:30px 10px"><div class="chip accent" style="margin:0 auto 12px">${I.flag}</div><p>Your saved reviews will appear here.</p></div>`}
+    </div>`;
+};
+
+/* ----- Resources -------------------------------------------------------- */
+RENDER.resources=()=>{
+  const groups=RESOURCES.map(g=>{
+    const items=g.items.map(it=>`
+      <a class="res-item" href="${esc(it.url)}" target="_blank" rel="noopener">
+        <div class="grow"><div class="ri-t">${esc(it.name)} ${it.ng?'<span class="badge badge-ng">'+I.star+' Nigeria</span>':''}${it.free?'<span class="badge badge-green">Free</span>':''}</div>
+          <div class="ri-d">${esc(it.desc)}</div></div>
+        <span class="ri-open">${I.open}</span>
+      </a>`).join('');
+    return `<h3 class="h-sec" style="margin-top:22px">${esc(g.group)}</h3><div class="list-card">${items}</div>`;
+  }).join('');
+  $('#view-resources').innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 8px"><div class="eyebrow">Curated</div>
+        <h1 class="h-large" style="margin-top:6px">Resources</h1>
+        <p class="muted" style="margin-top:8px">Real tools and platforms — global picks plus a few made for Nigeria. Always verify what AI tells you.</p></div>
+      ${groups}
+      <p class="tiny center" style="margin-top:22px">Links open in a new tab. Some sites change — if one moves, search its name.</p>
+    </div>`;
+};
+
+/* ----- Settings --------------------------------------------------------- */
+RENDER.settings=()=>{
+  $('#view-settings').innerHTML=`
+    <div class="stagger">
+      <div style="margin:2px 2px 16px"><div class="eyebrow">Settings</div>
+        <h1 class="h-large" style="margin-top:6px">Your system</h1></div>
+
+      <div class="card">
+        <div class="field"><label>Your name</label>
+          <input class="input" id="set-name" value="${esc(state.user.name)}" placeholder="Your name" /></div>
+        <div class="field" style="margin-bottom:0"><label>Appearance</label>
+          <div class="seg" id="set-theme">
+            <button data-theme-set="system" class="${state.theme==='system'?'on':''}">System</button>
+            <button data-theme-set="light" class="${state.theme==='light'?'on':''}">Light</button>
+            <button data-theme-set="dark" class="${state.theme==='dark'?'on':''}">Dark</button>
+          </div></div>
+      </div>
+
+      <div class="card">
+        <div class="row between">
+          <div class="grow"><div style="font-weight:650">Free navigation</div>
+            <div class="tiny">Unlock every journey and mission now, instead of one step at a time.</div></div>
+          <button class="icon-btn" id="freeNavToggle" data-action="toggle-freenav" aria-label="Toggle free navigation"
+            style="width:52px;height:32px;border-radius:999px;justify-content:${state.freeNav?'flex-end':'flex-start'};background:${state.freeNav?'var(--green)':'var(--fill-2)'};padding:3px">
+            <span style="width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:var(--shadow-1);display:block"></span>
+          </button>
+        </div>
+      </div>
+
+      <h3 class="h-sec" style="margin-top:22px">Your data</h3>
+      <div class="card">
+        <button class="btn btn-ghost" data-action="export-json">${I.download} Export progress (JSON)</button>
+        <button class="btn btn-ghost" data-action="import-json" style="margin-top:10px">Import progress (JSON)</button>
+        <button class="btn btn-ghost" data-action="reset" style="margin-top:10px; color:var(--red)">Reset everything</button>
+        <p class="tiny" style="margin-top:12px">Everything lives only on this device. Export a backup before switching phones or browsers.</p>
+      </div>
+
+      <p class="tiny center" style="margin-top:22px">EngineerOS v1.0 · Dyrane Academy<br>One mission at a time.</p>
+    </div>`;
+};
+
+/* =======================================================================
+   ACTIONS
+   ======================================================================= */
+function completeMission(id){
+  if(!state.completed[id]){
+    state.completed[id]=true;
+    touchStreak();
+    saveNow();
+    celebrate();
+    toast("Today's win saved");
+  }
+  const found=findMission(id);
+  /* find next mission to suggest */
+  setTimeout(()=>{
+    const tm=todaysMission();
+    if(tm){
+      // if next mission is in same journey, drop user back to journey list; else home
+      go(missionFrom==='home'?'home': (tm.ji===found.ji?'journey':'journeys'), tm.ji===found.ji?found.ji:null);
+    } else {
+      go('home');
+    }
+  }, 950);
+}
+function reopenMission(id){ delete state.completed[id]; saveNow(); RENDER.mission(id); toast('Reopened',false); }
+
+function buildExport(store){
+  const b=state.builders[store]||{};
+  const L=[]; const name=b.name||state.user.name||'';
+  if(store==='resume'){
+    L.push(`# ${b.name||'Your Name'}`);
+    const contact=[b.email,b.phone,b.location].filter(Boolean).join(' · ');
+    if(contact) L.push(contact);
+    sec(L,'Summary',b.summary); sec(L,'Education',b.education); sec(L,'Skills',b.skills);
+    sec(L,'Projects',b.projects); sec(L,'Experience',b.experience); sec(L,'Certifications',b.certifications);
+  } else if(store==='portfolio'){
+    L.push(`# Portfolio — ${name||'Your Name'}`);
+    sec(L,'About',b.about); sec(L,'Education',b.education); sec(L,'Final-Year Project',b.project);
+    sec(L,'Skills',b.skills); sec(L,'Tools & Software',b.tools); sec(L,'Projects',b.projects);
+    sec(L,'Certifications',b.certs); sec(L,'Contact',b.contact);
+  } else {
+    L.push(`# LinkedIn — ${name||'Your Name'}`);
+    sec(L,'Headline',b.headline); sec(L,'About',b.about); sec(L,'Education',b.education);
+    sec(L,'Skills',b.skills); sec(L,'Featured Projects',b.featured); sec(L,'First Post Draft',b.post);
+  }
+  return L.join('\n\n')+'\n';
+}
+function sec(L,title,val){ if(val && String(val).trim()){ L.push(`## ${title}\n\n${String(val).trim()}`); } }
+
+function exportBuilder(store, copy){
+  const text=buildExport(store);
+  if(copy){ copyText(text); }
+  else { download(`${store}-${(state.user.name||'engineeros').toLowerCase().replace(/\s+/g,'-')}.md`, text); toast('Markdown downloaded'); }
+}
+
+function saveReview(){
+  const r={ date:new Date().toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}),
+    done:$('#rv-done').value.trim(), learned:$('#rv-learned').value.trim(),
+    confused:$('#rv-confused').value.trim(), built:$('#rv-built').value.trim(), next:$('#rv-next').value.trim() };
+  if(!r.done&&!r.learned&&!r.confused&&!r.built&&!r.next){ toast('Write at least one line first',false); return; }
+  state.reviews.push(r); touchStreak(); saveNow(); celebrate(); RENDER.review();
+  $('#view-review').classList.add('enter');
+}
+
+function exportJSON(){ download('engineeros-progress.json', JSON.stringify(state,null,2),'application/json'); toast('Backup downloaded'); }
+function importJSON(){ $('#importFile').click(); }
+$('#importFile').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const p=JSON.parse(r.result); state=deepDefaults(p); saveNow(); applyTheme(); go('home'); toast('Progress imported'); }
+    catch(err){ toast('Could not read that file',false); } };
+  r.readAsText(f); e.target.value='';
+});
+function resetAll(){
+  if(confirm('Reset everything? This clears all progress, reflections and builders on this device. Export a backup first if unsure.')){
+    const theme=state.theme; state=defaultState(); state.theme=theme; saveNow(); applyTheme();
+    go('welcome'); toast('Fresh start',false);
+  }
+}
+function setTheme(t){ state.theme=t; applyTheme(); save();
+  document.querySelectorAll('[data-theme-set]').forEach(b=>b.classList.toggle('on', b.dataset.themeSet===t)); }
+
+/* =======================================================================
+   EVENT WIRING
+   ======================================================================= */
+document.addEventListener('click', e=>{
+  const themeBtn=e.target.closest('[data-theme-set]');
+  if(themeBtn){ setTheme(themeBtn.dataset.themeSet); return; }
+  const t=e.target.closest('[data-action]'); if(!t) return;
+  const a=t.dataset.action, v=t.dataset.value;
+  switch(a){
+    case 'to-setup': go('setup'); break;
+    case 'finish-setup': {
+      const n=$('#nameInput'); state.user.name=(n&&n.value.trim())||'';
+      state.onboarded=true; touchStreak(); saveNow(); go('home');
+      toast('Welcome aboard, '+firstName()); break; }
+    case 'nav': go(v); break;
+    case 'open-journey': go('journey', parseInt(v,10)); break;
+    case 'open-mission': missionFrom=t.dataset.from||'journey'; go('mission', v); break;
+    case 'open-progress': go('progress'); break;
+    case 'open-settings': go('settings'); break;
+    case 'back': handleBack(); break;
+    case 'toggle-theme': cycleTheme(); break;
+    case 'complete-mission': completeMission(v); break;
+    case 'reopen-mission': reopenMission(v); break;
+    case 'export-resume': exportBuilder('resume',false); break;
+    case 'export-resume-copy': exportBuilder('resume',true); break;
+    case 'export-portfolio': exportBuilder('portfolio',false); break;
+    case 'export-portfolio-copy': exportBuilder('portfolio',true); break;
+    case 'export-linkedin': exportBuilder('linkedin',false); break;
+    case 'export-linkedin-copy': exportBuilder('linkedin',true); break;
+    case 'save-review': saveReview(); break;
+    case 'export-json': exportJSON(); break;
+    case 'import-json': importJSON(); break;
+    case 'reset': resetAll(); break;
+    case 'toggle-freenav': state.freeNav=!state.freeNav; save(); RENDER.settings(); toast(state.freeNav?'All unlocked':'Guided mode',false); break;
+  }
+});
+
+/* checkbox + textarea (delegated) */
+document.addEventListener('change', e=>{
+  const c=e.target.closest('[data-check]');
+  if(c){ const [id,i]=c.dataset.check.split(':'); const d=md(id); d.checks[i]=c.checked; save();
+    const m=findMission(id).m; const bar=$('#checkbar'); if(bar) bar.style.width=checkPct(m,d)+'%'; }
+});
+document.addEventListener('input', e=>{
+  const r=e.target.closest('[data-reflect]'); if(r){ md(r.dataset.reflect).reflection=r.value; save(); return; }
+  const n=e.target.closest('[data-notes]'); if(n){ md(n.dataset.notes).notes=r?r.value:n.value; save(); return; }
+  const b=e.target.closest('[data-builder]'); if(b){ const [store,key]=b.dataset.builder.split(':');
+    state.builders[store]=state.builders[store]||{}; state.builders[store][key]=b.value; save(); return; }
+  const sn=e.target.closest('#set-name'); if(sn){ state.user.name=sn.value; save(); }
+});
+
+/* topbar shadow on scroll */
+window.addEventListener('scroll',()=>{ $('#topbar').classList.toggle('scrolled', window.scrollY>6); }, {passive:true});
+
+/* =======================================================================
+   INIT
+   ======================================================================= */
+function init(){
+  applyTheme();
+  if(state.onboarded){ go('home'); }
+  else { go('welcome'); }
+}
+init();
+</script>
+</body>
+</html>
