@@ -6,7 +6,7 @@ import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { download, copyText, toast } from '../core/feedback.js';
-import { meter, pageHeader } from '../ui/components.js';
+import { meter, pageHeader, strengthLabel } from '../ui/components.js';
 import { ACTION_VERBS } from '../data/resume-assets.js';
 
 const emptyProj = () => ({ title: '', role: '', tech: '', link: '', problem: '', approach: '', result: '' });
@@ -73,8 +73,8 @@ function scoreData(p) {
 function scoreHTML(p) {
   const { score, tips } = scoreData(p);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
-  return `<div class="row between"><div><div class="rs-score-n">${score}<span style="font-size:15px">/100</span></div>
-      <div class="t-foot text-3">Portfolio strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
+  return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
+      <div class="t-foot text-3">${score}/100 · portfolio strength · a nudge, not a grade</div></div><div style="width:120px">${meter(score, tone)}</div></div>
     <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
       <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '→'}</span>
       <span>${esc(t)}</span></div>`).join('')}</div>`;

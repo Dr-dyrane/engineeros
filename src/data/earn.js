@@ -1,0 +1,62 @@
+/* EngineerOS · Earn while you learn
+   Honest, near-term ways for a new engineer to earn — modest at first, growing
+   with skill. Every item: what it is, realistic pay, and how to start.
+   Tone: a protective friend, never hype. (ng = especially relevant in Nigeria) */
+
+export const EARN = [
+  { group: 'Sell your engineering skills',
+    note: 'Turn what you’re learning into paid work. Every gig is also a portfolio piece.',
+    items: [
+      { name: 'Upwork', desc: 'Freelance CAD, 2D drawings, 3D modelling, rendering and simulation for clients worldwide.',
+        pay: '$15–60+ per project as you start', start: 'Make a profile and show 2–3 sample designs — your Journey 6 projects work.',
+        url: 'https://www.upwork.com', free: true },
+      { name: 'Fiverr', desc: 'Sell fixed-price “gigs”: CAD models, technical drawings, 3D-print files, product renders.',
+        pay: '$10–50 a gig early on', start: 'Create 3 clear gigs, each with a sample image.',
+        url: 'https://www.fiverr.com', free: true },
+      { name: 'Cad Crowd', desc: 'Design contests and jobs specifically for CAD and 3D designers.',
+        pay: 'Project- and contest-based', start: 'Sign up and enter a design challenge to build proof.',
+        url: 'https://www.cadcrowd.com', free: true },
+      { name: 'Truelancer', desc: 'Freelance marketplace widely used across Africa and Asia for CAD & design.',
+        pay: 'Project-based', start: 'Profile + a small portfolio of your work.',
+        url: 'https://www.truelancer.com', ng: true },
+    ]},
+  { group: 'Earn online now — start this week',
+    note: 'No portfolio needed. Just a laptop, good English, and consistency. Pay is modest but real.',
+    items: [
+      { name: 'Outlier', desc: 'Paid AI-training tasks that use your subject knowledge (maths, engineering, writing).',
+        pay: '$15–40/hr depending on task & skill', start: 'Apply and pass a subject assessment. Research it first.',
+        url: 'https://outlier.ai', free: true },
+      { name: 'DataAnnotation', desc: 'Paid AI data and annotation work — popular with Nigerian contributors.',
+        pay: 'Hourly, project-based', start: 'Apply and complete a starter assessment.',
+        url: 'https://www.dataannotation.tech', free: true },
+      { name: 'Remotasks', desc: 'Beginner-friendly annotation tasks (by Scale AI). The easiest place to start.',
+        pay: '$1–20/hr by task type', start: 'Sign up and finish the free training courses.',
+        url: 'https://www.remotasks.com', free: true },
+      { name: 'Prolific', desc: 'Get paid to take part in research studies — short and flexible.',
+        pay: 'Small per-study payouts', start: 'Create a profile and fill your details honestly.',
+        url: 'https://www.prolific.com', free: true },
+    ]},
+  { group: 'Earn while you build a career',
+    note: 'Roles that pay while you grow — a stipend now, a salary later.',
+    items: [
+      { name: 'Jobberman', desc: 'Internships and graduate-trainee roles, many with a stipend.',
+        pay: 'Stipend → salary', start: 'Apply to entry roles weekly (it’s a numbers game).',
+        url: 'https://www.jobberman.com/jobs/internship-graduate', ng: true },
+      { name: 'Prosple Nigeria', desc: 'Engineering internships and graduate programs in Nigeria.',
+        pay: 'Stipend → salary', start: 'Filter for engineering + your city.',
+        url: 'https://ng.prosple.com/engineering-internships-nigeria', ng: true },
+      { name: 'RemoteOK', desc: 'Remote, entry-level tech roles you can do from anywhere.',
+        pay: 'Part-time → full-time', start: 'Apply to junior/intern roles that match your skills.',
+        url: 'https://remoteok.com', free: true },
+      { name: 'Wellfound', desc: 'Startups hiring remote and junior talent worldwide.',
+        pay: 'Varies', start: 'Build a profile; startups often take a chance on hungry beginners.',
+        url: 'https://wellfound.com', free: true },
+    ]},
+  { group: 'Get paid — the practical bit',
+    note: 'How the money actually reaches you from abroad.',
+    items: [
+      { name: 'Payoneer', desc: 'Receive international payments and convert to Naira at a fair rate.',
+        pay: '—', start: 'Open a free account before your first payout.',
+        url: 'https://www.payoneer.com', ng: true },
+    ]},
+];

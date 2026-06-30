@@ -6,7 +6,7 @@ import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { download, copyText, toast } from '../core/feedback.js';
-import { meter, pageHeader } from '../ui/components.js';
+import { meter, pageHeader, strengthLabel } from '../ui/components.js';
 import { ACTION_VERBS, VERB_SET, XYZ, STOPWORDS, SKILL_HINTS } from '../data/resume-assets.js';
 
 /* ---------- model + one-time migration from the old flat shape ----------- */
@@ -87,8 +87,8 @@ function scoreData(r) {
 function scoreHTML(r) {
   const { score, tips } = scoreData(r);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
-  return `<div class="row between"><div><div class="rs-score-n">${score}<span style="font-size:15px">/100</span></div>
-      <div class="t-foot text-3">Resume strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
+  return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
+      <div class="t-foot text-3">${score}/100 · resume strength · a friendly nudge, never a grade</div></div><div style="width:120px">${meter(score, tone)}</div></div>
     <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
       <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '→'}</span>
       <span>${esc(t)}</span></div>`).join('')}</div>`;
@@ -257,6 +257,7 @@ function renderResume() {
 
   qs('#view-resume').innerHTML = `<div class="stagger">
     ${pageHeader('Build Studio', 'Resume Studio')}
+    <div class="notice notice-accent mb-4">Start small — your name and one real thing you did is enough for today. The score and tips are a friendly nudge, never a grade. You’ll improve it over time.</div>
 
     <div class="studio-toolbar">
       <div class="segmented studio-toggle">

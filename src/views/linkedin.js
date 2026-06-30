@@ -7,7 +7,7 @@ import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { copyText, download, toast } from '../core/feedback.js';
-import { pageHeader } from '../ui/components.js';
+import { pageHeader, strengthLabel } from '../ui/components.js';
 
 const LIMITS = { headline: 220, about: 2600, post: 3000 };
 const emptyFeat = () => ({ title: '', link: '', blurb: '' });
@@ -72,8 +72,8 @@ function scoreData(l) {
 function scoreHTML(l) {
   const { score, tips } = scoreData(l);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
-  return `<div class="row between"><div><div class="rs-score-n">${score}<span style="font-size:15px">/100</span></div>
-      <div class="t-foot text-3">Profile strength</div></div><div style="width:120px"><div class="meter ${tone}"><i style="width:${score}%"></i></div></div></div>
+  return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
+      <div class="t-foot text-3">${score}/100 · profile strength · a nudge, not a grade</div></div><div style="width:120px"><div class="meter ${tone}"><i style="width:${score}%"></i></div></div></div>
     <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
       <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '→'}</span>
       <span>${esc(t)}</span></div>`).join('')}</div>`;

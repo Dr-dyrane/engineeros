@@ -27,9 +27,14 @@ export function statTile(n, label) {
 
 export function readyTile(name, val, tone = '') {
   return `<div class="ready">
-    <div class="rt"><span class="name">${esc(name)}</span><span class="v">${val}%</span></div>
+    <div class="rt"><span class="name">${esc(name)}</span><span class="v">${val === 0 ? 'Start' : val + '%'}</span></div>
     ${meter(val, tone)}
   </div>`;
+}
+
+/* Encouraging label for a 0–100 strength score — friendlier than a bare number. */
+export function strengthLabel(score) {
+  return score >= 80 ? 'Interview-ready' : score >= 55 ? 'Coming together' : score >= 30 ? 'Good start' : 'Just getting started';
 }
 
 /* Progress ring (SVG). size in px; stroke scales with it. */

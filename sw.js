@@ -16,11 +16,11 @@ const PRECACHE = [
   '/styles/tokens.css', '/styles/base.css', '/styles/components.css', '/styles/studio.css', '/styles/animations.css', '/styles/print.css',
   '/src/main.js',
   '/src/core/state.js', '/src/core/dom.js', '/src/core/feedback.js', '/src/core/theme.js', '/src/core/router.js',
-  '/src/data/journeys.js', '/src/data/resources.js', '/src/data/resume-assets.js',
+  '/src/data/journeys.js', '/src/data/resources.js', '/src/data/resume-assets.js', '/src/data/earn.js',
   '/src/ui/components.js',
   '/src/views/onboarding.js', '/src/views/home.js', '/src/views/journeys.js', '/src/views/mission.js',
   '/src/views/build.js', '/src/views/resume.js', '/src/views/portfolio.js', '/src/views/linkedin.js',
-  '/src/views/progress.js', '/src/views/review.js', '/src/views/resources.js', '/src/views/settings.js',
+  '/src/views/progress.js', '/src/views/review.js', '/src/views/resources.js', '/src/views/earn.js', '/src/views/settings.js',
 ];
 
 self.addEventListener('install', (e) => {

@@ -46,7 +46,18 @@ registerView('home', () => {
         <h1 class="t-display" style="margin-top:6px">${esc(firstName())}.</h1>
       </header>
       <div class="home-grid">
-        <div>${todayCard}</div>
+        <div class="stack">
+          ${todayCard}
+          <div class="card tap" data-action="nav" data-value="earn"
+               style="background:linear-gradient(180deg, color-mix(in srgb,var(--green) 14%, transparent), var(--surface-1))">
+            <div class="row">
+              <div class="chip chip-green">${icon('wallet')}</div>
+              <div class="grow"><div class="t-headline">Earn while you learn</div>
+                <div class="t-foot text-2 mt-1">Real ways to make money as your skills grow — freelance gigs, AI tasks, paid internships.</div></div>
+              <span class="chev text-3">${icon('chevron-right')}</span>
+            </div>
+          </div>
+        </div>
         <div class="stack">
           <div class="grid-3">
             ${statTile(overallPct() + '<span style="font-size:15px">%</span>', 'Progress')}

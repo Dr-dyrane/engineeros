@@ -17,6 +17,7 @@ import { exportBuilder } from './views/build.js';
 import './views/progress.js';
 import { saveReview } from './views/review.js';
 import './views/resources.js';
+import './views/earn.js';
 import { renderSettings } from './views/settings.js';
 import { resumeInput, resumeAction } from './views/resume.js';
 import { portfolioInput, portfolioAction } from './views/portfolio.js';

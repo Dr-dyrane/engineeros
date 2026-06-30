@@ -23,7 +23,7 @@ const TAB_OF = { journey: 'journeys', mission: 'journeys', progress: 'home',
 const TITLES = { welcome: 'Welcome', setup: 'Setup', home: 'Today', journeys: 'Journeys',
   journey: 'Journey', mission: 'Mission', progress: 'Progress', build: 'Build Studio',
   resume: 'Resume Builder', portfolio: 'Portfolio Builder', linkedin: 'LinkedIn Builder',
-  review: 'Weekly Review', resources: 'Resources', settings: 'Settings' };
+  review: 'Weekly Review', resources: 'Resources', earn: 'Earn', settings: 'Settings' };
 
 export function registerView(name, fn) { registry[name] = fn; }
 export function getParam() { return curParam; }
@@ -46,7 +46,7 @@ function parseHash() {
     const sub = parts[1];
     return ['resume', 'portfolio', 'linkedin'].includes(sub) ? { view: sub, param: null } : { view: 'build', param: null };
   }
-  const known = ['home', 'journeys', 'progress', 'review', 'resources', 'settings', 'welcome', 'setup', 'build'];
+  const known = ['home', 'journeys', 'progress', 'review', 'resources', 'earn', 'settings', 'welcome', 'setup', 'build'];
   return { view: known.includes(a) ? a : 'home', param: null };
 }
 /* Gate onboarding so a deep link can't skip it (and vice-versa). */
