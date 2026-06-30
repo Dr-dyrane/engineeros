@@ -3,10 +3,10 @@
 
    Strategy:
    • Precache the app shell + every module + icons on install.
-   • Navigations  → network-first (fresh on each deploy), fall back to cached shell offline.
-   • Same-origin  → stale-while-revalidate (instant load + quiet background updates).
-   • Cross-origin → cache-first (Lucide + Google Fonts work offline once seen).
-   No manual version bumps needed for content — SWR keeps assets fresh. */
+   • Navigations , network-first (fresh on each deploy), fall back to cached shell offline.
+   • Same-origin , stale-while-revalidate (instant load + quiet background updates).
+   • Cross-origin, cache-first (Lucide + Google Fonts work offline once seen).
+   No manual version bumps needed for content, SWR keeps assets fresh. */
 
 const CACHE = 'engineeros-v1';
 
@@ -45,7 +45,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // Navigations: network-first so deploys show up; offline → cached shell.
+  // Navigations: network-first so deploys show up; offline, cached shell.
   if (req.mode === 'navigate') {
     e.respondWith(
       fetch(req)

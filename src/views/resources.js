@@ -21,8 +21,8 @@ registerView('resources', () => {
   }).join('');
 
   qs('#view-resources').innerHTML = `<div class="stagger">
-    ${pageHeader('Curated', 'Resources', 'Real tools and platforms — global picks plus a few made for Nigeria. Always verify what AI tells you.')}
+    ${pageHeader('Curated', 'Resources', 'Real tools and platforms. Global picks, plus a few made for Nigeria. Always check what AI tells you.')}
     ${groups}
-    <p class="t-foot text-3 center mt-5">Links open in a new tab. Some sites change — if one moves, search its name.</p>
+    <p class="t-foot text-3 center mt-5">Links open in a new tab. Some sites change. If one moves, search its name.</p>
   </div>`;
 });

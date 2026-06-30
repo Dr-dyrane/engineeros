@@ -1,4 +1,4 @@
-/* EngineerOS · Mission view — why / today / checklist / reflection / complete */
+/* EngineerOS · Mission view, why / today / checklist / reflection / complete */
 
 import { findMission, md, store } from '../core/state.js';
 import { qs, esc, icon } from '../core/dom.js';
@@ -72,7 +72,7 @@ registerView('mission', (id) => {
         <button class="btn ${isDone ? 'btn-ghost' : 'btn-primary'}" data-action="${isDone ? 'reopen-mission' : 'complete-mission'}" data-value="${m.id}">
           ${isDone ? 'Mark as not done' : 'Mark complete'}
         </button>
-        <p class="t-foot text-3 center mt-3">Done is better than perfect. Save it, improve it later.</p>
+        <p class="t-foot text-3 center mt-3">It does not have to be perfect. Save it now, and improve it later.</p>
       </div>
     </div>`;
 });

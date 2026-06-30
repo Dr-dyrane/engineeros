@@ -1,6 +1,6 @@
 /* EngineerOS · Resume Studio
    Structured editor + live, ATS-safe single-page preview, strength score,
-   ATS keyword match, action-verb coaching, and Print→PDF / text / markdown export. */
+   ATS keyword match, action-verb coaching, and Print to PDF / text / markdown export. */
 
 import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
@@ -75,22 +75,22 @@ function scoreData(r) {
   score = Math.min(100, score);
   const tips = [];
   if (!hasContact) tips.push(['miss', 'Add your name and email']);
-  if (!hasSummary) tips.push(['miss', 'Write a 2–3 line summary up top']);
+  if (!hasSummary) tips.push(['miss', 'Write a two or three line summary up top']);
   if (!hasExp) tips.push(['miss', 'Add at least one experience or project with bullet points']);
   if (bullets.length && qRatio < 0.5) tips.push(['miss', `Add a number or metric to ${bullets.length - quant} more bullet${bullets.length - quant === 1 ? '' : 's'}`]);
   if (bullets.length && vRatio < 0.7) { const n = bullets.length - verbN; tips.push(['miss', `Start ${n} bullet${n === 1 ? '' : 's'} with a strong action verb`]); }
   if (!hasSkills) tips.push(['miss', 'List your skills and tools']);
   if (!hasEdu) tips.push(['miss', 'Add your education']);
-  if (!tips.length) tips.push(['ok', 'Strong resume — now tailor it to each job with the ATS check below']);
+  if (!tips.length) tips.push(['ok', 'Strong resume. Now tailor it to each job using the ATS check below.']);
   return { score, tips };
 }
 function scoreHTML(r) {
   const { score, tips } = scoreData(r);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
   return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
-      <div class="t-foot text-3">${score}/100 · resume strength · a friendly nudge, never a grade</div></div><div style="width:120px">${meter(score, tone)}</div></div>
+      <div class="t-foot text-3">${score} of 100 · resume strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
     <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
-      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '→'}</span>
+      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '•'}</span>
       <span>${esc(t)}</span></div>`).join('')}</div>`;
 }
 
@@ -111,18 +111,18 @@ function atsData(r) {
 }
 function atsHTML(r) {
   const a = atsData(r);
-  if (!a) return `<p class="t-foot text-3">Paste a job description above and I’ll show how well your resume matches its keywords — and which to add (honestly).</p>`;
+  if (!a) return `<p class="t-foot text-3">Paste a job description above to see how well your resume matches its keywords, and which ones to add honestly.</p>`;
   const tone = a.pct >= 70 ? 'green' : a.pct >= 40 ? 'amber' : '';
   return `<div class="row between mb-2"><div class="fw-semibold">Keyword match</div><div class="fw-bold">${a.pct}%</div></div>
     ${meter(a.pct, tone)}
-    ${a.miss.length ? `<div class="t-foot text-3 mt-3 mb-1">Missing — add the ones that genuinely apply:</div>
+    ${a.miss.length ? `<div class="t-foot text-3 mt-3 mb-1">Missing keywords. Add the ones that genuinely apply:</div>
       <div class="rs-kws">${a.miss.slice(0, 18).map(k => `<span class="rs-kw miss">${esc(k)}</span>`).join('')}</div>` : ''}
     ${a.hit.length ? `<div class="t-foot text-3 mt-3 mb-1">Matched:</div>
       <div class="rs-kws">${a.hit.slice(0, 18).map(k => `<span class="rs-kw hit">${esc(k)}</span>`).join('')}</div>` : ''}`;
 }
 
 /* ---------- the resume "paper" ------------------------------------------- */
-function dates(a, b, cur) { return [a, cur ? 'Present' : b].filter(Boolean).join(' – '); }
+function dates(a, b, cur) { return [a, cur ? 'Present' : b].filter(Boolean).join(' to '); }
 function bl(arr) { const i = (arr || []).filter(b => b && b.trim()); return i.length ? `<ul class="rp-ul">${i.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''; }
 function paperHTML(r) {
   const contact = [r.email, r.phone, r.location, r.linkedin, r.github, r.portfolio].filter(Boolean);
@@ -137,21 +137,21 @@ function paperHTML(r) {
   if (r.summary && r.summary.trim()) h += `<div class="rp-section"><div class="rp-h">Summary</div><div class="rp-summary">${esc(r.summary)}</div></div>`;
   if (exp.length) h += `<div class="rp-section"><div class="rp-h">Experience</div>${exp.map(e => `
     <div class="rp-item"><div class="rp-row">
-      <span><span class="rp-role">${esc(e.role || 'Role')}</span>${e.org ? ` — <span class="rp-org">${esc(e.org)}</span>` : ''}</span>
+      <span><span class="rp-role">${esc(e.role || 'Role')}</span>${e.org ? `, <span class="rp-org">${esc(e.org)}</span>` : ''}</span>
       <span class="rp-meta">${esc([e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · '))}</span>
     </div>${bl(e.bullets)}</div>`).join('')}</div>`;
   if (proj.length) h += `<div class="rp-section"><div class="rp-h">Projects</div>${proj.map(p => `
     <div class="rp-item"><div class="rp-row">
-      <span class="rp-role">${esc(p.name || 'Project')}${p.tech ? ` <span class="rp-meta">— ${esc(p.tech)}</span>` : ''}</span>
+      <span class="rp-role">${esc(p.name || 'Project')}${p.tech ? ` <span class="rp-meta">· ${esc(p.tech)}</span>` : ''}</span>
       ${p.link ? `<span class="rp-meta">${esc(p.link)}</span>` : ''}
     </div>${bl(p.bullets)}</div>`).join('')}</div>`;
   if (edu.length) h += `<div class="rp-section"><div class="rp-h">Education</div>${edu.map(e => `
     <div class="rp-item"><div class="rp-row">
-      <span><span class="rp-role">${esc(e.degree || 'Degree')}</span>${e.school ? ` — <span class="rp-org">${esc(e.school)}</span>` : ''}</span>
+      <span><span class="rp-role">${esc(e.degree || 'Degree')}</span>${e.school ? `, <span class="rp-org">${esc(e.school)}</span>` : ''}</span>
       <span class="rp-meta">${esc([e.place, dates(e.start, e.end)].filter(Boolean).join(' · '))}</span>
     </div>${e.detail ? `<div>${esc(e.detail)}</div>` : ''}</div>`).join('')}</div>`;
   if (sk.length) h += `<div class="rp-section"><div class="rp-h">Skills</div>${sk.map(s => `<div class="rp-skline">${s.group ? `<b>${esc(s.group)}:</b> ` : ''}${esc(s.items)}</div>`).join('')}</div>`;
-  if (ce.length) h += `<div class="rp-section"><div class="rp-h">Certifications</div>${ce.map(c => `<div class="rp-skline">${esc(c.name)}${c.issuer ? ` — ${esc(c.issuer)}` : ''}${c.year ? ` (${esc(c.year)})` : ''}</div>`).join('')}</div>`;
+  if (ce.length) h += `<div class="rp-section"><div class="rp-h">Certifications</div>${ce.map(c => `<div class="rp-skline">${esc(c.name)}${c.issuer ? `, ${esc(c.issuer)}` : ''}${c.year ? ` (${esc(c.year)})` : ''}</div>`).join('')}</div>`;
   return h;
 }
 
@@ -162,16 +162,16 @@ function plain(r) {
   if (r.summary && r.summary.trim()) { L.push('', 'SUMMARY', r.summary.trim()); }
   const sec = (t, items) => { if (items.length) { L.push('', t.toUpperCase()); items.forEach(x => L.push(x)); } };
   sec('Experience', (r.experience || []).filter(e => e.role || e.org || e.bullets.some(b => b && b.trim())).flatMap(e => {
-    const head = [[e.role, e.org].filter(Boolean).join(' — '), [e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · ')].filter(Boolean).join('  |  ');
+    const head = [[e.role, e.org].filter(Boolean).join(', '), [e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · ')].filter(Boolean).join('  |  ');
     return [head, ...e.bullets.filter(b => b && b.trim()).map(b => '  • ' + b.trim())];
   }));
   sec('Projects', (r.projects || []).filter(p => p.name || p.bullets.some(b => b && b.trim())).flatMap(p => {
-    const head = [p.name, p.tech, p.link].filter(Boolean).join(' — ');
+    const head = [p.name, p.tech, p.link].filter(Boolean).join(', ');
     return [head, ...p.bullets.filter(b => b && b.trim()).map(b => '  • ' + b.trim())];
   }));
-  sec('Education', (r.education || []).filter(e => e.degree || e.school).map(e => [[e.degree, e.school].filter(Boolean).join(' — '), [e.place, dates(e.start, e.end)].filter(Boolean).join(' · ')].filter(Boolean).join('  |  ')));
+  sec('Education', (r.education || []).filter(e => e.degree || e.school).map(e => [[e.degree, e.school].filter(Boolean).join(', '), [e.place, dates(e.start, e.end)].filter(Boolean).join(' · ')].filter(Boolean).join('  |  ')));
   sec('Skills', (r.skills || []).filter(s => s.items && s.items.trim()).map(s => (s.group ? s.group + ': ' : '') + s.items.trim()));
-  sec('Certifications', (r.certifications || []).filter(c => c.name && c.name.trim()).map(c => c.name + (c.issuer ? ' — ' + c.issuer : '') + (c.year ? ' (' + c.year + ')' : '')));
+  sec('Certifications', (r.certifications || []).filter(c => c.name && c.name.trim()).map(c => c.name + (c.issuer ? ', ' + c.issuer : '') + (c.year ? ' (' + c.year + ')' : '')));
   return L.join('\n') + '\n';
 }
 function markdown(r) {
@@ -179,15 +179,15 @@ function markdown(r) {
   const c = [r.email, r.phone, r.location, r.linkedin, r.github, r.portfolio].filter(Boolean); if (c.length) L.push(c.join(' · '));
   if (r.summary && r.summary.trim()) L.push('', '## Summary', '', r.summary.trim());
   const exp = (r.experience || []).filter(e => e.role || e.org || e.bullets.some(b => b && b.trim()));
-  if (exp.length) { L.push('', '## Experience'); exp.forEach(e => { L.push('', `**${[e.role, e.org].filter(Boolean).join(' — ')}** — ${[e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · ')}`); e.bullets.filter(b => b && b.trim()).forEach(b => L.push('- ' + b.trim())); }); }
+  if (exp.length) { L.push('', '## Experience'); exp.forEach(e => { L.push('', `**${[e.role, e.org].filter(Boolean).join(', ')}** · ${[e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · ')}`); e.bullets.filter(b => b && b.trim()).forEach(b => L.push('- ' + b.trim())); }); }
   const pr = (r.projects || []).filter(p => p.name || p.bullets.some(b => b && b.trim()));
-  if (pr.length) { L.push('', '## Projects'); pr.forEach(p => { L.push('', `**${[p.name, p.tech].filter(Boolean).join(' — ')}**${p.link ? ' · ' + p.link : ''}`); p.bullets.filter(b => b && b.trim()).forEach(b => L.push('- ' + b.trim())); }); }
+  if (pr.length) { L.push('', '## Projects'); pr.forEach(p => { L.push('', `**${[p.name, p.tech].filter(Boolean).join(', ')}**${p.link ? ' · ' + p.link : ''}`); p.bullets.filter(b => b && b.trim()).forEach(b => L.push('- ' + b.trim())); }); }
   const ed = (r.education || []).filter(e => e.degree || e.school);
-  if (ed.length) { L.push('', '## Education'); ed.forEach(e => L.push('', `**${[e.degree, e.school].filter(Boolean).join(' — ')}** — ${[e.place, dates(e.start, e.end)].filter(Boolean).join(' · ')}`, e.detail || '')); }
+  if (ed.length) { L.push('', '## Education'); ed.forEach(e => L.push('', `**${[e.degree, e.school].filter(Boolean).join(', ')}** · ${[e.place, dates(e.start, e.end)].filter(Boolean).join(' · ')}`, e.detail || '')); }
   const sk = (r.skills || []).filter(s => s.items && s.items.trim());
   if (sk.length) { L.push('', '## Skills'); sk.forEach(s => L.push('- ' + (s.group ? '**' + s.group + ':** ' : '') + s.items.trim())); }
   const ce = (r.certifications || []).filter(c => c.name && c.name.trim());
-  if (ce.length) { L.push('', '## Certifications'); ce.forEach(c => L.push('- ' + c.name + (c.issuer ? ' — ' + c.issuer : '') + (c.year ? ' (' + c.year + ')' : ''))); }
+  if (ce.length) { L.push('', '## Certifications'); ce.forEach(c => L.push('- ' + c.name + (c.issuer ? ', ' + c.issuer : '') + (c.year ? ' (' + c.year + ')' : ''))); }
   return L.join('\n') + '\n';
 }
 const fname = ext => `${(R().name || 'resume').toLowerCase().replace(/\s+/g, '-')}-resume.${ext}`;
@@ -257,7 +257,7 @@ function renderResume() {
 
   qs('#view-resume').innerHTML = `<div class="stagger">
     ${pageHeader('Build Studio', 'Resume Studio')}
-    <div class="notice notice-accent mb-4">Start small — your name and one real thing you did is enough for today. The score and tips are a friendly nudge, never a grade. You’ll improve it over time.</div>
+    <div class="notice notice-accent mb-4">Start small. Your name and one real thing you did is enough for today. The score and tips are just guidance, not a test. You can improve it any time.</div>
 
     <div class="studio-toolbar">
       <div class="segmented studio-toggle">
@@ -275,7 +275,7 @@ function renderResume() {
       <div class="studio-edit">
         <div class="card">
           <h3 class="section-label" style="margin-top:0">Contact</h3>
-          <div class="rs-two">${inp('name', r.name, 'Full name')}${inp('title', r.title, 'Headline (Mechanical → AI & Robotics)')}</div>
+          <div class="rs-two">${inp('name', r.name, 'Full name')}${inp('title', r.title, 'Headline (Mechanical, AI & Robotics)')}</div>
           <div class="rs-two mt-2">${inp('email', r.email, 'Email', 'email')}${inp('phone', r.phone, 'Phone', 'tel')}</div>
           <div class="mt-2">${inp('location', r.location, 'Location (Lagos, Nigeria)')}</div>
           <div class="rs-two mt-2">${inp('linkedin', r.linkedin, 'LinkedIn URL')}${inp('github', r.github, 'GitHub URL')}</div>
@@ -325,7 +325,7 @@ function renderResume() {
 
       <div class="studio-preview">
         <div class="resume-paper" id="rs-paper"></div>
-        <p class="t-foot text-3 center mt-3 no-print">“Save PDF” opens your browser’s print dialog — choose <b>Save as PDF</b>. Single-column, ATS-safe.</p>
+        <p class="t-foot text-3 center mt-3 no-print">“Save PDF” opens your browser’s print dialog. Choose <b>Save as PDF</b>. It prints as a single column, ready for an ATS.</p>
       </div>
     </div>
   </div>`;

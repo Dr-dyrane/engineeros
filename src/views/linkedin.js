@@ -1,6 +1,6 @@
 /* EngineerOS · LinkedIn Studio
-   Craft the text blocks LinkedIn actually asks for — headline, About, featured
-   projects, skills, and a first post — with live character counters, examples,
+   Craft the text blocks LinkedIn actually asks for, headline, About, featured
+   projects, skills, and a first post, with live character counters, examples,
    post templates, a profile preview, and per-section copy. */
 
 import { store, save } from '../core/state.js';
@@ -13,9 +13,9 @@ const LIMITS = { headline: 220, about: 2600, post: 3000 };
 const emptyFeat = () => ({ title: '', link: '', blurb: '' });
 
 const POST_TEMPLATES = [
-  { label: 'Built something', text: 'This week I built [what].\n\n• Problem: [what needed solving]\n• Approach: [what you did]\n• Result: [outcome with a number]\n\nNext I want to [next step].\n\nIf you’ve done something similar, what would you add? 👇' },
-  { label: 'Learned something', text: 'I used to think [old belief].\n\nThis week, while [doing what], it clicked: [new insight].\n\nThe thing that helped most: [one concrete tip].\n\nIf you’re starting out in [field], you’ve got this.\n\nWhat helped it click for you?' },
-  { label: 'Shared a project', text: 'New project: [name] 🚀\n\n[One line on what it does.]\nProblem → Approach → Result: [...]\nBuilt with [tools]. Repo/demo: [link]\n\nFeedback welcome — what would you improve?' },
+  { label: 'Built something', text: 'This week I built [what].\n\nThe problem: [what needed solving].\nWhat I did: [your approach].\nThe result: [outcome with a number].\n\nNext, I want to [next step].\n\nIf you have built something similar, what would you add?' },
+  { label: 'Learned something', text: 'I used to think [old belief].\n\nThis week, while [doing what], it clicked: [new insight].\n\nThe thing that helped most was [one concrete tip].\n\nIf you are starting out in [field], you can do this too.\n\nWhat helped it click for you?' },
+  { label: 'Shared a project', text: 'New project: [name].\n\n[One line on what it does.]\nProblem, approach, and result: [the short version].\nBuilt with [tools]. Repo or demo: [link].\n\nFeedback is welcome. What would you improve?' },
 ];
 
 /* ---------- model + migration -------------------------------------------- */
@@ -61,21 +61,21 @@ function scoreData(l) {
   };
   const score = Math.round(Object.values(checks).filter(Boolean).length / 5 * 100);
   const tips = [];
-  if (!checks.headline) tips.push(['miss', 'Write a headline (40–220 chars): Role → where you’re heading | key skills']);
-  if (!checks.about) tips.push(['miss', 'Write an About of at least a few sentences — hook, what you do, a CTA']);
+  if (!checks.headline) tips.push(['miss', 'Write a headline (40 to 220 characters): your role, where you are heading, and your key skills']);
+  if (!checks.about) tips.push(['miss', 'Write an About of at least a few sentences: a hook, what you do, and a clear next step']);
   if (!checks.featured) tips.push(['miss', 'Feature at least one project']);
   if (!checks.skills) tips.push(['miss', `Add ${Math.max(0, 5 - skillsN)} more skills (LinkedIn allows up to 50)`]);
-  if (!checks.post) tips.push(['miss', 'Draft a first post — share something you built or learned']);
-  if (!tips.length) tips.push(['ok', 'Profile is in great shape — copy each block into LinkedIn']);
+  if (!checks.post) tips.push(['miss', 'Draft a first post. Share something you built or learned.']);
+  if (!tips.length) tips.push(['ok', 'Looking great. Copy each block into LinkedIn.']);
   return { score, tips };
 }
 function scoreHTML(l) {
   const { score, tips } = scoreData(l);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
   return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
-      <div class="t-foot text-3">${score}/100 · profile strength · a nudge, not a grade</div></div><div style="width:120px"><div class="meter ${tone}"><i style="width:${score}%"></i></div></div></div>
+      <div class="t-foot text-3">${score} of 100 · profile strength</div></div><div style="width:120px"><div class="meter ${tone}"><i style="width:${score}%"></i></div></div></div>
     <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
-      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '→'}</span>
+      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '•'}</span>
       <span>${esc(t)}</span></div>`).join('')}</div>`;
 }
 
@@ -94,11 +94,11 @@ function previewHTML(l) {
 
 /* ---------- export -------------------------------------------------------- */
 function markdown(l) {
-  const L2 = ['# LinkedIn — ' + (l.name || 'Your Name')];
+  const L2 = ['# LinkedIn: ' + (l.name || 'Your Name')];
   if (l.headline) L2.push('', '## Headline', '', l.headline);
   if (l.about) L2.push('', '## About', '', l.about);
   const feat = (l.featured || []).filter(f => f.title || f.blurb);
-  if (feat.length) { L2.push('', '## Featured'); feat.forEach(f => L2.push('- **' + (f.title || 'Project') + '**' + (f.link ? ' — ' + f.link : '') + (f.blurb ? ': ' + f.blurb : ''))); }
+  if (feat.length) { L2.push('', '## Featured'); feat.forEach(f => L2.push('- **' + (f.title || 'Project') + '**' + (f.link ? ', ' + f.link : '') + (f.blurb ? ': ' + f.blurb : ''))); }
   if (l.skills) L2.push('', '## Skills', '', l.skills);
   if (l.post) L2.push('', '## First Post', '', l.post);
   return L2.join('\n') + '\n';
@@ -160,16 +160,16 @@ function renderLinkedIn() {
 
         <div class="card">
           <div class="row between"><h3 class="section-label" style="margin-top:0">Headline</h3>${copyBtn('headline')}</div>
-          ${ta('headline', l.headline, 'Mechanical Engineer → AI & Robotics | Python · CAD · Arduino', 2)}
+          ${ta('headline', l.headline, 'Mechanical Engineer, AI & Robotics | Python · CAD · Arduino', 2)}
           ${counter('headline', l.headline)}
-          <p class="hint">Formula: who you are → where you’re heading | your strongest skills.</p>
+          <p class="hint">Formula: who you are, where you’re heading | your strongest skills.</p>
         </div>
 
         <div class="card">
           <div class="row between"><h3 class="section-label" style="margin-top:0">About</h3>${copyBtn('about')}</div>
           ${ta('about', l.about, 'Start with one strong line (a hook). Then what you do and build, your skills, and what you’re looking for. End with how to reach you.', 6)}
           ${counter('about', l.about)}
-          <p class="hint">Hook → what you do → skills → a clear call to action.</p>
+          <p class="hint">Hook, what you do, skills, a clear call to action.</p>
         </div>
 
         <div class="rs-group">
@@ -181,7 +181,7 @@ function renderLinkedIn() {
         <div class="card">
           <h3 class="section-label" style="margin-top:0">Skills</h3>
           ${inp('skills', l.skills, 'SolidWorks, Python, Robotics, ROS, Technical Writing…')}
-          <p class="hint">Comma-separated. LinkedIn allows up to 50 — list your strongest first.</p>
+          <p class="hint">Comma-separated. LinkedIn allows up to 50, so list your strongest first.</p>
         </div>
 
         <div class="card">

@@ -1,4 +1,4 @@
-/* EngineerOS · Reusable UI components — pure functions returning HTML strings.
+/* EngineerOS · Reusable UI components, pure functions returning HTML strings.
    Every surface here obeys the system: no borders, elevation + tint only. */
 
 import { esc, icon } from '../core/dom.js';
@@ -32,7 +32,7 @@ export function readyTile(name, val, tone = '') {
   </div>`;
 }
 
-/* Encouraging label for a 0–100 strength score — friendlier than a bare number. */
+/* Encouraging label for a 0-100 strength score, friendlier than a bare number. */
 export function strengthLabel(score) {
   return score >= 80 ? 'Interview-ready' : score >= 55 ? 'Coming together' : score >= 30 ? 'Good start' : 'Just getting started';
 }

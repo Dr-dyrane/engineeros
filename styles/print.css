@@ -1,4 +1,4 @@
-/* EngineerOS · Print — only the resume paper prints, clean on A4. */
+/* EngineerOS · Print, only the resume paper prints, clean on A4. */
 @media print {
   @page { size: A4; margin: 13mm; }
   html, body { background: #ffffff !important; }

@@ -1,4 +1,4 @@
-/* EngineerOS · main — wiring + init
+/* EngineerOS · main, wiring + init
    Imports register all views (side effects), then sets up global event
    delegation and boots the app. */
 
@@ -133,6 +133,6 @@ function init() {
   applyTheme();
   watchSystemTheme();
   refreshIcons();
-  initRouter();   // reads the URL hash → refresh-safe, deep-linkable, real Back
+  initRouter();   // reads the URL hash, refresh-safe, deep-linkable, real Back
 }
 init();

@@ -13,7 +13,7 @@
 /* The focused view animates in each time it becomes active. */
 .view.is-active.is-entering { animation: viewIn var(--dur-3) var(--ease-emphasized); }
 
-/* Staggered children — progressive reveal within a view. */
+/* Staggered children, progressive reveal within a view. */
 .stagger > * { opacity: 0; animation: floatIn var(--dur-3) var(--ease-emphasized) forwards; }
 .stagger > *:nth-child(1){ animation-delay: 20ms; }
 .stagger > *:nth-child(2){ animation-delay: 70ms; }
@@ -29,7 +29,7 @@
 .reveal { animation: viewInUp var(--dur-3) var(--ease-emphasized); }
 
 /* =============================================================================
-   Reduced motion — disable all movement, keep opacity only.
+   Reduced motion, disable all movement, keep opacity only.
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

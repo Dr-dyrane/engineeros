@@ -1,4 +1,4 @@
-/* EngineerOS · Onboarding views — welcome + setup */
+/* EngineerOS · Onboarding views, welcome + setup */
 
 import { store } from '../core/state.js';
 import { qs, esc, icon } from '../core/dom.js';
@@ -20,7 +20,7 @@ registerView('welcome', () => {
         </div>
       </div>
       <div>
-        <button class="btn btn-primary" data-action="to-setup">Let’s begin ${icon('arrow-right')}</button>
+        <button class="btn btn-primary" data-action="to-setup">Get started ${icon('arrow-right')}</button>
         <p class="t-foot text-3 center mt-3">No account. No pressure. Everything saves on this device.</p>
       </div>
     </div>`;

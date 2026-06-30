@@ -53,7 +53,7 @@ registerView('home', () => {
             <div class="row">
               <div class="chip chip-green">${icon('wallet')}</div>
               <div class="grow"><div class="t-headline">Earn while you learn</div>
-                <div class="t-foot text-2 mt-1">Real ways to make money as your skills grow — freelance gigs, AI tasks, paid internships.</div></div>
+                <div class="t-foot text-2 mt-1">Real ways to make money as your skills grow: freelance gigs, AI tasks, and paid internships.</div>
               <span class="chev text-3">${icon('chevron-right')}</span>
             </div>
           </div>

@@ -1,4 +1,4 @@
-/* EngineerOS · Feedback — toast + subtle celebration */
+/* EngineerOS · Feedback, toast + subtle celebration */
 
 import { qs, esc, refreshIcons, prefersReducedMotion } from './dom.js';
 

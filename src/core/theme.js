@@ -1,4 +1,4 @@
-/* EngineerOS · Theme — system / light / dark with manual override */
+/* EngineerOS · Theme, system / light / dark with manual override */
 
 import { store, save } from './state.js';
 import { qs, refreshIcons } from './dom.js';

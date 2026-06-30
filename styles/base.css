@@ -1,7 +1,7 @@
 /* =============================================================================
    EngineerOS · Base
    Reset, canvas, layout, the focused-view system, and the type scale.
-   Note: a hard rule — no element declares a `border`. Ever.
+   Note: a hard rule, no element declares a `border`. Ever.
    ========================================================================== */
 
 *, *::before, *::after { box-sizing: border-box; border: 0; -webkit-tap-highlight-color: transparent; }
@@ -21,7 +21,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Ambient background wash — soft, alive, never flat. */
+/* Ambient background wash, soft, alive, never flat. */
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
@@ -38,7 +38,7 @@ input, textarea, select { font: inherit; color: var(--text); }
 img, svg { display: block; max-width: 100%; }
 ::selection { background: color-mix(in srgb, var(--accent) 26%, transparent); }
 
-/* Focus: a soft ring (box-shadow, NOT a border) — keyboard users only. */
+/* Focus: a soft ring (box-shadow, NOT a border), keyboard users only. */
 :focus { outline: none; }
 :focus-visible { box-shadow: var(--ring); border-radius: var(--r-sm); }
 
@@ -53,7 +53,7 @@ img, svg { display: block; max-width: 100%; }
   background: var(--material);
   backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
   -webkit-backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
-  /* separation from content is a soft shadow that appears on scroll — no line */
+  /* separation from content is a soft shadow that appears on scroll, no line */
   box-shadow: 0 0 0 rgba(0,0,0,0);
   transition: box-shadow var(--dur-3) var(--ease-standard);
 }
@@ -61,7 +61,7 @@ img, svg { display: block; max-width: 100%; }
 
 #views { flex: 1; width: 100%; }
 
-/* Responsive container system — the measure adapts to BOTH the view type and the
+/* Responsive container system, the measure adapts to BOTH the view type and the
    screen. Reading views stay comfortable; grid views and Studios use the room. */
 :root { --gutter: 18px; --view-max: 760px; --view-grid-max: 760px; --view-wide-max: 760px; }
 @media (min-width: 600px)  { :root { --gutter: 26px; } }
@@ -75,7 +75,7 @@ img, svg { display: block; max-width: 100%; }
 .view-wide { max-width: var(--view-wide-max); }
 .view.is-active { display: block; }
 
-/* Tab bar — a floating glass pill (functional layer above content). */
+/* Tab bar, a floating glass pill (functional layer above content). */
 #tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bar);
   display: flex; justify-content: center; pointer-events: none;

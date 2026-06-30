@@ -1,4 +1,4 @@
-/* EngineerOS · Resume Studio assets — coaching content + ATS helpers */
+/* EngineerOS · Resume Studio assets, coaching content + ATS helpers */
 
 /* Strong action verbs, grouped. Tap to drop into a bullet. */
 export const ACTION_VERBS = [

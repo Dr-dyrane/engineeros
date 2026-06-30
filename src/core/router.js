@@ -1,10 +1,10 @@
-/* EngineerOS · Router — hash-routed, focused single-view navigation.
+/* EngineerOS · Router, hash-routed, focused single-view navigation.
 
    Model:
    • The URL hash is the source of truth (refresh-safe, deep-linkable, shareable).
    • go() renders immediately and writes history with pushState (no double render).
    • The OS / browser Back button traverses history via popstate.
-   • The in-app chevron is *hierarchical* Back — it goes up to the logical parent.
+   • The in-app chevron is *hierarchical* Back, it goes up to the logical parent.
    • Each route change sets document.title and moves focus to the heading (a11y). */
 
 import { store } from './state.js';

@@ -1,6 +1,6 @@
 /* =============================================================================
    EngineerOS · Components
-   Element design. No borders — surfaces lift with tint + blur + shadow.
+   Element design. No borders, surfaces lift with tint + blur + shadow.
    Continuous-curve squircles. Hover-to-animate, touch-to-animate.
    ========================================================================== */
 
@@ -13,7 +13,7 @@
 .sheet   { background: var(--surface-2); border-radius: var(--r-sheet); box-shadow: var(--shadow-2); padding: var(--s-5); }
 .well    { background: var(--surface-sunken); border-radius: var(--r-field); }
 
-/* Material (glass) — for the functional layer (bars, floating controls). */
+/* Material (glass), for the functional layer (bars, floating controls). */
 .material {
   background: var(--material);
   backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
@@ -71,7 +71,7 @@
 .btn-row { display: flex; gap: var(--s-3); }
 .btn[disabled] { opacity: .42; pointer-events: none; }
 
-/* Icon button — round, quiet, springs on press. */
+/* Icon button, round, quiet, springs on press. */
 .iconbtn { width: 44px; height: 44px; min-width: 44px; border-radius: var(--r-pill);
   display: grid; place-items: center; color: var(--text); background: var(--fill);
   transition: transform var(--dur-1) var(--ease-emphasized), background var(--dur-2); }
@@ -135,7 +135,7 @@
 .textarea { min-height: 98px; line-height: 1.5; }
 .hint { font-size: var(--fs-foot); color: var(--text-3); margin: 6px var(--s-1) 0; }
 
-/* Segmented control — sliding selection, no lines. */
+/* Segmented control, sliding selection, no lines. */
 .segmented { display: inline-flex; width: 100%; padding: 3px; gap: 2px; border-radius: var(--r-field);
   background: var(--surface-sunken); }
 .segmented button { flex: 1; padding: 9px 10px; border-radius: 11px; font-size: var(--fs-callout);
@@ -174,7 +174,7 @@
 .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--s-3); }
 .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: var(--s-3); }
 
-/* Responsive card grids — fill wider screens instead of a lone narrow column. */
+/* Responsive card grids, fill wider screens instead of a lone narrow column. */
 .auto-grid { display: grid; gap: var(--s-3); grid-template-columns: 1fr; }
 .auto-grid > .card { margin-top: 0; }
 @media (min-width: 640px)  { .auto-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -208,7 +208,7 @@
 .check input:checked ~ .ctext { color: var(--text-3); text-decoration: line-through; }
 .check:active .box { transform: scale(.9); }
 
-/* Numbered "today" steps — leading number chips, no lines. */
+/* Numbered "today" steps, leading number chips, no lines. */
 .steps { list-style: none; counter-reset: s; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .steps li { counter-increment: s; position: relative; padding: 11px 0 11px 42px; font-size: var(--fs-callout); line-height: 1.4; }
 .steps li::before { content: counter(s); position: absolute; left: 0; top: 8px; width: 28px; height: 28px;

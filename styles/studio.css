@@ -1,6 +1,6 @@
 /* EngineerOS · Resume Studio
    Editor + live "paper" preview. The .resume-paper is a *document*, so it may use
-   thin typographic rules — the zero-border law governs app chrome, not printed output. */
+   thin typographic rules, the zero-border law governs app chrome, not printed output. */
 
 .studio-toolbar { display: flex; align-items: center; gap: var(--s-2); flex-wrap: wrap; margin-bottom: var(--s-4); }
 .studio-toolbar .studio-toggle { flex: 1; min-width: 180px; }

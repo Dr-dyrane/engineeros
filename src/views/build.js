@@ -1,4 +1,4 @@
-/* EngineerOS · Build Studio — hub + Resume / Portfolio / LinkedIn builders */
+/* EngineerOS · Build Studio, hub + Resume / Portfolio / LinkedIn builders */
 
 import { store, resumeReady, portfolioReady, linkedinReady } from '../core/state.js';
 import { qs, esc, icon } from '../core/dom.js';
@@ -54,11 +54,11 @@ function builderView(rootId, key, title, fields, exportAction, intro) {
   </div>`;
 }
 
-/* Resume now has its own dedicated module — src/views/resume.js (Resume Studio). */
+/* Resume now has its own dedicated module, src/views/resume.js (Resume Studio). */
 
-/* Portfolio now has its own dedicated module — src/views/portfolio.js (Portfolio Studio). */
+/* Portfolio now has its own dedicated module, src/views/portfolio.js (Portfolio Studio). */
 
-/* LinkedIn now has its own dedicated module — src/views/linkedin.js (LinkedIn Studio). */
+/* LinkedIn now has its own dedicated module, src/views/linkedin.js (LinkedIn Studio). */
 
 /* ---- Export logic (called by the central action handler) ----------------- */
 function sec(L, title, val) { if (val && String(val).trim()) L.push(`## ${title}\n\n${String(val).trim()}`); }
@@ -71,12 +71,12 @@ function buildExport(key) {
     sec(L, 'Summary', b.summary); sec(L, 'Education', b.education); sec(L, 'Skills', b.skills);
     sec(L, 'Projects', b.projects); sec(L, 'Experience', b.experience); sec(L, 'Certifications', b.certifications);
   } else if (key === 'portfolio') {
-    L.push(`# Portfolio — ${name || 'Your Name'}`);
+    L.push(`# Portfolio, ${name || 'Your Name'}`);
     sec(L, 'About', b.about); sec(L, 'Education', b.education); sec(L, 'Final-Year Project', b.project);
     sec(L, 'Skills', b.skills); sec(L, 'Tools & Software', b.tools); sec(L, 'Projects', b.projects);
     sec(L, 'Certifications', b.certs); sec(L, 'Contact', b.contact);
   } else {
-    L.push(`# LinkedIn — ${name || 'Your Name'}`);
+    L.push(`# LinkedIn, ${name || 'Your Name'}`);
     sec(L, 'Headline', b.headline); sec(L, 'About', b.about); sec(L, 'Education', b.education);
     sec(L, 'Skills', b.skills); sec(L, 'Featured Projects', b.featured); sec(L, 'First Post Draft', b.post);
   }

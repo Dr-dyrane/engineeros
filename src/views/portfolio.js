@@ -1,6 +1,6 @@
 /* EngineerOS · Portfolio Studio
-   Guided case studies (Problem → Approach → Result), a live printable one-pager,
-   a strength score, action-verb coaching, and Print→PDF / hostable HTML / Markdown export. */
+   Guided case studies (Problem, Approach, Result), a live printable one-pager,
+   a strength score, action-verb coaching, and Print to PDF / hostable HTML / Markdown export. */
 
 import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
@@ -61,22 +61,22 @@ function scoreData(p) {
     + (complete.length >= 2 ? 14 : 0) + (quantified ? 16 : 0) + (hasSkills ? 16 : 0);
   score = Math.min(100, score);
   const tips = [];
-  if (!hasAbout) tips.push(['miss', 'Write a short About — who you are and what you build']);
+  if (!hasAbout) tips.push(['miss', 'Write a short About: who you are and what you build']);
   if (!complete.length) tips.push(['miss', 'Finish one case study: Problem, Approach and Result']);
   if (complete.length && !quantified) tips.push(['miss', 'Put a number in at least one Result (%, time, cost…)']);
-  if (complete.length < 2) tips.push(['miss', 'Aim for 2–3 strong case studies']);
+  if (complete.length < 2) tips.push(['miss', 'Aim for two or three strong case studies']);
   if (!hasContact) tips.push(['miss', 'Add a way to reach you (email or links)']);
   if (!hasSkills) tips.push(['miss', 'List your skills']);
-  if (!tips.length) tips.push(['ok', 'Strong portfolio — export the one-pager and host it']);
+  if (!tips.length) tips.push(['ok', 'Strong portfolio. Export the one-pager and host it.']);
   return { score, tips };
 }
 function scoreHTML(p) {
   const { score, tips } = scoreData(p);
   const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
   return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
-      <div class="t-foot text-3">${score}/100 · portfolio strength · a nudge, not a grade</div></div><div style="width:120px">${meter(score, tone)}</div></div>
+      <div class="t-foot text-3">${score} of 100 · portfolio strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
     <div class="mt-3">${tips.map(([k, t]) => `<div class="rs-tip ${k === 'ok' ? 'ok' : ''}">
-      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '→'}</span>
+      <span style="color:${k === 'ok' ? 'var(--green)' : 'var(--amber)'};font-weight:700">${k === 'ok' ? '✓' : '•'}</span>
       <span>${esc(t)}</span></div>`).join('')}</div>`;
 }
 
@@ -100,7 +100,7 @@ function paperHTML(p) {
     </div>`).join('');
   if (sk.length || p.tools) h += `<div class="pf-h">Skills & Tools</div>` + sk.map(s => `<div class="pf-skline">${s.group ? `<b>${esc(s.group)}:</b> ` : ''}${esc(s.items)}</div>`).join('') + (p.tools ? `<div class="pf-skline"><b>Tools:</b> ${esc(p.tools)}</div>` : '');
   if (p.education && p.education.trim()) h += `<div class="pf-h">Education</div><div>${esc(p.education)}</div>`;
-  if (ce.length) h += `<div class="pf-h">Certifications</div>` + ce.map(c => `<div class="pf-skline">${esc(c.name)}${c.issuer ? ` — ${esc(c.issuer)}` : ''}${c.year ? ` (${esc(c.year)})` : ''}</div>`).join('');
+  if (ce.length) h += `<div class="pf-h">Certifications</div>` + ce.map(c => `<div class="pf-skline">${esc(c.name)}${c.issuer ? `, ${esc(c.issuer)}` : ''}${c.year ? ` (${esc(c.year)})` : ''}</div>`).join('');
   return h;
 }
 
@@ -110,12 +110,12 @@ function markdown(p) {
   const c = [p.email, p.linkedin, p.github, p.website].filter(Boolean); if (c.length) L.push(c.join(' · '));
   if (p.about && p.about.trim()) L.push('', '## About', '', p.about.trim());
   const projs = (p.projects || []).filter(x => x.title || x.problem || x.approach || x.result);
-  if (projs.length) { L.push('', '## Selected Projects'); projs.forEach(x => { L.push('', '### ' + (x.title || 'Project') + ([x.role, x.tech].filter(Boolean).length ? '  — ' + [x.role, x.tech].filter(Boolean).join(' · ') : '')); if (x.problem) L.push('- **Problem:** ' + x.problem); if (x.approach) L.push('- **Approach:** ' + x.approach); if (x.result) L.push('- **Result:** ' + x.result); if (x.link) L.push('- ' + x.link); }); }
+  if (projs.length) { L.push('', '## Selected Projects'); projs.forEach(x => { L.push('', '### ' + (x.title || 'Project') + ([x.role, x.tech].filter(Boolean).length ? '  ·  ' + [x.role, x.tech].filter(Boolean).join(' · ') : '')); if (x.problem) L.push('- **Problem:** ' + x.problem); if (x.approach) L.push('- **Approach:** ' + x.approach); if (x.result) L.push('- **Result:** ' + x.result); if (x.link) L.push('- ' + x.link); }); }
   const sk = (p.skills || []).filter(s => s.items && s.items.trim());
   if (sk.length || p.tools) { L.push('', '## Skills & Tools'); sk.forEach(s => L.push('- ' + (s.group ? '**' + s.group + ':** ' : '') + s.items.trim())); if (p.tools) L.push('- **Tools:** ' + p.tools); }
   if (p.education && p.education.trim()) L.push('', '## Education', '', p.education.trim());
   const ce = (p.certifications || []).filter(c => c.name && c.name.trim());
-  if (ce.length) { L.push('', '## Certifications'); ce.forEach(c => L.push('- ' + c.name + (c.issuer ? ' — ' + c.issuer : '') + (c.year ? ' (' + c.year + ')' : ''))); }
+  if (ce.length) { L.push('', '## Certifications'); ce.forEach(c => L.push('- ' + c.name + (c.issuer ? ', ' + c.issuer : '') + (c.year ? ' (' + c.year + ')' : ''))); }
   return L.join('\n') + '\n';
 }
 function htmlDoc(p) {
@@ -130,7 +130,7 @@ function htmlDoc(p) {
 .pf-skline{margin:2px 0}.pf-skline b{color:#0b0c0e}a{color:#0a6ae0;text-decoration:none}
 @media print{body{background:#fff}.wrap{padding:0}.paper{box-shadow:none;border-radius:0;padding:0}}`;
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>${esc(p.name || 'Portfolio')} — Portfolio</title><style>${css}</style></head>
+<title>${esc(p.name || 'Portfolio')} · Portfolio</title><style>${css}</style></head>
 <body><div class="wrap"><div class="paper">${paperHTML(p)}</div></div></body></html>`;
 }
 const fname = ext => `${(P().name || 'portfolio').toLowerCase().replace(/\s+/g, '-')}-portfolio.${ext}`;
@@ -153,9 +153,9 @@ function projEntry(x, i) {
     <div class="rs-entry-head"><span class="t">PROJECT ${i + 1}</span>${delBtn('pf-del-proj', i)}</div>
     <div class="rs-two">${inp(`proj.${i}.title`, x.title, 'Project title')}${inp(`proj.${i}.role`, x.role, 'Your role')}</div>
     <div class="rs-two mt-2">${inp(`proj.${i}.tech`, x.tech, 'Tech / tools used')}${inp(`proj.${i}.link`, x.link, 'Link (GitHub / demo)')}</div>
-    <div class="mt-2">${ta(`proj.${i}.problem`, x.problem, 'Problem — what needed solving?')}</div>
-    <div class="mt-2">${ta(`proj.${i}.approach`, x.approach, 'Approach — what you designed / built / tested')}</div>
-    <div class="mt-2">${ta(`proj.${i}.result`, x.result, 'Result — the outcome, with a number if you can')}</div>
+    <div class="mt-2">${ta(`proj.${i}.problem`, x.problem, 'Problem: what needed solving?')}</div>
+    <div class="mt-2">${ta(`proj.${i}.approach`, x.approach, 'Approach: what you designed, built, or tested')}</div>
+    <div class="mt-2">${ta(`proj.${i}.result`, x.result, 'Result: the outcome, with a number if you can')}</div>
   </div>`;
 }
 function skillEntry(s, i) {
@@ -169,7 +169,7 @@ function certEntry(c, i) {
 }
 function verbHelper() {
   return `<details class="card" style="margin-top:10px"><summary class="fw-semibold" style="cursor:pointer">${icon('wand-sparkles')} Strong verbs for your Approach / Result</summary>
-    <p class="t-foot text-3 mt-2">Tap one — it drops into the field you last tapped.</p>
+    <p class="t-foot text-3 mt-2">Tap one and it drops into the field you last tapped.</p>
     ${ACTION_VERBS.map(g => `<div class="rs-verb-group">${g.group}</div><div class="rs-verbs">${g.verbs.map(v => `<button class="rs-verb" data-action="pf-verb" data-value="${v}">${v}</button>`).join('')}</div>`).join('')}
   </details>`;
 }
@@ -193,14 +193,14 @@ function renderPortfolio() {
       </div>
     </div>
 
-    <div class="notice notice-accent mb-4">Each project is a <b>case study</b>: Problem → Approach → Result. A number in the Result is what makes employers believe you.</div>
+    <div class="notice notice-accent mb-4">Each project is a <b>case study</b>: Problem, Approach, Result. A number in the Result is what makes employers believe you.</div>
 
     <div class="studio" data-panel="edit">
       <div class="studio-edit">
         <div class="card">
           <h3 class="section-label" style="margin-top:0">Header</h3>
           ${inp('name', p.name, 'Full name')}
-          <div class="rs-two mt-2">${inp('title', p.title, 'Title (Mechanical → AI & Robotics)')}${inp('tagline', p.tagline, 'One-line tagline')}</div>
+          <div class="rs-two mt-2">${inp('title', p.title, 'Title (Mechanical, AI & Robotics)')}${inp('tagline', p.tagline, 'One-line tagline')}</div>
         </div>
         <div class="card"><h3 class="section-label" style="margin-top:0">About</h3>
           ${ta('about', p.about, 'A short paragraph: who you are, what you build, where you’re heading.')}</div>
@@ -233,7 +233,7 @@ function renderPortfolio() {
 
       <div class="studio-preview">
         <div class="pf-paper" id="pf-paper"></div>
-        <p class="t-foot text-3 center mt-3 no-print">“.html” exports a single self-contained file you can host (GitHub Pages, Netlify). “Save PDF” → choose <b>Save as PDF</b>.</p>
+        <p class="t-foot text-3 center mt-3 no-print">“.html” exports a single self-contained file you can host (GitHub Pages, Netlify). “Save PDF”, choose <b>Save as PDF</b>.</p>
       </div>
     </div>
   </div>`;

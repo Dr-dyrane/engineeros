@@ -2,11 +2,11 @@
    EngineerOS · Design Tokens
    The single source of truth. Every color, space, radius, type step, motion
    curve and elevation lives here as a CSS custom property. Components consume
-   these — never hard-coded values.
+   these, never hard-coded values.
 
    Design law:
-   • ZERO BORDERS anywhere. Surfaces are separated by ELEVATION — background
-     tint, translucent material, blur and shadow — never by lines.
+   • ZERO BORDERS anywhere. Surfaces are separated by ELEVATION, background
+     tint, translucent material, blur and shadow, never by lines.
    • Continuous-curve squircles (see --r-* and the .squircle utility).
    • Motion is purposeful and spring-like; honor prefers-reduced-motion.
    ========================================================================== */
@@ -55,7 +55,7 @@
   --glow-green:  0 8px 22px rgba(52,199,89,0.32);
   --ring: 0 0 0 4px rgba(10,132,255,0.35);   /* focus ring (not a border) */
 
-  /* ---- Radius — continuous squircle scale -------------------------------- */
+  /* ---- Radius, continuous squircle scale -------------------------------- */
   --r-xs:   10px;
   --r-sm:   14px;
   --r-md:   18px;
@@ -68,7 +68,7 @@
   --r-sheet:34px;
   --r-pill: 999px;
 
-  /* ---- Spacing — 4 / 8-pt grid ------------------------------------------- */
+  /* ---- Spacing, 4 / 8-pt grid ------------------------------------------- */
   --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;  --s-5: 20px;
   --s-6: 24px;  --s-7: 32px;  --s-8: 40px;  --s-9: 48px;  --s-10: 64px;
 
@@ -110,7 +110,7 @@
 }
 
 /* =============================================================================
-   Dark theme — applied automatically by system, or forced via [data-theme].
+   Dark theme, applied automatically by system, or forced via [data-theme].
    In dark, RAISED surfaces get LIGHTER (Apple elevation), reinforcing the
    no-border, elevation-only separation model.
    ========================================================================== */
