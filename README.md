@@ -36,10 +36,11 @@ Today's mission → Done checklist → Reflection → Mark complete.**
 ## Features
 
 - **Progressive disclosure** — views render one at a time; the next step unlocks when the current one is done. A *Free navigation* switch unlocks everything.
-- **Build Studio** — Resume, Portfolio, and LinkedIn builders that export to Markdown.
+- **Build Studio** — three full Studios with live preview: **Resume** (structured entries, ATS keyword match, action-verb + stat coaching, strength score, Print→PDF / text / Markdown), **Portfolio** (guided case studies, printable one-pager, hostable HTML export), and **LinkedIn** (character counters, post templates, profile preview, per-section copy).
 - **Progress** — overall ring, day streak, per-journey bars, readiness meters.
 - **Weekly Review** — a five-question Sunday ritual, saved locally.
 - **Resources** — real, curated links with Nigeria-specific picks.
+- **Installable PWA** — works offline / on weak connections via a service worker; add it to your phone's home screen.
 - **Light / Dark / System themes**, smooth Apple-HIG motion, reduced-motion support.
 - **Your data stays on your device** (browser `localStorage`). Export / import a JSON backup anytime.
 
@@ -56,16 +57,18 @@ Apple-HIG inspired, encoded as tokens in `styles/`:
 
 ## Tech
 
-Vanilla HTML + CSS + JavaScript (ES modules). No build step. CDN-loaded
-**Tailwind**, **Lucide** icons, and **Inter** (with the system font / SF first).
+Vanilla HTML + CSS + JavaScript (ES modules). No build step. **Lucide** icons and
+**Inter** load from CDN (the system font / SF is used first). Installable PWA via
+`sw.js` + `manifest.webmanifest`.
 
 ```
-index.html            · shell, CDN wiring, Tailwind→token config
-styles/               · tokens · base · components · animations
-src/data/             · journeys (61 missions) · resources
+index.html            · shell, CDN + token wiring, SW registration
+sw.js                 · service worker (offline app shell)
+styles/               · tokens · base · components · studio · animations · print
+src/data/             · journeys (61 missions) · resources · resume-assets
 src/core/             · state · router · theme · feedback · dom
 src/ui/components.js   · reusable render helpers
-src/views/            · one module per screen
+src/views/            · one module per screen (incl. resume / portfolio / linkedin Studios)
 src/main.js           · event wiring + boot
 ```
 

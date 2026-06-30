@@ -108,5 +108,11 @@
 <input type="file" id="importFile" accept="application/json" hidden />
 
 <script type="module" src="./src/main.js"></script>
+<script>
+  // Register the service worker (offline / installable). Safe no-op if unsupported.
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+  }
+</script>
 </body>
 </html>

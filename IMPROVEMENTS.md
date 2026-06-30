@@ -124,3 +124,14 @@ product matures into something people rely on daily.
 - Directional push/pop **page transitions**; richer empty states + completion moments. *(M)*
 - **Progress depth**: streak calendar/heatmap, milestone badges. *(M)*
 - Proactive **backup nudge** (localStorage can be wiped). *(S)*
+
+---
+
+## Update — builders complete · responsive · offline
+
+- **Portfolio Studio** shipped — guided case studies (Problem → Approach → Result), live one-pager preview, strength score, and Print→PDF / **hostable HTML** / Markdown export.
+- **LinkedIn Studio** shipped — character counters, examples, post templates, profile preview, per-section copy, Markdown export. **All three builders now match the same bar — the consistency gap is closed.**
+- **Responsive layout system** shipped — adaptive containers (reading / grid / wide) from mobile to large screens; card grids flow into columns; Studios get real split-screen room; Home is a 2-column dashboard on desktop. The 720px cap is gone.
+- **Service worker** shipped — app shell + every module + icons precached; navigations network-first, same-origin stale-while-revalidate, CDN cache-first. EngineerOS is now a **true installable PWA that loads offline / on weak connections**.
+
+**Still open:** Resources search + Nigeria/Free filters; error boundary around renders; backup-reminder nudge; directional page transitions; progress depth (streak heatmap); decide whether the Weekly Review should extend the streak; remove now-dead builder code in `build.js`/`main.js`.
