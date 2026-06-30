@@ -13,10 +13,11 @@ system works for any technical graduate.
 
 ## What it is
 
-EngineerOS is a single-page web app (one `index.html` file, no backend, no build step).
-It feels less like an online course and more like an Apple-style setup assistant for a
-career. Everything you do produces a visible artifact: a resume, a portfolio, a GitHub
-project, a LinkedIn presence.
+EngineerOS is a buildless, modular single-page web app — plain ES modules and a
+CSS design system, no bundler, no backend, no build step. It feels less like an
+online course and more like an Apple-style setup assistant for a career. Everything
+you do produces a visible artifact: a resume, a portfolio, a GitHub project, a
+LinkedIn presence.
 
 ### Eight journeys, sixty-one missions
 
@@ -42,17 +43,38 @@ Today's mission → Done checklist → Reflection → Mark complete.**
 - **Light / Dark / System themes**, smooth Apple-HIG motion, reduced-motion support.
 - **Your data stays on your device** (browser `localStorage`). Export / import a JSON backup anytime.
 
+## Design system
+
+Apple-HIG inspired, encoded as tokens in `styles/`:
+
+- **Zero borders.** Surfaces are separated only by elevation — background tint,
+  translucent material, blur and shadow. No element declares a `border`.
+- **Continuous-curve squircles**, an 8-pt spacing grid, a HIG-style type scale,
+  semantic adaptive colors, and purposeful spring motion (with reduced-motion support).
+- **Micro-interactions** everywhere: hover-to-animate, touch-to-animate, focused
+  one-view-at-a-time navigation.
+
 ## Tech
 
-Vanilla HTML, CSS, and JavaScript in a single file. No frameworks, no dependencies,
-works offline once loaded.
+Vanilla HTML + CSS + JavaScript (ES modules). No build step. CDN-loaded
+**Tailwind**, **Lucide** icons, and **Inter** (with the system font / SF first).
+
+```
+index.html            · shell, CDN wiring, Tailwind→token config
+styles/               · tokens · base · components · animations
+src/data/             · journeys (61 missions) · resources
+src/core/             · state · router · theme · feedback · dom
+src/ui/components.js   · reusable render helpers
+src/views/            · one module per screen
+src/main.js           · event wiring + boot
+```
 
 ## Run locally
 
-Just open `index.html` in any modern browser. That's it.
+ES modules need to be served over http (opening the file directly with `file://`
+won't load the modules). Use any static server:
 
 ```bash
-# optional: serve it locally
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
