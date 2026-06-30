@@ -60,8 +60,19 @@ img, svg { display: block; max-width: 100%; }
 #topbar.is-scrolled { box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent), var(--shadow-1); }
 
 #views { flex: 1; width: 100%; }
-.view { display: none; width: 100%; max-width: var(--maxw); margin: 0 auto;
-        padding: var(--s-5) var(--s-5) calc(var(--tabbar-h) + 96px); }
+
+/* Responsive container system — the measure adapts to BOTH the view type and the
+   screen. Reading views stay comfortable; grid views and Studios use the room. */
+:root { --gutter: 18px; --view-max: 760px; --view-grid-max: 760px; --view-wide-max: 760px; }
+@media (min-width: 600px)  { :root { --gutter: 26px; } }
+@media (min-width: 768px)  { :root { --view-grid-max: 980px;  --view-wide-max: 1060px; } }
+@media (min-width: 1200px) { :root { --gutter: 40px; --view-max: 820px; --view-grid-max: 1160px; --view-wide-max: 1320px; } }
+@media (min-width: 1600px) { :root { --gutter: 56px; --view-grid-max: 1360px; --view-wide-max: 1520px; } }
+
+.view { display: none; width: 100%; max-width: var(--view-max); margin: 0 auto;
+        padding: var(--s-5) var(--gutter) calc(var(--tabbar-h) + 96px); }
+.view-grid { max-width: var(--view-grid-max); }
+.view-wide { max-width: var(--view-wide-max); }
 .view.is-active { display: block; }
 
 /* Tab bar — a floating glass pill (functional layer above content). */

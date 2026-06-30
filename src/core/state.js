@@ -115,7 +115,16 @@ export function resumeReady() {
   ];
   return Math.round(checks.filter(Boolean).length / checks.length * 100);
 }
-export function linkedinReady() { return pctFilled(store.s.builders.linkedin, LI_KEYS); }
+export function linkedinReady() {
+  const l = store.s.builders.linkedin; if (!l) return 0;
+  const has = v => v && String(v).trim().length > 1;
+  const checks = [
+    has(l.headline), has(l.about),
+    Array.isArray(l.featured) ? l.featured.some(f => f.title || f.blurb) : has(l.featured),
+    has(l.skills), has(l.post),
+  ];
+  return Math.round(checks.filter(Boolean).length / checks.length * 100);
+}
 export function portfolioReady() {
   const p = store.s.builders.portfolio; if (!p) return 0;
   const has = v => v && String(v).trim().length > 1;

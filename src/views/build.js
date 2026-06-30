@@ -24,7 +24,7 @@ registerView('build', () => {
 
   qs('#view-build').innerHTML = `<div class="stagger">
     ${pageHeader('Build Studio', 'Turn work into evidence.', 'Fill a little at a time. Everything exports when you’re ready.')}
-    ${tiles}
+    <div class="auto-grid">${tiles}</div>
   </div>`;
 });
 
@@ -58,14 +58,7 @@ function builderView(rootId, key, title, fields, exportAction, intro) {
 
 /* Portfolio now has its own dedicated module — src/views/portfolio.js (Portfolio Studio). */
 
-registerView('linkedin', () => builderView('view-linkedin', 'linkedin', 'LinkedIn Builder', [
-  { k:'headline', l:'Headline', p:'Mechanical Engineer → AI & Robotics | Python · CAD · Arduino', h:'220 characters max. Show who you are + where you are heading.' },
-  { k:'about', l:'About section', type:'area', p:'Start with one strong line. Then your focus, skills and what you want next.', rows:5 },
-  { k:'education', l:'Education', type:'area', p:'Degree, school, year.', rows:2 },
-  { k:'skills', l:'Skills (add up to 50 on LinkedIn)', type:'area', p:'SolidWorks, Python, Robotics, ROS, Technical Writing…' },
-  { k:'featured', l:'Featured projects', type:'area', p:'2–3 links or titles to pin on your profile.', rows:3 },
-  { k:'post', l:'First post draft', type:'area', p:'Share something you built or learned this week. Keep it human.', rows:5, h:'Tip: end with one question to invite comments.' },
-], 'export-linkedin', 'Copy each block straight into LinkedIn. Small, real updates beat a perfect profile you never publish.'));
+/* LinkedIn now has its own dedicated module — src/views/linkedin.js (LinkedIn Studio). */
 
 /* ---- Export logic (called by the central action handler) ----------------- */
 function sec(L, title, val) { if (val && String(val).trim()) L.push(`## ${title}\n\n${String(val).trim()}`); }

@@ -34,7 +34,7 @@ registerView('journeys', () => {
 
   qs('#view-journeys').innerHTML = `<div class="stagger">
     ${pageHeader('The path', 'Journeys', 'Eight journeys, one at a time. Finish a journey to open the next.')}
-    ${cards}
+    <div class="auto-grid">${cards}</div>
   </div>`;
 });
 

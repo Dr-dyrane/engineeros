@@ -20,6 +20,7 @@ import './views/resources.js';
 import { renderSettings } from './views/settings.js';
 import { resumeInput, resumeAction } from './views/resume.js';
 import { portfolioInput, portfolioAction } from './views/portfolio.js';
+import { linkedinInput, linkedinAction } from './views/linkedin.js';
 
 let missionFrom = 'journey';
 
@@ -53,6 +54,7 @@ document.addEventListener('click', (e) => {
   const a = t.dataset.action, v = t.dataset.value;
   if (a && a.indexOf('rs-') === 0) { resumeAction(a, v); return; }   // Resume Studio actions
   if (a && a.indexOf('pf-') === 0) { portfolioAction(a, v); return; } // Portfolio Studio actions
+  if (a && a.indexOf('li-') === 0) { linkedinAction(a, v); return; } // LinkedIn Studio actions
   switch (a) {
     case 'to-setup': go('setup'); break;
     case 'finish-setup': {
@@ -99,6 +101,7 @@ document.addEventListener('change', (e) => {
 document.addEventListener('input', (e) => {
   const rs = e.target.closest('[data-rs]'); if (rs) { resumeInput(rs.dataset.rs, e.target.value); return; }
   const pf = e.target.closest('[data-pf]'); if (pf) { portfolioInput(pf.dataset.pf, e.target.value); return; }
+  const li = e.target.closest('[data-li]'); if (li) { linkedinInput(li.dataset.li, e.target.value); return; }
   const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); return; }
   const n = e.target.closest('[data-notes]'); if (n) { md(n.dataset.notes).notes = n.value; save(); return; }
   const b = e.target.closest('[data-builder]'); if (b) {

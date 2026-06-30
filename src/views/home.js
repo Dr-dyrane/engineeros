@@ -41,27 +41,33 @@ registerView('home', () => {
 
   qs('#view-home').innerHTML = `
     <div class="stagger">
-      <header style="margin:2px 2px 18px">
+      <header style="margin:2px 2px 14px">
         <div class="eyebrow">${esc(greet)}</div>
         <h1 class="t-display" style="margin-top:6px">${esc(firstName())}.</h1>
       </header>
-      ${todayCard}
-      <div class="grid-3 mt-5">
-        ${statTile(overallPct() + '<span style="font-size:15px">%</span>', 'Progress')}
-        ${statTile(done, 'Missions done')}
-        ${statTile(streak + (streak > 0 ? ' 🔥' : ''), 'Day streak')}
-      </div>
-      <h3 class="section-label mt-6">Your readiness</h3>
-      <div class="grid-2">
-        ${readyTile('Resume', resumeReady(), 'amber')}
-        ${readyTile('LinkedIn', linkedinReady(), '')}
-        ${readyTile('Portfolio', portfolioReady(), 'green')}
-        ${readyTile('GitHub', githubReady(), '')}
-      </div>
-      <div class="card tap mt-5" data-action="open-progress">
-        <div class="row between">
-          <div><div class="fw-semibold">See your full progress</div><div class="t-foot text-3">Journeys, streak and milestones</div></div>
-          <span class="chev text-3">${icon('chevron-right')}</span>
+      <div class="home-grid">
+        <div>${todayCard}</div>
+        <div class="stack">
+          <div class="grid-3">
+            ${statTile(overallPct() + '<span style="font-size:15px">%</span>', 'Progress')}
+            ${statTile(done, 'Missions done')}
+            ${statTile(streak + (streak > 0 ? ' 🔥' : ''), 'Day streak')}
+          </div>
+          <div>
+            <h3 class="section-label" style="margin-top:2px">Your readiness</h3>
+            <div class="grid-2">
+              ${readyTile('Resume', resumeReady(), 'amber')}
+              ${readyTile('LinkedIn', linkedinReady(), '')}
+              ${readyTile('Portfolio', portfolioReady(), 'green')}
+              ${readyTile('GitHub', githubReady(), '')}
+            </div>
+          </div>
+          <div class="card tap" data-action="open-progress">
+            <div class="row between">
+              <div><div class="fw-semibold">See your full progress</div><div class="t-foot text-3">Journeys, streak and milestones</div></div>
+              <span class="chev text-3">${icon('chevron-right')}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>`;
