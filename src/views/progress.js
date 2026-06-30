@@ -10,7 +10,7 @@ registerView('progress', () => {
   const total = totalMissions(), done = completedCount();
   const jlist = JOURNEYS.map((j, ji) => {
     const d = j.missions.filter(m => store.s.completed[m.id]).length, t = j.missions.length;
-    const p = Math.round(d / t * 100), full = d === t;
+    const p = t ? Math.round(d / t * 100) : 0, full = t > 0 && d === t;
     return `<div class="list-row">
       <div class="chip chip-sm ${full ? 'chip-green' : d > 0 ? 'chip-accent' : ''}">${icon(full ? 'check' : j.icon)}</div>
       <div class="lt"><div class="t1" style="font-size:15px">${esc(j.title)}</div>

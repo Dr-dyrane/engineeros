@@ -63,7 +63,14 @@ function render(view, param) {
   const el = qs('#view-' + view);
   if (!el) return;
   currentView = view; curParam = param;
-  if (registry[view]) registry[view](param);
+  try { if (registry[view]) registry[view](param); }
+  catch (err) {
+    try { console.error('EngineerOS render error:', err); } catch (_) {}
+    el.innerHTML = `<div class="empty" style="padding-top:64px">
+      <div class="chip chip-accent" style="margin:0 auto 14px;width:56px;height:56px"><i data-lucide="triangle-alert"></i></div>
+      <p class="t-callout">Something hiccuped on this screen.</p>
+      <button class="btn btn-ghost btn-sm" data-action="nav" data-value="home" style="margin-top:14px">Go home</button></div>`;
+  }
   qsa('.view').forEach(v => v.classList.remove('is-active', 'is-entering'));
   el.classList.add('is-active');
   void el.offsetWidth;

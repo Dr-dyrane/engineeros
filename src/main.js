@@ -3,7 +3,7 @@
    delegation and boots the app. */
 
 import { store, save, saveNow, touchStreak, md, findMission, todaysMission, firstName,
-         replaceState, resetState } from './core/state.js';
+         replaceState, resetState, completedCount } from './core/state.js';
 import { go, back, initRouter } from './core/router.js';
 import { applyTheme, setTheme, cycleTheme, watchSystemTheme } from './core/theme.js';
 import { toast, celebrate, download } from './core/feedback.js';
@@ -13,10 +13,10 @@ import './views/onboarding.js';
 import './views/home.js';
 import './views/journeys.js';
 import { checkPct } from './views/mission.js';
-import { exportBuilder } from './views/build.js';
+import './views/build.js';
 import './views/progress.js';
 import { saveReview } from './views/review.js';
-import './views/resources.js';
+import { resourceSearch, resourceFilter } from './views/resources.js';
 import './views/earn.js';
 import { renderSettings } from './views/settings.js';
 import { resumeInput, resumeAction } from './views/resume.js';
@@ -72,12 +72,7 @@ document.addEventListener('click', (e) => {
     case 'toggle-theme': cycleTheme(); break;
     case 'complete-mission': completeMission(v); break;
     case 'reopen-mission': delete store.s.completed[v]; saveNow(); go('mission', v); toast('Reopened', false); break;
-    case 'export-resume': exportBuilder('resume', false); break;
-    case 'export-resume-copy': exportBuilder('resume', true); break;
-    case 'export-portfolio': exportBuilder('portfolio', false); break;
-    case 'export-portfolio-copy': exportBuilder('portfolio', true); break;
-    case 'export-linkedin': exportBuilder('linkedin', false); break;
-    case 'export-linkedin-copy': exportBuilder('linkedin', true); break;
+    case 'res-filter': resourceFilter(v); break;
     case 'save-review': saveReview(); break;
     case 'export-json': exportJSON(); break;
     case 'import-json': qs('#importFile').click(); break;
@@ -105,10 +100,7 @@ document.addEventListener('input', (e) => {
   const li = e.target.closest('[data-li]'); if (li) { linkedinInput(li.dataset.li, e.target.value); return; }
   const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); return; }
   const n = e.target.closest('[data-notes]'); if (n) { md(n.dataset.notes).notes = n.value; save(); return; }
-  const b = e.target.closest('[data-builder]'); if (b) {
-    const [k, key] = b.dataset.builder.split(':');
-    (store.s.builders[k] = store.s.builders[k] || {})[key] = b.value; save(); return;
-  }
+  const rsch = e.target.closest('[data-res-search]'); if (rsch) { resourceSearch(rsch.value); return; }
   const sn = e.target.closest('#set-name'); if (sn) { store.s.user.name = sn.value; save(); }
 });
 
@@ -128,11 +120,20 @@ if (importFile) importFile.addEventListener('change', (e) => {
 /* Hydrate icons once the Lucide CDN script has loaded. */
 window.addEventListener('load', () => refreshIcons());
 
+/* A gentle, one-time reminder to back up once there is progress worth keeping. */
+function maybeBackupNudge() {
+  if (store.s.onboarded && completedCount() >= 5 && !store.s.flags.backupNudged) {
+    store.s.flags.backupNudged = true; saveNow();
+    setTimeout(() => toast('Tip: export a backup in Settings to keep your progress safe', false), 1600);
+  }
+}
+
 /* ---- Boot ---------------------------------------------------------------- */
 function init() {
   applyTheme();
   watchSystemTheme();
   refreshIcons();
   initRouter();   // reads the URL hash, refresh-safe, deep-linkable, real Back
+  maybeBackupNudge();
 }
 init();

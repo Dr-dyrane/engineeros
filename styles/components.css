@@ -100,6 +100,14 @@
   font-size: var(--fs-caption); font-weight: var(--fw-bold); letter-spacing: .01em; }
 .badge .lucide { width: 13px; height: 13px; }
 .badge-accent { background: color-mix(in srgb, var(--accent) 15%, transparent); color: var(--accent); }
+
+/* Filter chips (Resources) */
+.filter-chip { height: 36px; padding: 0 16px; border-radius: var(--r-pill); background: var(--fill);
+  color: var(--text-2); font-size: var(--fs-foot); font-weight: var(--fw-semibold);
+  transition: background var(--dur-2), color var(--dur-2), transform var(--dur-1) var(--ease-emphasized); }
+.filter-chip:active { transform: scale(.94); }
+@media (hover: hover) { .filter-chip:hover { background: var(--fill-strong); } }
+.filter-chip.is-on { background: var(--accent); color: var(--on-accent); }
 .badge-amber  { background: color-mix(in srgb, var(--amber) 18%, transparent);  color: color-mix(in srgb, var(--amber) 82%, #5a3d00); }
 .badge-green  { background: color-mix(in srgb, var(--green) 18%, transparent);  color: color-mix(in srgb, var(--green) 70%, #0a3d18); }
 :root[data-theme="dark"] .badge-amber, :root[data-theme="dark"] .badge-green { color: var(--text); }

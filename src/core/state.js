@@ -16,7 +16,8 @@ export function defaultState() {
     missionData: {},          // missionId -> { checks:{i:true}, reflection, notes }
     streak: { count: 0, best: 0, last: '' },
     builders: { portfolio: {}, resume: {}, linkedin: {} },
-    reviews: []               // [{date, done, learned, confused, built, next}]
+    reviews: [],              // [{date, done, learned, confused, built, next}]
+    flags: {}                 // one-time UI flags, e.g. backupNudged
   };
 }
 
@@ -29,6 +30,7 @@ export function deepDefaults(p) {
   s.completed = (p && p.completed) || {};
   s.missionData = (p && p.missionData) || {};
   s.reviews = (p && p.reviews) || [];
+  s.flags = Object.assign({}, (p && p.flags) || {});
   return s;
 }
 

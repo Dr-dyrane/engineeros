@@ -10,7 +10,7 @@ registerView('journeys', () => {
   const cards = JOURNEYS.map((j, ji) => {
     const unlocked = isJourneyUnlocked(ji);
     const done = j.missions.filter(m => store.s.completed[m.id]).length;
-    const tot = j.missions.length, isDone = done === tot, pct = Math.round(done / tot * 100);
+    const tot = j.missions.length, isDone = tot > 0 && done === tot, pct = tot ? Math.round(done / tot * 100) : 0;
     const chipCls = isDone ? 'chip-green' : unlocked ? 'chip-accent' : 'chip-muted';
     const ic = isDone ? 'check' : unlocked ? j.icon : 'lock';
     const right = isDone ? badge('Complete', 'green', 'check')

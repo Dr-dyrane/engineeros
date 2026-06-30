@@ -135,3 +135,17 @@ product matures into something people rely on daily.
 - **Service worker** shipped — app shell + every module + icons precached; navigations network-first, same-origin stale-while-revalidate, CDN cache-first. EngineerOS is now a **true installable PWA that loads offline / on weak connections**.
 
 **Still open:** Resources search + Nigeria/Free filters; error boundary around renders; backup-reminder nudge; directional page transitions; progress depth (streak heatmap); decide whether the Weekly Review should extend the streak; remove now-dead builder code in `build.js`/`main.js`.
+
+---
+
+## Update — completion pass
+
+The actionable backlog is now cleared:
+
+- **Resources search + filters** shipped. A live search box plus All / Nigeria / Free chips, with a friendly empty state when nothing matches.
+- **Error boundary** shipped. View renders are wrapped, so a thrown render shows a calm "Something hiccuped, go home" card instead of a blank screen.
+- **Backup nudge** shipped. After five completed missions, a one-time, gentle toast suggests exporting a backup from Settings.
+- **Dead-code cleanup** done. The old textarea `builderView` and `exportBuilder` are gone from `build.js`, with their dead handlers removed from `main.js`. The Build hub copy now says "Studio".
+- **Robustness.** Journey and progress percentages are guarded against an empty journey.
+
+**Optional polish left (nice-to-have, not needed):** directional push/pop page transitions, a streak calendar or milestone badges on Progress, and scoping `refreshIcons` to its root. The Weekly Review intentionally still counts toward the streak (it is a weekly action, so it cannot inflate a daily streak).
