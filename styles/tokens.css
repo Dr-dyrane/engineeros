@@ -1,0 +1,162 @@
+/* =============================================================================
+   EngineerOS · Design Tokens
+   The single source of truth. Every color, space, radius, type step, motion
+   curve and elevation lives here as a CSS custom property. Components consume
+   these — never hard-coded values.
+
+   Design law:
+   • ZERO BORDERS anywhere. Surfaces are separated by ELEVATION — background
+     tint, translucent material, blur and shadow — never by lines.
+   • Continuous-curve squircles (see --r-* and the .squircle utility).
+   • Motion is purposeful and spring-like; honor prefers-reduced-motion.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand / accent ---------------------------------------------------- */
+  --accent:        #0a84ff;   /* refined blue */
+  --accent-press:  #0066cc;
+  --accent-2:      #00b4d8;   /* cyan, for gradients */
+  --amber:         #ff9f0a;   /* active mission / "today" */
+  --green:         #34c759;   /* success */
+  --red:           #ff453a;   /* destructive */
+  --on-accent:     #ffffff;
+
+  /* ---- Surfaces (light). Separation = lightness + shadow, never borders --- */
+  --bg:            #eef0f4;   /* app canvas */
+  --bg-tint-1:     #ffffff;   /* ambient wash a */
+  --bg-tint-2:     #e7eaf0;   /* ambient wash b */
+  --surface-1:     #ffffff;   /* raised card */
+  --surface-2:     #ffffff;   /* sheet / overlay */
+  --surface-3:     #ffffff;   /* popover */
+  --surface-sunken:#e9ebf1;   /* inset / wells (inputs, tracks) */
+  --fill:          rgba(120,124,134,0.10);  /* quiet fill (chips, ghost) */
+  --fill-strong:   rgba(120,124,134,0.16);
+  --fill-press:    rgba(120,124,134,0.22);
+
+  /* ---- Text -------------------------------------------------------------- */
+  --text:          #1c1c1e;
+  --text-2:        #51545c;
+  --text-3:        #8a8d96;
+  --text-on-fill:  #2a2c31;
+
+  /* ---- Translucent materials (the "glass" functional layer) -------------- */
+  --material:          rgba(255,255,255,0.70);
+  --material-strong:   rgba(255,255,255,0.82);
+  --material-blur:     22px;
+  --material-saturate: 180%;
+
+  /* ---- Elevation shadows (the ONLY way surfaces lift) -------------------- */
+  --shadow-1: 0 1px 2px rgba(17,24,39,0.05), 0 4px 12px rgba(17,24,39,0.06);
+  --shadow-2: 0 2px 6px rgba(17,24,39,0.07), 0 14px 32px rgba(17,24,39,0.10);
+  --shadow-3: 0 8px 24px rgba(17,24,39,0.10), 0 28px 60px rgba(17,24,39,0.16);
+  --shadow-press: 0 1px 2px rgba(17,24,39,0.08);
+  --glow-accent: 0 8px 24px rgba(10,132,255,0.34);
+  --glow-amber:  0 8px 24px rgba(255,159,10,0.34);
+  --glow-green:  0 8px 22px rgba(52,199,89,0.32);
+  --ring: 0 0 0 4px rgba(10,132,255,0.35);   /* focus ring (not a border) */
+
+  /* ---- Radius — continuous squircle scale -------------------------------- */
+  --r-xs:   10px;
+  --r-sm:   14px;
+  --r-md:   18px;
+  --r-lg:   24px;
+  --r-xl:   30px;
+  --r-2xl:  38px;
+  --r-chip: 16px;
+  --r-field:14px;
+  --r-card: 26px;
+  --r-sheet:34px;
+  --r-pill: 999px;
+
+  /* ---- Spacing — 4 / 8-pt grid ------------------------------------------- */
+  --s-1: 4px;   --s-2: 8px;   --s-3: 12px;  --s-4: 16px;  --s-5: 20px;
+  --s-6: 24px;  --s-7: 32px;  --s-8: 40px;  --s-9: 48px;  --s-10: 64px;
+
+  /* ---- Typography (HIG-style scale) -------------------------------------- */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+               "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, monospace;
+
+  --fs-display:  clamp(30px, 7.5vw, 40px);  --lh-display: 1.05; --tr-display: -0.026em;
+  --fs-title-1:  27px;  --lh-title-1: 1.12;  --tr-title-1: -0.022em;
+  --fs-title-2:  22px;  --lh-title-2: 1.18;  --tr-title-2: -0.018em;
+  --fs-headline: 17px;  --lh-headline:1.3;   --tr-headline:-0.012em;
+  --fs-body:     16px;  --lh-body:    1.5;    --tr-body:    -0.006em;
+  --fs-callout:  15px;  --lh-callout: 1.45;
+  --fs-foot:     13px;  --lh-foot:    1.4;
+  --fs-caption:  11.5px;--lh-caption: 1.35;   --tr-caption: 0.02em;
+
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 680; --fw-heavy: 760;
+
+  /* ---- Motion ------------------------------------------------------------ */
+  --ease-standard:  cubic-bezier(.4, 0, .2, 1);
+  --ease-emphasized:cubic-bezier(.22, 1, .36, 1);   /* spring-like settle */
+  --ease-springy:   cubic-bezier(.34, 1.56, .64, 1); /* gentle overshoot */
+  --ease-exit:      cubic-bezier(.4, 0, 1, 1);
+  --dur-1: 130ms;  --dur-2: 220ms;  --dur-3: 340ms;  --dur-4: 520ms;
+
+  /* ---- Layout ------------------------------------------------------------ */
+  --maxw: 720px;
+  --topbar-h: 54px;
+  --tabbar-h: 66px;
+
+  /* ---- Z layers ---------------------------------------------------------- */
+  --z-content: 1; --z-bar: 50; --z-toast: 90; --z-celebrate: 80; --z-sheet: 70;
+
+  /* ---- Squircle mask (superellipse) for square decorative elements ------- */
+  --squircle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' preserveAspectRatio='none'%3E%3Cpath d='M100 0C38 0 0 38 0 100s38 100 100 100 100-38 100-100S162 0 100 0Z' fill='%23000'/%3E%3C/svg%3E");
+
+  color-scheme: light;
+}
+
+/* =============================================================================
+   Dark theme — applied automatically by system, or forced via [data-theme].
+   In dark, RAISED surfaces get LIGHTER (Apple elevation), reinforcing the
+   no-border, elevation-only separation model.
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) { color-scheme: dark; }
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --bg:            #000000;
+    --bg-tint-1:     #161719;
+    --bg-tint-2:     #050506;
+    --surface-1:     #1c1c1e;
+    --surface-2:     #242427;
+    --surface-3:     #2c2c2f;
+    --surface-sunken:#101012;
+    --fill:          rgba(120,124,134,0.20);
+    --fill-strong:   rgba(120,124,134,0.30);
+    --fill-press:    rgba(120,124,134,0.40);
+    --text:          #f5f5f7;
+    --text-2:        #b4b6bd;
+    --text-3:        #87898f;
+    --text-on-fill:  #e8e9ec;
+    --material:          rgba(28,28,30,0.62);
+    --material-strong:   rgba(28,28,30,0.80);
+    --shadow-1: 0 1px 2px rgba(0,0,0,0.5), 0 6px 18px rgba(0,0,0,0.5);
+    --shadow-2: 0 2px 8px rgba(0,0,0,0.55), 0 18px 40px rgba(0,0,0,0.6);
+    --shadow-3: 0 10px 30px rgba(0,0,0,0.6), 0 34px 70px rgba(0,0,0,0.7);
+    --shadow-press: 0 1px 3px rgba(0,0,0,0.6);
+    --accent: #0a84ff; --accent-2: #40c8e0; --green: #30d158; --red: #ff453a;
+    --ring: 0 0 0 4px rgba(10,132,255,0.5);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg:#000000; --bg-tint-1:#161719; --bg-tint-2:#050506;
+  --surface-1:#1c1c1e; --surface-2:#242427; --surface-3:#2c2c2f; --surface-sunken:#101012;
+  --fill:rgba(120,124,134,0.20); --fill-strong:rgba(120,124,134,0.30); --fill-press:rgba(120,124,134,0.40);
+  --text:#f5f5f7; --text-2:#b4b6bd; --text-3:#87898f; --text-on-fill:#e8e9ec;
+  --material:rgba(28,28,30,0.62); --material-strong:rgba(28,28,30,0.80);
+  --shadow-1:0 1px 2px rgba(0,0,0,0.5),0 6px 18px rgba(0,0,0,0.5);
+  --shadow-2:0 2px 8px rgba(0,0,0,0.55),0 18px 40px rgba(0,0,0,0.6);
+  --shadow-3:0 10px 30px rgba(0,0,0,0.6),0 34px 70px rgba(0,0,0,0.7);
+  --shadow-press:0 1px 3px rgba(0,0,0,0.6);
+  --accent-2:#40c8e0; --green:#30d158;
+  --ring:0 0 0 4px rgba(10,132,255,0.5);
+}
+:root[data-theme="light"] { color-scheme: light; }
