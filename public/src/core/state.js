@@ -1,11 +1,34 @@
+// @ts-check
 /* EngineerOS · State + persistence + selectors
    One module owns the state. `store.s` is the live state object; reassigning it
    (on import/reset) propagates everywhere because the wrapper object is shared. */
 
 import { JOURNEYS, GH_MILESTONES } from '../data/journeys.js';
+import { migrateBuilders } from './models.js';
 
 const KEY = 'engineeros.v1';
 
+/**
+ * @typedef {import('./models.js').ResumeModel} ResumeModel
+ * @typedef {import('./models.js').PortfolioModel} PortfolioModel
+ * @typedef {import('./models.js').LinkedinModel} LinkedinModel
+ * @typedef {{
+ *   version:number, updated:number, onboarded:boolean,
+ *   user:{name:string},
+ *   theme:'system'|'light'|'dark',
+ *   freeNav:boolean,
+ *   completed:Record<string, boolean>,
+ *   missionData:Record<string, {checks:Record<string,boolean>, reflection:string, notes:string}>,
+ *   streak:{count:number, best:number, last:string},
+ *   builders:{portfolio:PortfolioModel, resume:ResumeModel, linkedin:LinkedinModel},
+ *   reviews:Array<Record<string,string>>,
+ *   applications:Array<Record<string,any>>,
+ *   interview:{answers:Record<string, Record<string,string>>},
+ *   flags:Record<string, any>
+ * }} AppState
+ */
+
+/** @returns {any} */
 export function defaultState() {
   return {
     version: 1, updated: 0, onboarded: false,
@@ -23,6 +46,8 @@ export function defaultState() {
   };
 }
 
+/** Normalize + migrate any raw object into a full AppState (load / import / sync merge).
+ * @param {any} p @returns {AppState} */
 export function deepDefaults(p) {
   const d = defaultState();
   const s = Object.assign(d, p || {});
@@ -36,14 +61,15 @@ export function deepDefaults(p) {
   s.interview = { answers: (p && p.interview && p.interview.answers) || {} };
   s.flags = Object.assign({}, (p && p.flags) || {});
   s.updated = (p && p.updated) || 0;
-  return s;
+  return migrateBuilders(s);   // every entry path (load / import / sync merge) migrates here
 }
 
 function load() {
   try { const raw = localStorage.getItem(KEY); if (raw) return deepDefaults(JSON.parse(raw)); } catch (e) {}
-  return defaultState();
+  return deepDefaults(null);
 }
 
+/** @type {{ s: AppState }} */
 export const store = { s: load() };
 
 let saveTimer = null;
@@ -60,7 +86,7 @@ export function saveNow() {
   if (changeHook) { try { changeHook(); } catch (e) {} }
 }
 export function replaceState(next) { store.s = deepDefaults(next); saveNow(); }
-export function resetState() { const theme = store.s.theme; store.s = defaultState(); store.s.theme = theme; saveNow(); }
+export function resetState() { const theme = store.s.theme; store.s = deepDefaults(null); store.s.theme = theme; saveNow(); }
 
 /* ---- small helpers ------------------------------------------------------- */
 function localYMD(d = new Date()) { const z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`; }
@@ -139,13 +165,14 @@ export function linkedinReady() {
 }
 export function portfolioReady() {
   const p = store.s.builders.portfolio; if (!p) return 0;
+  const legacy = /** @type {any} */ (p);   // pre-v2 keys may survive on migrated objects
   const has = v => v && String(v).trim().length > 1;
-  const csAny = Array.isArray(p.projects) ? p.projects.some(x => x.title || x.approach || x.result) : (has(p.project) || has(p.projects));
+  const csAny = Array.isArray(p.projects) ? p.projects.some(x => x.title || x.approach || x.result) : (has(legacy.project) || has(legacy.projects));
   const checks = [
     has(p.about),
-    has(p.email) || has(p.linkedin) || has(p.github) || has(p.website) || has(p.contact),
+    has(p.email) || has(p.linkedin) || has(p.github) || has(p.website) || has(legacy.contact),
     csAny,
-    Array.isArray(p.skills) ? p.skills.some(s => has(s.items)) : has(p.skills),
+    Array.isArray(p.skills) ? p.skills.some(s => has(s.items)) : has(legacy.skills),
     has(p.education),
   ];
   return Math.round(checks.filter(Boolean).length / checks.length * 100);

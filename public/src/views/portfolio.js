@@ -1,54 +1,24 @@
 /* EngineerOS · Portfolio Studio
    Guided case studies (Problem, Approach, Result), a live printable one-pager,
-   a strength score, action-verb coaching, and Print to PDF / hostable HTML / Markdown export. */
+   a strength score, action-verb coaching, and Print to PDF / hostable HTML / Markdown export.
+   Mechanics (paths, panels, form fields, verb insert) come from the studio engine. */
 
-import { store, save } from '../core/state.js';
-import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
+import { save } from '../core/state.js';
+import { qs, esc, icon, refreshIcons, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
+import { registerActions, registerInput } from '../core/actions.js';
 import { download, copyText, toast } from '../core/feedback.js';
-import { meter, pageHeader, strengthLabel, tip } from '../ui/components.js';
-import { ACTION_VERBS } from '../data/resume-assets.js';
+import { pageHeader, tip } from '../ui/components.js';
+import { createStudio, coachPanel } from '../ui/studio.js';
+import { emptyCaseStudy } from '../core/models.js';
 import { reviewPortfolio, draftAbout } from '../core/coach.js';
 
-const emptyProj = () => ({ title: '', role: '', tech: '', link: '', problem: '', approach: '', result: '' });
-
-/* ---------- model + migration -------------------------------------------- */
-function P() { const b = store.s.builders; b.portfolio = b.portfolio || {}; migrate(b.portfolio); return b.portfolio; }
-function migrate(p) {
-  if (p._v === 2) return;
-  const o = Object.assign({}, p);
-  const str = v => (typeof v === 'string' && v.trim()) ? v.trim() : '';
-  p.name = o.name || ''; p.title = o.title || ''; p.tagline = o.tagline || '';
-  p.about = o.about || ''; p.email = o.email || ''; p.linkedin = o.linkedin || ''; p.github = o.github || ''; p.website = o.website || '';
-  p.tools = o.tools || ''; p.education = Array.isArray(o.education) ? '' : str(o.education);
-  if (Array.isArray(o.projects)) p.projects = o.projects;
-  else {
-    const arr = [];
-    if (str(o.project)) arr.push(Object.assign(emptyProj(), { title: 'Final-Year Project', approach: str(o.project) }));
-    if (str(o.projects)) arr.push(Object.assign(emptyProj(), { title: 'Other Projects', approach: str(o.projects) }));
-    p.projects = arr;
-  }
-  p.skills = Array.isArray(o.skills) ? o.skills : (str(o.skills) ? [{ group: 'Skills', items: str(o.skills) }] : []);
-  p.certifications = Array.isArray(o.certifications) ? o.certifications : (str(o.certs) ? [{ name: str(o.certs), issuer: '', year: '' }] : []);
-  if (!p.projects.length) p.projects.push(emptyProj());
-  if (!p.skills.length) p.skills.push({ group: '', items: '' });
-  p._v = 2;
-}
-
-const ARR = { proj: 'projects', skill: 'skills', cert: 'certifications' };
-function setPath(p, path, value) {
-  const s = path.split('.');
-  if (s.length === 1) { p[s[0]] = value; return; }
-  const arr = p[ARR[s[0]]]; if (!arr || !arr[+s[1]]) return;
-  arr[+s[1]][s[2]] = value;
-}
-export function portfolioInput(path, value) { setPath(P(), path, value); save(); refreshDynamic(); }
-
-let lastField = null;
-document.addEventListener('focusin', e => {
-  const f = e.target.closest && e.target.closest('#view-portfolio [data-pf]');
-  if (f && (f.tagName === 'TEXTAREA' || f.tagName === 'INPUT')) lastField = f;
+const st = createStudio({
+  key: 'portfolio', attr: 'pf',
+  arrays: { proj: 'projects', skill: 'skills', cert: 'certifications' },
+  refresh: () => refreshDynamic(),
 });
+const P = st.model;
 
 /* ---------- score --------------------------------------------------------- */
 function scoreData(p) {
@@ -58,31 +28,12 @@ function scoreData(p) {
   const hasAbout = !!(p.about && p.about.trim().length > 20);
   const hasContact = !!(p.email || p.linkedin || p.github || p.website);
   const hasSkills = (p.skills || []).some(s => s.items && s.items.trim());
-  let score = (hasAbout ? 16 : 0) + (hasContact ? 14 : 0) + (complete.length ? 24 : 0)
+  const score = (hasAbout ? 16 : 0) + (hasContact ? 14 : 0) + (complete.length ? 24 : 0)
     + (complete.length >= 2 ? 14 : 0) + (quantified ? 16 : 0) + (hasSkills ? 16 : 0);
-  score = Math.min(100, score);
-  const tips = [];
-  if (!hasAbout) tips.push(['miss', 'Write a short About: who you are and what you build']);
-  if (!complete.length) tips.push(['miss', 'Finish one case study: Problem, Approach and Result']);
-  if (complete.length && !quantified) tips.push(['miss', 'Put a number in at least one Result (%, time, cost…)']);
-  if (complete.length < 2) tips.push(['miss', 'Aim for two or three strong case studies']);
-  if (!hasContact) tips.push(['miss', 'Add a way to reach you (email or links)']);
-  if (!hasSkills) tips.push(['miss', 'List your skills']);
-  if (!tips.length) tips.push(['ok', 'Strong portfolio. Export the one-pager and host it.']);
-  return { score, tips };
+  return Math.min(100, score);
 }
-function scoreHTML(p) {
-  const { score } = scoreData(p);
-  const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
-  const review = reviewPortfolio(p);
-  const dot = sev => sev === 'high' ? 'var(--red)' : sev === 'med' ? 'var(--amber)' : 'var(--text-3)';
-  const itemsHTML = review.items.length
-    ? review.items.slice(0, 10).map(it => `<div class="rs-tip"><span style="color:${dot(it.sev)};font-weight:700">•</span><span><b>${esc(it.where)}.</b> ${esc(it.fix)}</span></div>`).join('')
-    : `<div class="rs-tip ok"><span style="color:var(--green);font-weight:700">✓</span><span>Strong portfolio. Export the one-pager and host it.</span></div>`;
-  return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
-      <div class="t-foot text-3">${score} of 100 · portfolio strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
-    <div class="mt-3">${itemsHTML}</div>`;
-}
+const scoreHTML = (p) => coachPanel(scoreData(p), 'portfolio strength', reviewPortfolio(p),
+  'Strong portfolio. Export the one-pager and host it.');
 
 /* ---------- one-pager ----------------------------------------------------- */
 function paperHTML(p) {
@@ -90,22 +41,21 @@ function paperHTML(p) {
   const projs = (p.projects || []).filter(x => x.title || x.problem || x.approach || x.result);
   const sk = (p.skills || []).filter(s => s.items && s.items.trim());
   const ce = (p.certifications || []).filter(c => c.name && c.name.trim());
-  let h = `<div class="pf-name">${esc(p.name || 'Your Name')}</div>`;
-  if (p.title) h += `<div class="pf-title">${esc(p.title)}</div>`;
-  if (p.tagline) h += `<div class="pf-tagline">${esc(p.tagline)}</div>`;
-  h += `<div class="pf-contact">${contact.length ? contact.map(c => `<span>${esc(c)}</span>`).join('') : '<span class="pf-empty">add your contact links</span>'}</div>`;
-  if (p.about && p.about.trim()) h += `<div class="pf-h">About</div><div>${esc(p.about)}</div>`;
-  if (projs.length) h += `<div class="pf-h">Selected Projects</div>` + projs.map(x => `
-    <div class="pf-proj"><div class="pf-proj-h"><span class="pf-proj-t">${esc(x.title || 'Project')}</span><span class="pf-proj-meta">${esc([x.role, x.tech].filter(Boolean).join(' · '))}</span></div>
-      ${x.problem ? `<div class="pf-cs"><b>Problem:</b> ${esc(x.problem)}</div>` : ''}
-      ${x.approach ? `<div class="pf-cs"><b>Approach:</b> ${esc(x.approach)}</div>` : ''}
-      ${x.result ? `<div class="pf-cs pf-result"><b>Result:</b> ${esc(x.result)}</div>` : ''}
-      ${x.link ? `<div class="pf-cs"><a href="${esc(x.link)}">${esc(x.link)}</a></div>` : ''}
-    </div>`).join('');
-  if (sk.length || p.tools) h += `<div class="pf-h">Skills & Tools</div>` + sk.map(s => `<div class="pf-skline">${s.group ? `<b>${esc(s.group)}:</b> ` : ''}${esc(s.items)}</div>`).join('') + (p.tools ? `<div class="pf-skline"><b>Tools:</b> ${esc(p.tools)}</div>` : '');
-  if (p.education && p.education.trim()) h += `<div class="pf-h">Education</div><div>${esc(p.education)}</div>`;
-  if (ce.length) h += `<div class="pf-h">Certifications</div>` + ce.map(c => `<div class="pf-skline">${esc(c.name)}${c.issuer ? `, ${esc(c.issuer)}` : ''}${c.year ? ` (${esc(c.year)})` : ''}</div>`).join('');
-  return h;
+  return html`<div class="pf-name">${p.name || 'Your Name'}</div>
+    ${p.title ? html`<div class="pf-title">${p.title}</div>` : ''}
+    ${p.tagline ? html`<div class="pf-tagline">${p.tagline}</div>` : ''}
+    <div class="pf-contact">${contact.length ? contact.map(c => html`<span>${c}</span>`) : html`<span class="pf-empty">add your contact links</span>`}</div>
+    ${p.about && p.about.trim() ? html`<div class="pf-h">About</div><div>${p.about}</div>` : ''}
+    ${projs.length ? html`<div class="pf-h">Selected Projects</div>${projs.map(x => html`
+      <div class="pf-proj"><div class="pf-proj-h"><span class="pf-proj-t">${x.title || 'Project'}</span><span class="pf-proj-meta">${[x.role, x.tech].filter(Boolean).join(' · ')}</span></div>
+        ${x.problem ? html`<div class="pf-cs"><b>Problem:</b> ${x.problem}</div>` : ''}
+        ${x.approach ? html`<div class="pf-cs"><b>Approach:</b> ${x.approach}</div>` : ''}
+        ${x.result ? html`<div class="pf-cs pf-result"><b>Result:</b> ${x.result}</div>` : ''}
+        ${x.link ? html`<div class="pf-cs"><a href="${x.link}">${x.link}</a></div>` : ''}
+      </div>`)}` : ''}
+    ${sk.length || p.tools ? html`<div class="pf-h">Skills & Tools</div>${sk.map(s => html`<div class="pf-skline">${s.group ? html`<b>${s.group}:</b> ` : ''}${s.items}</div>`)}${p.tools ? html`<div class="pf-skline"><b>Tools:</b> ${p.tools}</div>` : ''}` : ''}
+    ${p.education && p.education.trim() ? html`<div class="pf-h">Education</div><div>${p.education}</div>` : ''}
+    ${ce.length ? html`<div class="pf-h">Certifications</div>${ce.map(c => html`<div class="pf-skline">${c.name}${c.issuer ? ', ' + c.issuer : ''}${c.year ? ' (' + c.year + ')' : ''}</div>`)}` : ''}`;
 }
 
 /* ---------- exports ------------------------------------------------------- */
@@ -140,23 +90,19 @@ function htmlDoc(p) {
 const fname = ext => `${(P().name || 'portfolio').toLowerCase().replace(/\s+/g, '-')}-portfolio.${ext}`;
 
 /* ---------- live refresh -------------------------------------------------- */
-let coachOpen = false;   // survives re-renders within the session
 function refreshDynamic() {
   const p = P();
   const pp = qs('#pf-paper'); if (pp) pp.innerHTML = paperHTML(p);
   const s = qs('#pf-score'); if (s) s.innerHTML = scoreHTML(p);
-  const ss = qs('#pf-score-sum'); if (ss) ss.textContent = scoreData(p).score + '/100';
+  const ss = qs('#pf-score-sum'); if (ss) ss.textContent = scoreData(p) + '/100';
 }
 
-/* ---------- form helpers -------------------------------------------------- */
-const inp = (path, val, ph) => `<input class="input" data-pf="${path}" placeholder="${esc(ph)}" aria-label="${esc(ph)}" value="${esc(val || '')}" />`;
-const ta = (path, val, ph) => `<textarea class="textarea" data-pf="${path}" placeholder="${esc(ph)}" aria-label="${esc(ph)}">${esc(val || '')}</textarea>`;
-const delBtn = (action, value) => `<button class="rs-iconbtn" data-action="${action}" data-value="${value}" aria-label="Remove">${icon('trash-2')}</button>`;
-const addBtn = (action, value, label) => `<button class="btn btn-ghost btn-sm" data-action="${action}" data-value="${value}">${icon('plus')} ${esc(label)}</button>`;
+/* ---------- entry blocks --------------------------------------------------- */
+const { inp, ta, groupHead, entryHead } = st;
 
 function projEntry(x, i) {
-  return `<div class="rs-entry">
-    <div class="rs-entry-head"><span class="t">PROJECT ${i + 1}</span>${delBtn('pf-del-proj', i)}</div>
+  return html`<div class="rs-entry">
+    ${entryHead('PROJECT ' + (i + 1), 'pf-del-proj', i)}
     <div class="rs-two">${inp(`proj.${i}.title`, x.title, 'Project title')}${inp(`proj.${i}.role`, x.role, 'Your role')}</div>
     <div class="rs-two mt-2">${inp(`proj.${i}.tech`, x.tech, 'Tech / tools used')}${inp(`proj.${i}.link`, x.link, 'Link (GitHub / demo)')}</div>
     <div class="mt-2">${ta(`proj.${i}.problem`, x.problem, 'Problem: what needed solving?')}</div>
@@ -165,39 +111,25 @@ function projEntry(x, i) {
   </div>`;
 }
 function skillEntry(s, i) {
-  return `<div class="rs-entry"><div class="rs-entry-head"><span class="t">SKILL GROUP ${i + 1}</span>${delBtn('pf-del-skill', i)}</div>
+  return html`<div class="rs-entry">${entryHead('SKILL GROUP ' + (i + 1), 'pf-del-skill', i)}
     <div class="rs-two">${inp(`skill.${i}.group`, s.group, 'Group (e.g. Engineering)')}${inp(`skill.${i}.items`, s.items, 'SolidWorks, Python, Arduino…')}</div></div>`;
 }
 function certEntry(c, i) {
-  return `<div class="rs-entry"><div class="rs-entry-head"><span class="t">CERTIFICATION ${i + 1}</span>${delBtn('pf-del-cert', i)}</div>
+  return html`<div class="rs-entry">${entryHead('CERTIFICATION ' + (i + 1), 'pf-del-cert', i)}
     <div class="rs-two">${inp(`cert.${i}.name`, c.name, 'Name')}${inp(`cert.${i}.issuer`, c.issuer, 'Issuer')}</div>
     <div class="mt-2" style="max-width:140px">${inp(`cert.${i}.year`, c.year, 'Year')}</div></div>`;
-}
-function verbHelper() {
-  return `<details class="card" style="margin-top:10px"><summary class="fw-semibold" style="cursor:pointer">${icon('wand-sparkles')} Strong verbs for your Approach / Result</summary>
-    <p class="t-foot text-3 mt-2">Tap one and it drops into the field you last tapped.</p>
-    ${ACTION_VERBS.map(g => `<div class="rs-verb-group">${g.group}</div><div class="rs-verbs">${g.verbs.map(v => `<button class="rs-verb" data-action="pf-verb" data-value="${v}">${v}</button>`).join('')}</div>`).join('')}
-  </details>`;
 }
 
 /* ---------- render -------------------------------------------------------- */
 function renderPortfolio() {
   const p = P();
-  const groupHead = (label, action, addLabel) => `<div class="rs-group-h"><h3 class="section-label">${label}</h3>${addBtn(action, '', addLabel)}</div>`;
-  qs('#view-portfolio').innerHTML = `<div class="stagger">
+  qs('#view-portfolio').innerHTML = html`<div class="stagger">
     ${pageHeader('Build Studio', 'Portfolio Studio')}
 
-    <div class="studio-toolbar">
-      <div class="segmented studio-toggle">
-        <button data-action="pf-panel" data-value="edit" data-pf-panel-btn="edit" class="is-on">Edit</button>
-        <button data-action="pf-panel" data-value="preview" data-pf-panel-btn="preview">Preview</button>
-      </div>
-      <div class="tb-actions">
-        <button class="btn btn-primary btn-sm" data-action="pf-print">${icon('printer')} Save PDF</button>
-        <button class="btn btn-ghost btn-sm" data-action="pf-export-html">${icon('globe')} .html</button>
-        <button class="btn btn-ghost btn-sm" data-action="pf-export-md">${icon('download')} .md</button>
-      </div>
-    </div>
+    ${st.toolbar(html`
+      <button class="btn btn-primary btn-sm" data-action="pf-print">${icon('printer')} Save PDF</button>
+      <button class="btn btn-ghost btn-sm" data-action="pf-export-html">${icon('globe')} .html</button>
+      <button class="btn btn-ghost btn-sm" data-action="pf-export-md">${icon('download')} .md</button>`)}
 
     ${tip('portfolio-intro', 'Each project is a <b>case study</b>: Problem, Approach, Result, with a number in the Result.', 'accent', 'mb-4')}
 
@@ -218,13 +150,13 @@ function renderPortfolio() {
 
         <div class="rs-group">
           ${groupHead('Projects (case studies)', 'pf-add-proj', 'Add')}
-          ${(p.projects || []).map(projEntry).join('')}
-          ${verbHelper()}
+          ${(p.projects || []).map(projEntry)}
+          ${st.verbPicker('pf-verb', 'Strong verbs for your Approach / Result', 'Tap one and it drops into the field you last tapped.')}
         </div>
 
         <div class="rs-group">
           ${groupHead('Skills', 'pf-add-skill', 'Add group')}
-          ${(p.skills || []).map(skillEntry).join('')}
+          ${(p.skills || []).map(skillEntry)}
           <div class="card" style="margin-top:8px"><h3 class="section-label" style="margin-top:0">Tools & software</h3>${inp('tools', p.tools, 'SolidWorks, Fusion 360, Arduino, Python…')}</div>
         </div>
 
@@ -232,13 +164,10 @@ function renderPortfolio() {
 
         <div class="rs-group">
           ${groupHead('Certifications', 'pf-add-cert', 'Add')}
-          ${(p.certifications || []).map(certEntry).join('')}
+          ${(p.certifications || []).map(certEntry)}
         </div>
 
-        <details class="card" id="pf-coach"${coachOpen ? ' open' : ''}>
-          <summary class="sum-row">${icon('sparkles')} Coach <span class="sum-val" id="pf-score-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
-          <div id="pf-score" class="mt-3"></div>
-        </details>
+        ${st.keep('coach', st.sumRow('sparkles', 'Coach', 'pf-score-sum'), html`<div id="pf-score" class="mt-3"></div>`)}
       </div>
 
       <div class="studio-preview">
@@ -247,48 +176,33 @@ function renderPortfolio() {
       </div>
     </div>
   </div>`;
-  const cd = qs('#pf-coach'); if (cd) cd.addEventListener('toggle', () => { coachOpen = cd.open; });
+  st.wire();
   refreshDynamic();
   refreshIcons(qs('#view-portfolio'));
 }
 registerView('portfolio', renderPortfolio);
 
 /* ---------- actions ------------------------------------------------------- */
-function insertVerb(verb) {
-  if (lastField) {
-    const el = lastField, s = el.selectionStart ?? el.value.length, e = el.selectionEnd ?? s;
-    el.value = el.value.slice(0, s) + verb + ' ' + el.value.slice(e);
-    el.dispatchEvent(new window.Event('input', { bubbles: true }));
-    const pos = s + verb.length + 1;
-    try { el.focus(); el.setSelectionRange(pos, pos); } catch (_) {}
-    toast('Added “' + verb + '”', false);
-  } else { copyText(verb); }
-}
-function setPanel(panel) {
-  const s = qs('#view-portfolio .studio'); if (s) s.dataset.panel = panel;
-  qsa('#view-portfolio [data-pf-panel-btn]').forEach(b => b.classList.toggle('is-on', b.dataset.pfPanelBtn === panel));
-}
-export function portfolioAction(action, value) {
+registerInput('data-pf', st.input);
+registerActions('pf-', (action, value) => {
   const p = P();
   const reRender = () => { save(); renderPortfolio(); };
-  const ask = () => (typeof confirm === 'undefined') || confirm('Remove this entry? This can’t be undone.');
-  const filled = o => o && Object.keys(o).some(k => String(o[k] || '').trim());
   switch (action) {
-    case 'pf-panel': setPanel(value); break;
+    case 'pf-panel': st.setPanel(value); break;
     case 'pf-draft-about': {
-      if (p.about && p.about.trim() && !((typeof confirm === 'undefined') || confirm('Replace your About with a fresh starter draft?'))) break;
+      if (p.about && p.about.trim() && !st.ask('Replace your About with a fresh starter draft?')) break;
       p.about = draftAbout(p); reRender(); toast('Starter drafted. Now make it yours.', false); break;
     }
-    case 'pf-add-proj': p.projects.push(emptyProj()); reRender(); break;
-    case 'pf-del-proj': { if (filled(p.projects[+value]) && !ask()) break; p.projects.splice(+value, 1); if (!p.projects.length) p.projects.push(emptyProj()); reRender(); break; }
+    case 'pf-add-proj': p.projects.push(emptyCaseStudy()); reRender(); break;
+    case 'pf-del-proj': { if (st.filled(p.projects[+value]) && !st.ask()) break; p.projects.splice(+value, 1); if (!p.projects.length) p.projects.push(emptyCaseStudy()); reRender(); break; }
     case 'pf-add-skill': p.skills.push({ group: '', items: '' }); reRender(); break;
-    case 'pf-del-skill': { if (filled(p.skills[+value]) && !ask()) break; p.skills.splice(+value, 1); reRender(); break; }
+    case 'pf-del-skill': { if (st.filled(p.skills[+value]) && !st.ask()) break; p.skills.splice(+value, 1); reRender(); break; }
     case 'pf-add-cert': p.certifications.push({ name: '', issuer: '', year: '' }); reRender(); break;
-    case 'pf-del-cert': { if (filled(p.certifications[+value]) && !ask()) break; p.certifications.splice(+value, 1); reRender(); break; }
-    case 'pf-verb': insertVerb(value); break;
+    case 'pf-del-cert': { if (st.filled(p.certifications[+value]) && !st.ask()) break; p.certifications.splice(+value, 1); reRender(); break; }
+    case 'pf-verb': st.insertText(value); break;
     case 'pf-print': try { window.print(); } catch (_) {} break;
-    case 'pf-export-html': download(fname('html'), htmlDoc(p), 'text/html;charset=utf-8'); toast('Portfolio HTML downloaded'); break;
-    case 'pf-export-md': download(fname('md'), markdown(p)); toast('Markdown downloaded'); break;
-    case 'pf-copy': copyText(markdown(p)); break;
+    case 'pf-export-html': download(fname('html'), htmlDoc(P()), 'text/html;charset=utf-8'); toast('Portfolio HTML downloaded'); break;
+    case 'pf-export-md': download(fname('md'), markdown(P())); toast('Markdown downloaded'); break;
+    case 'pf-copy': copyText(markdown(P())); break;
   }
-}
+});

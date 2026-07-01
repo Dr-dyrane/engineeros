@@ -1,8 +1,9 @@
 /* EngineerOS · Career Launchpad, the last mile: track the search, prep the interview. */
 
 import { store, save, saveNow } from '../core/state.js';
-import { qs, esc, icon } from '../core/dom.js';
+import { qs, icon, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
+import { registerActions, registerInput } from '../core/actions.js';
 import { pageHeader, statTile, emptyState } from '../ui/components.js';
 import { download, toast } from '../core/feedback.js';
 import { INTERVIEW, INTERVIEW_QS } from '../data/interview.js';
@@ -31,7 +32,7 @@ function portfolioProjects() { const p = store.s.builders.portfolio || {}; retur
 /* ---- render -------------------------------------------------------------- */
 export function renderLaunchpad() {
   const root = qs('#view-launchpad'); if (!root) return;
-  root.innerHTML = `<div class="stagger">
+  root.innerHTML = html`<div class="stagger">
     ${pageHeader('Career Launchpad', 'Run your search, land the interview.')}
     <div class="segmented" style="margin-bottom:var(--s-4)">
       <button data-action="la-panel" data-value="apps" class="${panel === 'apps' ? 'is-on' : ''}">Applications</button>
@@ -44,40 +45,40 @@ registerView('launchpad', renderLaunchpad);
 
 function appsHTML() {
   const list = appList();
-  const stats = `<div class="grid-3">
+  const stats = html`<div class="grid-3">
     ${statTile(list.length, 'Tracked')}
     ${statTile(list.filter(a => a.status === 'applied' || a.status === 'interview').length, 'In play')}
     ${statTile(list.filter(a => a.status === 'interview').length, 'Interviews')}
   </div>`;
-  const insight = `<div class="notice notice-accent mt-4">${icon('compass')} ${esc(launchpadInsight(list))}</div>`;
-  const add = `<div class="mt-4"><button class="btn btn-primary" data-action="la-add">${icon('plus')} Add application</button></div>`;
+  const insight = html`<div class="notice notice-accent mt-4">${icon('compass')} ${launchpadInsight(list)}</div>`;
+  const add = html`<div class="mt-4"><button class="btn btn-primary" data-action="la-add">${icon('plus')} Add application</button></div>`;
   const groups = STATUS.map(s => {
     const items = list.filter(a => a.status === s.id);
     if (!items.length) return '';
-    return `<section style="margin-top:var(--s-5)">
-      <h3 class="section-label" style="margin-bottom:6px">${esc(s.label)} · ${items.length}</h3>
-      <div class="list">${items.map(appCard).join('')}</div>
+    return html`<section style="margin-top:var(--s-5)">
+      <h3 class="section-label" style="margin-bottom:6px">${s.label} · ${items.length}</h3>
+      <div class="list">${items.map(appCard)}</div>
     </section>`;
-  }).join('');
-  const empty = list.length ? '' : `<div class="mt-4">${emptyState('briefcase', 'No applications yet. Add the first role you are eyeing, even a stretch one.')}</div>`;
-  return `${stats}${insight}${add}${groups}${empty}`;
+  });
+  const empty = list.length ? '' : html`<div class="mt-4">${emptyState('briefcase', 'No applications yet. Add the first role you are eyeing, even a stretch one.')}</div>`;
+  return html`${stats}${insight}${add}${groups}${empty}`;
 }
 
 function appCard(a) {
-  const chips = STATUS.map(s => `<button class="filter-chip ${a.status === s.id ? 'is-on' : ''}" data-action="la-status" data-value="${a.id}:${s.id}">${esc(s.label)}</button>`).join('');
-  return `<div class="card" data-app="${a.id}">
-    <input class="input" data-la-field="${a.id}:company" value="${esc(a.company || '')}" placeholder="Company" style="font-weight:600" />
-    <input class="input mt-2" data-la-field="${a.id}:role" value="${esc(a.role || '')}" placeholder="Role" />
+  const chips = STATUS.map(s => html`<button class="filter-chip ${a.status === s.id ? 'is-on' : ''}" data-action="la-status" data-value="${a.id}:${s.id}">${s.label}</button>`);
+  return html`<div class="card" data-app="${a.id}">
+    <input class="input" data-la-field="${a.id}:company" value="${a.company || ''}" placeholder="Company" style="font-weight:600" />
+    <input class="input mt-2" data-la-field="${a.id}:role" value="${a.role || ''}" placeholder="Role" />
     <div class="row-tight mt-3" style="flex-wrap:wrap; gap:6px">${chips}</div>
     <div class="grid-2 mt-3">
-      <div class="field" style="margin-bottom:0"><label>Next action</label><input class="input" data-la-field="${a.id}:next" value="${esc(a.next || '')}" placeholder="e.g. Follow up" /></div>
-      <div class="field" style="margin-bottom:0"><label>By</label><input class="input" type="date" data-la-field="${a.id}:nextDate" value="${esc(a.nextDate || '')}" /></div>
+      <div class="field" style="margin-bottom:0"><label>Next action</label><input class="input" data-la-field="${a.id}:next" value="${a.next || ''}" placeholder="e.g. Follow up" /></div>
+      <div class="field" style="margin-bottom:0"><label>By</label><input class="input" type="date" data-la-field="${a.id}:nextDate" value="${a.nextDate || ''}" /></div>
     </div>
-    <div class="field mt-3" style="margin-bottom:0"><label>Link</label><input class="input" data-la-field="${a.id}:link" value="${esc(a.link || '')}" placeholder="Job posting URL" /></div>
+    <div class="field mt-3" style="margin-bottom:0"><label>Link</label><input class="input" data-la-field="${a.id}:link" value="${a.link || ''}" placeholder="Job posting URL" /></div>
     <details class="mt-3"><summary class="t-foot text-3" style="cursor:pointer">+ Notes</summary>
-      <textarea class="textarea mt-2" data-la-field="${a.id}:notes" placeholder="Contact, salary, what to prep...">${esc(a.notes || '')}</textarea></details>
+      <textarea class="textarea mt-2" data-la-field="${a.id}:notes" placeholder="Contact, salary, what to prep...">${a.notes || ''}</textarea></details>
     <div class="row between mt-3">
-      ${a.link ? `<a class="btn btn-ghost btn-sm" href="${esc(a.link)}" target="_blank" rel="noopener">${icon('external-link')} Open</a>` : '<span></span>'}
+      ${a.link ? html`<a class="btn btn-ghost btn-sm" href="${a.link}" target="_blank" rel="noopener">${icon('external-link')} Open</a>` : html`<span></span>`}
       <button class="btn btn-ghost btn-sm" data-action="la-del" data-value="${a.id}" style="color:var(--red)">${icon('trash-2')} Remove</button>
     </div>
   </div>`;
@@ -86,12 +87,12 @@ function appCard(a) {
 function interviewHTML() {
   const answered = INTERVIEW_QS.filter(q => isAnswered(q.id)).length;
   const projects = portfolioProjects();
-  const groups = INTERVIEW.map(g => `
+  const groups = INTERVIEW.map(g => html`
     <section style="margin-top:var(--s-5)">
-      <h3 class="section-label" style="margin-bottom:6px">${esc(g.group)}</h3>
-      <div class="stack">${g.items.map(q => questionCard(q, projects)).join('')}</div>
-    </section>`).join('');
-  return `<div class="notice notice-accent">${icon('mic')} ${answered} of ${INTERVIEW_QS.length} answered · practice out loud, not just in your head.</div>
+      <h3 class="section-label" style="margin-bottom:6px">${g.group}</h3>
+      <div class="stack">${g.items.map(q => questionCard(q, projects))}</div>
+    </section>`);
+  return html`<div class="notice notice-accent">${icon('mic')} ${answered} of ${INTERVIEW_QS.length} answered · practice out loud, not just in your head.</div>
     <div class="mt-3"><button class="btn btn-ghost" data-action="la-export">${icon('download')} Export prep sheet</button></div>
     ${groups}`;
 }
@@ -100,24 +101,24 @@ function questionCard(q, projects) {
   const a = answers()[q.id] || {};
   const open = isAnswered(q.id);
   const body = q.star ? starFields(q, a, projects)
-    : `<textarea class="textarea mt-2" data-la-ans="${q.id}:text" placeholder="Your answer, in your own words...">${esc(a.text || '')}</textarea>`;
-  return `<details class="card" ${open ? 'open' : ''}>
+    : html`<textarea class="textarea mt-2" data-la-ans="${q.id}:text" placeholder="Your answer, in your own words...">${a.text || ''}</textarea>`;
+  return html`<details class="card" ${open ? 'open' : ''}>
     <summary style="cursor:pointer; list-style:none">
-      <div class="row between"><div class="fw-semibold grow">${esc(q.q)}</div>
+      <div class="row between"><div class="fw-semibold grow">${q.q}</div>
         <span class="chev text-3">${isAnswered(q.id) ? icon('check') : icon('chevron-down')}</span></div>
     </summary>
-    <p class="t-foot text-2 mt-2">${esc(q.hint)}</p>
+    <p class="t-foot text-2 mt-2">${q.hint}</p>
     ${body}
   </details>`;
 }
 function starFields(q, a, projects) {
   const draft = projects.length
-    ? `<div class="row-tight mt-2" style="flex-wrap:wrap; gap:6px; align-items:center">
+    ? html`<div class="row-tight mt-2" style="flex-wrap:wrap; gap:6px; align-items:center">
         <span class="t-foot text-3">Draft from:</span>
-        ${projects.map((p, i) => `<button class="filter-chip" data-action="la-draft" data-value="${q.id}:${i}">${esc(p.title || ('Project ' + (i + 1)))}</button>`).join('')}</div>`
+        ${projects.map((p, i) => html`<button class="filter-chip" data-action="la-draft" data-value="${q.id}:${i}">${p.title || ('Project ' + (i + 1))}</button>`)}</div>`
     : '';
-  const f = (k, label, ph) => `<div class="field mt-2" style="margin-bottom:0"><label>${label}</label><textarea class="textarea" data-la-ans="${q.id}:${k}" placeholder="${esc(ph)}">${esc(a[k] || '')}</textarea></div>`;
-  return `${draft}
+  const f = (k, label, ph) => html`<div class="field mt-2" style="margin-bottom:0"><label>${label}</label><textarea class="textarea" data-la-ans="${q.id}:${k}" placeholder="${ph}">${a[k] || ''}</textarea></div>`;
+  return html`${draft}
     ${f('s', 'Situation', 'Where and when, briefly')}
     ${f('t', 'Task', 'What you needed to do')}
     ${f('a', 'Action', 'What YOU did, step by step')}
@@ -125,6 +126,8 @@ function starFields(q, a, projects) {
 }
 
 /* ---- inputs (live save, no re-render so focus is kept) -------------------- */
+registerInput('data-la-field', (key, value) => launchpadInput(key, value));
+registerInput('data-la-ans', (key, value) => launchpadAns(key, value));
 export function launchpadInput(key, value) {
   const [id, field] = key.split(':');
   const a = findApp(id); if (!a) return;
@@ -138,6 +141,7 @@ export function launchpadAns(key, value) {
 }
 
 /* ---- actions ------------------------------------------------------------- */
+registerActions('la-', (action, value) => launchpadAction(action, value));
 export function launchpadAction(action, value) {
   switch (action) {
     case 'la-panel': panel = value; renderLaunchpad(); refresh(); break;

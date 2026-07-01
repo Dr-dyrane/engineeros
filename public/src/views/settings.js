@@ -1,7 +1,7 @@
 /* EngineerOS · Settings */
 
 import { store } from '../core/state.js';
-import { qs, esc, icon } from '../core/dom.js';
+import { qs, icon, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { pageHeader } from '../ui/components.js';
 import { syncStatus } from '../core/sync.js';
@@ -16,13 +16,48 @@ function timeAgo(ts) {
   const d = Math.round(h / 24); return d + (d === 1 ? ' day ago' : ' days ago');
 }
 
+function syncCard() {
+  const s = syncStatus();
+  if (!s.on) return html`
+    <div class="card">
+      <div class="row between">
+        <div class="grow"><div class="fw-semibold">Encrypted sync</div>
+          <div class="t-foot text-3">Carry your progress to another device with a secret code. Encrypted end to end. We can never read it.</div></div>
+        <button class="switch" data-action="sync-enable" aria-label="Turn on sync"><span class="knob"></span></button>
+      </div>
+      <details class="mt-3"><summary class="t-foot text-3" style="cursor:pointer">+ I already have a sync code</summary>
+        <div class="field mt-2" style="margin-bottom:0">
+          <input class="input" id="sync-code-input" placeholder="Paste your sync code" autocapitalize="characters" autocomplete="off" spellcheck="false" />
+          <button class="btn btn-ghost mt-2" data-action="sync-link">${icon('refresh-cw')} Link this device</button>
+        </div>
+      </details>
+    </div>`;
+  const masked = s.code.replace(/[^-]/g, '•');
+  return html`
+    <div class="card">
+      <div class="row between">
+        <div class="grow"><div class="fw-semibold">Sync is on</div>
+          <div class="t-foot text-3">Encrypted end to end. Last synced ${s.last ? timeAgo(s.last) : 'just now'}.</div></div>
+        <button class="switch is-on" data-action="sync-off" aria-label="Turn off sync"><span class="knob"></span></button>
+      </div>
+      <div class="field mt-3" style="margin-bottom:0"><label>Your sync code</label>
+        <div class="row" style="gap:8px; align-items:center">
+          <input class="input" id="sync-code" value="${codeRevealed ? s.code : masked}" readonly style="letter-spacing:.08em" />
+          <button class="btn btn-ghost btn-sm" data-action="sync-reveal" aria-label="Reveal code">${icon(codeRevealed ? 'eye-off' : 'eye')}</button>
+          <button class="btn btn-ghost btn-sm" data-action="sync-copy" aria-label="Copy code">${icon('copy')}</button>
+        </div>
+        <p class="t-foot text-3 mt-2">Enter this in Settings on your other device. Save it somewhere safe. Without it, the synced copy can’t be recovered.</p>
+      </div>
+    </div>`;
+}
+
 export function renderSettings() {
-  qs('#view-settings').innerHTML = `<div class="stagger">
+  qs('#view-settings').innerHTML = html`<div class="stagger">
     ${pageHeader('Settings', 'Your system')}
 
     <div class="card">
       <div class="field"><label>Your name</label>
-        <input class="input" id="set-name" value="${esc(store.s.user.name)}" placeholder="Your name" /></div>
+        <input class="input" id="set-name" value="${store.s.user.name}" placeholder="Your name" /></div>
       <div class="field" style="margin-bottom:0"><label>Appearance</label>
         <div class="segmented" id="set-theme">
           <button data-theme-set="system" class="${store.s.theme==='system'?'is-on':''}">System</button>
@@ -69,40 +104,7 @@ export function renderSettings() {
     </div>
 
     <h3 class="section-label mt-5">Sync across devices</h3>
-    ${(() => {
-      const s = syncStatus();
-      if (!s.on) return `
-    <div class="card">
-      <div class="row between">
-        <div class="grow"><div class="fw-semibold">Encrypted sync</div>
-          <div class="t-foot text-3">Carry your progress to another device with a secret code. Encrypted end to end. We can never read it.</div></div>
-        <button class="switch" data-action="sync-enable" aria-label="Turn on sync"><span class="knob"></span></button>
-      </div>
-      <details class="mt-3"><summary class="t-foot text-3" style="cursor:pointer">+ I already have a sync code</summary>
-        <div class="field mt-2" style="margin-bottom:0">
-          <input class="input" id="sync-code-input" placeholder="Paste your sync code" autocapitalize="characters" autocomplete="off" spellcheck="false" />
-          <button class="btn btn-ghost mt-2" data-action="sync-link">${icon('refresh-cw')} Link this device</button>
-        </div>
-      </details>
-    </div>`;
-      const masked = s.code.replace(/[^-]/g, '•');
-      return `
-    <div class="card">
-      <div class="row between">
-        <div class="grow"><div class="fw-semibold">Sync is on</div>
-          <div class="t-foot text-3">Encrypted end to end. Last synced ${esc(s.last ? timeAgo(s.last) : 'just now')}.</div></div>
-        <button class="switch is-on" data-action="sync-off" aria-label="Turn off sync"><span class="knob"></span></button>
-      </div>
-      <div class="field mt-3" style="margin-bottom:0"><label>Your sync code</label>
-        <div class="row" style="gap:8px; align-items:center">
-          <input class="input" id="sync-code" value="${esc(codeRevealed ? s.code : masked)}" readonly style="letter-spacing:.08em" />
-          <button class="btn btn-ghost btn-sm" data-action="sync-reveal" aria-label="Reveal code">${icon(codeRevealed ? 'eye-off' : 'eye')}</button>
-          <button class="btn btn-ghost btn-sm" data-action="sync-copy" aria-label="Copy code">${icon('copy')}</button>
-        </div>
-        <p class="t-foot text-3 mt-2">Enter this in Settings on your other device. Save it somewhere safe. Without it, the synced copy can’t be recovered.</p>
-      </div>
-    </div>`;
-    })()}
+    ${syncCard()}
 
     <p class="t-foot text-3 center mt-5">EngineerOS v1.0 · Dyrane Academy<br>One mission at a time.</p>
   </div>`;

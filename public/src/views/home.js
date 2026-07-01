@@ -3,7 +3,7 @@
 import { store, todaysMission, totalMissions, completedCount, overallPct,
          liveStreak, resumeReady, linkedinReady, portfolioReady, githubReady, firstName,
          todayStr, yesterdayStr } from '../core/state.js';
-import { qs, esc, icon } from '../core/dom.js';
+import { qs, icon, html, raw } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { statTile, readyTile } from '../ui/components.js';
 import { userProfile } from '../core/context.js';
@@ -20,26 +20,26 @@ registerView('home', () => {
   let streakBanner = '';
   if (done > 0 && tm) {
     const last = store.s.streak.last;
-    if (last === yesterdayStr()) streakBanner = `<div class="notice notice-amber">${icon('flame')} <b>${streak}-day streak.</b> Finish today’s mission to keep it alive.</div>`;
-    else if (last !== todayStr()) streakBanner = `<div class="notice notice-accent">${icon('sparkles')} <b>Welcome back.</b> One mission today restarts your streak.</div>`;
+    if (last === yesterdayStr()) streakBanner = html`<div class="notice notice-amber">${icon('flame')} <b>${streak}-day streak.</b> Finish today’s mission to keep it alive.</div>`;
+    else if (last !== todayStr()) streakBanner = html`<div class="notice notice-accent">${icon('sparkles')} <b>Welcome back.</b> One mission today restarts your streak.</div>`;
   }
 
   let todayCard;
   if (tm) {
-    todayCard = `
+    todayCard = html`
       <div class="card tap" data-action="open-mission" data-value="${tm.m.id}" data-from="home"
            style="background:linear-gradient(180deg, color-mix(in srgb,var(--amber) 14%,transparent), var(--surface-1))">
         <div class="row between mb-4">
           <span class="badge badge-amber">${icon('sparkles')} Today’s mission</span>
-          <span class="pill">${esc(tm.m.time)}</span>
+          <span class="pill">${tm.m.time}</span>
         </div>
-        <div class="t-foot fw-bold" style="color:var(--amber); letter-spacing:.03em; text-transform:uppercase">${esc(tm.j.title)}</div>
-        <h2 class="t-title1" style="margin:4px 0 8px">${esc(tm.m.title)}</h2>
-        <p class="t-callout text-2">${esc(tm.m.why.split('. ')[0])}.</p>
+        <div class="t-foot fw-bold" style="color:var(--amber); letter-spacing:.03em; text-transform:uppercase">${tm.j.title}</div>
+        <h2 class="t-title1" style="margin:4px 0 8px">${tm.m.title}</h2>
+        <p class="t-callout text-2">${tm.m.why.split('. ')[0]}.</p>
         <button class="btn btn-amber mt-4" data-action="open-mission" data-value="${tm.m.id}" data-from="home">Start today’s win ${icon('arrow-right')}</button>
       </div>`;
   } else if (total > 0) {
-    todayCard = `
+    todayCard = html`
       <div class="card center" style="background:linear-gradient(180deg, color-mix(in srgb,var(--green) 15%,transparent), var(--surface-1))">
         <div class="chip chip-green" style="margin:0 auto 12px; width:54px; height:54px">${icon('check')}</div>
         <h2 class="t-title1">Every mission complete.</h2>
@@ -47,14 +47,14 @@ registerView('home', () => {
         <button class="btn btn-primary mt-4" data-action="nav" data-value="build">Open Build Studio</button>
       </div>`;
   } else {
-    todayCard = `<div class="empty">${'<div class="chip chip-accent">'+icon('sparkles')+'</div>'}<p>Your missions are loading.</p></div>`;
+    todayCard = html`<div class="empty"><div class="chip chip-accent">${icon('sparkles')}</div><p>Your missions are loading.</p></div>`;
   }
 
-  qs('#view-home').innerHTML = `
+  qs('#view-home').innerHTML = html`
     <div class="stagger">
       <header style="margin:2px 2px 14px">
-        <div class="eyebrow">${esc(greet)}</div>
-        <h1 class="t-display" style="margin-top:6px">${esc(firstName())}.</h1>
+        <div class="eyebrow">${greet}</div>
+        <h1 class="t-display" style="margin-top:6px">${firstName()}.</h1>
       </header>
       ${streakBanner}
       <div class="home-grid">
@@ -81,11 +81,11 @@ registerView('home', () => {
         </div>
         <div class="stack">
           <div class="grid-3">
-            ${statTile(overallPct() + '<span style="font-size:15px">%</span>', 'Progress')}
+            ${statTile(raw(overallPct() + '<span style="font-size:15px">%</span>'), 'Progress')}
             ${statTile(done, 'Missions done')}
             ${statTile(streak + (streak > 0 ? ' 🔥' : ''), 'Day streak')}
           </div>
-          ${streakBanner ? '' : `<div class="notice notice-accent">${esc(homeNudge(userProfile()))}</div>`}
+          ${streakBanner ? '' : html`<div class="notice notice-accent">${homeNudge(userProfile())}</div>`}
           <div>
             <h3 class="section-label" style="margin-top:2px">Your readiness</h3>
             <div class="grid-2">

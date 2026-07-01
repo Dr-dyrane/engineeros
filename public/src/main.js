@@ -13,20 +13,22 @@ import { enableSync, linkDevice, disableSync, pullNow, scheduleSync, syncCode, s
 import { initHelpers, refreshHelpers, snoozeNudge, hideUpdate, triggerInstall, applyUpdate, stampVersion, markExported } from './core/helpers.js';
 import { qs, refreshIcons } from './core/dom.js';
 
+import { dispatchAction, dispatchInput, dispatchChange } from './core/actions.js';
+
 import './views/onboarding.js';
 import './views/home.js';
 import './views/journeys.js';
 import { checkPct, onReflect } from './views/mission.js';
 import './views/build.js';
 import './views/progress.js';
-import { saveReview } from './views/review.js';
-import { resourceSearch, resourceFilter } from './views/resources.js';
+import './views/review.js';
+import './views/resources.js';
 import './views/earn.js';
 import { renderSettings, toggleCodeReveal } from './views/settings.js';
-import { resumeInput, resumeAction } from './views/resume.js';
-import { portfolioInput, portfolioAction } from './views/portfolio.js';
-import { linkedinInput, linkedinAction } from './views/linkedin.js';
-import { launchpadInput, launchpadAns, launchpadAction } from './views/launchpad.js';
+import './views/resume.js';
+import './views/portfolio.js';
+import './views/linkedin.js';
+import './views/launchpad.js';
 
 let missionFrom = 'journey';
 
@@ -90,10 +92,7 @@ document.addEventListener('click', (e) => {
   if (themeBtn) { setTheme(themeBtn.dataset.themeSet); return; }
   const t = e.target.closest('[data-action]'); if (!t) return;
   const a = t.dataset.action, v = t.dataset.value;
-  if (a && a.indexOf('rs-') === 0) { resumeAction(a, v); return; }   // Resume Studio actions
-  if (a && a.indexOf('pf-') === 0) { portfolioAction(a, v); return; } // Portfolio Studio actions
-  if (a && a.indexOf('li-') === 0) { linkedinAction(a, v); return; } // LinkedIn Studio actions
-  if (a && a.indexOf('la-') === 0) { launchpadAction(a, v); return; } // Launchpad actions
+  if (dispatchAction(a, v, t)) return;   // view-registered handlers (studios, launchpad, tips…)
   switch (a) {
     case 'to-setup': go('setup'); break;
     case 'finish-setup': {
@@ -110,8 +109,6 @@ document.addEventListener('click', (e) => {
     case 'toggle-theme': cycleTheme(); break;
     case 'complete-mission': completeMission(v); break;
     case 'reopen-mission': delete store.s.completed[v]; saveNow(); go('mission', v); toast('Reopened', false); break;
-    case 'res-filter': resourceFilter(v); break;
-    case 'save-review': saveReview(); break;
     case 'export-json': exportJSON(); break;
     case 'import-json': qs('#importFile').click(); break;
     case 'reset': resetAll(); break;
@@ -146,7 +143,6 @@ document.addEventListener('click', (e) => {
       break;
     case 'sync-reveal': toggleCodeReveal(); renderSettings(); refreshIcons(qs('#view-settings')); break;
     case 'sync-copy': copyText(syncCode()); break;
-    case 'dismiss-tip': { store.s.flags['tip.' + v] = true; save(); const n = t.closest('.notice'); if (n) n.remove(); break; }
     case 'helper-do': doHelper(v); break;
     case 'helper-skip': snoozeNudge(v); break;
     case 'helper-refresh': applyUpdate(); break;
@@ -155,7 +151,7 @@ document.addEventListener('click', (e) => {
 });
 
 document.addEventListener('change', (e) => {
-  const rsc = e.target.closest('[data-rs-check]'); if (rsc) { resumeInput(rsc.dataset.rsCheck, e.target.checked); return; }
+  if (dispatchChange(e)) return;   // view-registered change handlers
   const c = e.target.closest('[data-check]');
   if (c) {
     const [id, i] = c.dataset.check.split(':');
@@ -166,14 +162,9 @@ document.addEventListener('change', (e) => {
 });
 
 document.addEventListener('input', (e) => {
-  const rs = e.target.closest('[data-rs]'); if (rs) { resumeInput(rs.dataset.rs, e.target.value); return; }
-  const pf = e.target.closest('[data-pf]'); if (pf) { portfolioInput(pf.dataset.pf, e.target.value); return; }
-  const li = e.target.closest('[data-li]'); if (li) { linkedinInput(li.dataset.li, e.target.value); return; }
-  const laf = e.target.closest('[data-la-field]'); if (laf) { launchpadInput(laf.dataset.laField, e.target.value); return; }
-  const lan = e.target.closest('[data-la-ans]'); if (lan) { launchpadAns(lan.dataset.laAns, e.target.value); return; }
+  if (dispatchInput(e)) return;   // view-registered input handlers (studios, launchpad, search…)
   const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); onReflect(r.value); return; }
   const n = e.target.closest('[data-notes]'); if (n) { md(n.dataset.notes).notes = n.value; save(); return; }
-  const rsch = e.target.closest('[data-res-search]'); if (rsch) { resourceSearch(rsch.value); return; }
   const sn = e.target.closest('#set-name'); if (sn) { store.s.user.name = sn.value; save(); }
 });
 

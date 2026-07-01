@@ -267,7 +267,7 @@ se.value='zzzqqxnope'; se.dispatchEvent(new window.Event('input',{bubbles:true})
 A(document.querySelector('#res-results').textContent.includes('Nothing matches'),'no-match shows friendly empty state');
 se.value=''; se.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(8);
 
-// open EVERY mission (freeNav) — no render throws
+// open EVERY mission (freeNav), no render throws
 click(document.querySelector('.tab[data-value="journeys"]')); await wait(8);
 A(document.querySelectorAll('[data-action="open-journey"]').length===8,'8 journeys');
 let total=0;
@@ -291,6 +291,21 @@ window.location.hash='#/resources'; window.dispatchEvent(new window.Event('hashc
 A(av()==='view-resources','hash route to resources');
 A(window.location.hash==='#/resources','url hash reflects view');
 
+// ---- escape-by-default render layer (html`` tag) ----
+// user input must render inert even where a template does not call esc()
+window.location.hash='#/build/resume'; window.dispatchEvent(new window.Event('hashchange')); await wait(15);
+const XSS='<img src=x onerror="window.__xss=1"><scr'+'ipt>window.__xss=2</scr'+'ipt>';
+const nameEl=document.querySelector('[data-rs="name"]');
+nameEl.value=XSS; nameEl.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(25);
+A(!document.querySelector('#rs-paper img'),'injected <img> does not become an element');
+A(!document.querySelector('#rs-paper script'),'injected <script> does not become an element');
+A(window.__xss===undefined,'no injected handler ran');
+A(document.querySelector('#rs-paper').textContent.includes('<img'),'payload renders as literal text');
+nameEl.value='Ada & Bob <QA>'; nameEl.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(25);
+A(document.querySelector('#rs-paper').textContent.includes('Ada & Bob <QA>'),'& and <> render once (no double escape)');
+A(!document.body.innerHTML.includes('&amp;amp;') && !document.body.innerHTML.includes('&amp;lt;'),'no double-escaped entities anywhere in the DOM');
+nameEl.value='Ada Lovelace'; nameEl.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(25);
+
 console.log('\n==== RESULT ====');
 if(errors.length){ console.log('❌ '+errors.length+' issue(s):'); [...new Set(errors)].forEach(e=>console.log(' - '+e)); process.exit(1); }
-else console.log('✅ ALL MODULAR TESTS PASSED — missions:'+total);
+else console.log('✅ ALL MODULAR TESTS PASSED, missions:'+total);

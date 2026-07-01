@@ -1,11 +1,11 @@
 /* EngineerOS · Onboarding views, welcome + setup */
 
 import { store } from '../core/state.js';
-import { qs, esc, icon } from '../core/dom.js';
+import { qs, icon, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 
 registerView('welcome', () => {
-  qs('#view-welcome').innerHTML = `
+  qs('#view-welcome').innerHTML = html`
     <div class="hero stagger">
       <div class="logo-mark">${icon('compass')}</div>
       <div>
@@ -15,7 +15,7 @@ registerView('welcome', () => {
       <p class="t-title2 text-2 fw-medium balance" style="max-width:24ch">A calm, self-guided career system for becoming visible, skilled, and employable.</p>
       <div class="card">
         <div class="row">
-          ${'<div class="chip chip-accent">' + icon('sparkles') + '</div>'}
+          <div class="chip chip-accent">${icon('sparkles')}</div>
           <div><div class="fw-semibold">One mission at a time</div><div class="t-foot text-3">One day, one visible win.</div></div>
         </div>
       </div>
@@ -27,7 +27,7 @@ registerView('welcome', () => {
 });
 
 registerView('setup', () => {
-  qs('#view-setup').innerHTML = `
+  qs('#view-setup').innerHTML = html`
     <div class="hero stagger">
       <div>
         <div class="eyebrow">Setup</div>
@@ -36,7 +36,7 @@ registerView('setup', () => {
       </div>
       <div class="field">
         <input class="input" id="nameInput" placeholder="Your name" autocomplete="given-name"
-          value="${esc(store.s.user.name)}" style="font-size:19px; padding:16px" />
+          value="${store.s.user.name}" style="font-size:19px; padding:16px" />
       </div>
       <div class="field">
         <label>Appearance</label>

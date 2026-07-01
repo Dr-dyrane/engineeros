@@ -1,56 +1,25 @@
 /* EngineerOS · Resume Studio
    Structured editor + live, ATS-safe single-page preview, strength score,
-   ATS keyword match, action-verb coaching, and Print to PDF / text / markdown export. */
+   ATS keyword match, action-verb coaching, and Print to PDF / text / markdown export.
+   Mechanics (paths, panels, form fields, verb insert) come from the studio engine. */
 
-import { store, save } from '../core/state.js';
-import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
+import { save } from '../core/state.js';
+import { qs, icon, refreshIcons, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
+import { registerActions, registerInput, registerChange } from '../core/actions.js';
 import { download, copyText, toast } from '../core/feedback.js';
-import { meter, pageHeader, strengthLabel, tip } from '../ui/components.js';
-import { ACTION_VERBS, VERB_SET, XYZ, STOPWORDS, SKILL_HINTS } from '../data/resume-assets.js';
+import { meter, pageHeader, tip } from '../ui/components.js';
+import { createStudio, coachPanel } from '../ui/studio.js';
+import { emptyExp, emptyProj, emptyEdu } from '../core/models.js';
+import { VERB_SET, XYZ, STOPWORDS, SKILL_HINTS } from '../data/resume-assets.js';
 import { reviewResume, draftSummary } from '../core/coach.js';
 
-/* ---------- model + one-time migration from the old flat shape ----------- */
-const emptyExp = () => ({ role:'', org:'', place:'', start:'', end:'', current:false, bullets:[''] });
-const emptyProj = () => ({ name:'', tech:'', link:'', bullets:[''] });
-const emptyEdu = () => ({ degree:'', school:'', place:'', start:'', end:'', detail:'' });
-
-function R() { const b = store.s.builders; b.resume = b.resume || {}; migrate(b.resume); return b.resume; }
-function migrate(r) {
-  if (r._v === 2) return;
-  const o = Object.assign({}, r);
-  const str = v => (typeof v === 'string' && v.trim()) ? v.trim() : '';
-  r.name = o.name || ''; r.title = o.title || ''; r.email = o.email || ''; r.phone = o.phone || '';
-  r.location = o.location || ''; r.linkedin = o.linkedin || ''; r.github = o.github || ''; r.portfolio = o.portfolio || '';
-  r.summary = o.summary || '';
-  r.experience = Array.isArray(o.experience) ? o.experience : (str(o.experience) ? [Object.assign(emptyExp(), { bullets: [str(o.experience)] })] : []);
-  r.projects = Array.isArray(o.projects) ? o.projects : (str(o.projects) ? [Object.assign(emptyProj(), { bullets: [str(o.projects)] })] : []);
-  r.education = Array.isArray(o.education) ? o.education : (str(o.education) ? [Object.assign(emptyEdu(), { degree: str(o.education) })] : []);
-  r.skills = Array.isArray(o.skills) ? o.skills : (str(o.skills) ? [{ group: 'Skills', items: str(o.skills) }] : []);
-  r.certifications = Array.isArray(o.certifications) ? o.certifications : (str(o.certifications) ? [{ name: str(o.certifications), issuer: '', year: '' }] : []);
-  r.targetJD = o.targetJD || '';
-  if (!r.experience.length) r.experience.push(emptyExp());
-  if (!r.skills.length) r.skills.push({ group: '', items: '' });
-  r._v = 2;
-}
-
-/* ---------- path set (for live editing) ---------------------------------- */
-const ARR = { exp: 'experience', proj: 'projects', edu: 'education', skill: 'skills', cert: 'certifications' };
-function setPath(r, path, value) {
-  const s = path.split('.');
-  if (s.length === 1) { r[s[0]] = value; return; }
-  const arr = r[ARR[s[0]]]; if (!arr || !arr[+s[1]]) return;
-  if (s[2] === 'b') arr[+s[1]].bullets[+s[3]] = value;
-  else arr[+s[1]][s[2]] = value;
-}
-export function resumeInput(path, value) { setPath(R(), path, value); save(); refreshDynamic(); }
-
-/* last-focused editable field, so a tapped verb lands in the right bullet */
-let lastField = null;
-document.addEventListener('focusin', e => {
-  const f = e.target.closest && e.target.closest('#view-resume [data-rs]');
-  if (f && (f.tagName === 'TEXTAREA' || f.tagName === 'INPUT')) lastField = f;
+const st = createStudio({
+  key: 'resume', attr: 'rs',
+  arrays: { exp: 'experience', proj: 'projects', edu: 'education', skill: 'skills', cert: 'certifications' },
+  refresh: () => refreshDynamic(),
 });
+const R = st.model;
 
 /* ---------- scoring ------------------------------------------------------- */
 function allBullets(r) {
@@ -73,33 +42,10 @@ function scoreData(r) {
   const vRatio = bullets.length ? verbN / bullets.length : 0;
   let score = (hasContact ? 15 : 0) + (hasSummary ? 12 : 0) + (hasExp ? 18 : 0) + (hasEdu ? 10 : 0) + (hasSkills ? 10 : 0)
     + Math.round(qRatio * 20) + Math.round(vRatio * 15);
-  score = Math.min(100, score);
-  const tips = [];
-  if (!hasContact) tips.push(['miss', 'Add your name and email']);
-  if (!hasSummary) tips.push(['miss', 'Write a two or three line summary up top']);
-  if (!hasExp) tips.push(['miss', 'Add at least one experience or project with bullet points']);
-  if (bullets.length && qRatio < 0.5) tips.push(['miss', `Add a number or metric to ${bullets.length - quant} more bullet${bullets.length - quant === 1 ? '' : 's'}`]);
-  if (bullets.length && vRatio < 0.7) { const n = bullets.length - verbN; tips.push(['miss', `Start ${n} bullet${n === 1 ? '' : 's'} with a strong action verb`]); }
-  if (!hasSkills) tips.push(['miss', 'List your skills and tools']);
-  if (!hasEdu) tips.push(['miss', 'Add your education']);
-  if (!tips.length) tips.push(['ok', 'Strong resume. Now tailor it to each job using the ATS check below.']);
-  return { score, tips };
+  return Math.min(100, score);
 }
-function scoreHTML(r) {
-  const { score } = scoreData(r);
-  const tone = score >= 70 ? 'green' : score >= 40 ? 'amber' : '';
-  const review = reviewResume(r);
-  const dot = sev => sev === 'high' ? 'var(--red)' : sev === 'med' ? 'var(--amber)' : 'var(--text-3)';
-  const itemsHTML = review.items.length
-    ? review.items.slice(0, 10).map(it => `<div class="rs-tip">
-        <span style="color:${dot(it.sev)};font-weight:700">•</span>
-        <span><b>${esc(it.where)}.</b> ${esc(it.fix)}</span></div>`).join('')
-    : `<div class="rs-tip ok"><span style="color:var(--green);font-weight:700">✓</span>
-        <span>Looking strong. Now tailor it to each job using the ATS check below.</span></div>`;
-  return `<div class="row between"><div><div class="t-title2">${strengthLabel(score)}</div>
-      <div class="t-foot text-3">${score} of 100 · resume strength</div></div><div style="width:120px">${meter(score, tone)}</div></div>
-    <div class="mt-3">${itemsHTML}</div>`;
-}
+const scoreHTML = (r) => coachPanel(scoreData(r), 'resume strength', reviewResume(r),
+  'Looking strong. Now tailor it to each job using the ATS check below.');
 
 /* ---------- ATS keyword match -------------------------------------------- */
 function tokenize(t) { return (t.toLowerCase().match(/[a-z][a-z+#.]*[a-z+#]|[a-z]/g) || []); }
@@ -118,19 +64,19 @@ function atsData(r) {
 }
 function atsHTML(r) {
   const a = atsData(r);
-  if (!a) return `<p class="t-foot text-3">Paste a job description to see your keyword match.</p>`;
+  if (!a) return html`<p class="t-foot text-3">Paste a job description to see your keyword match.</p>`;
   const tone = a.pct >= 70 ? 'green' : a.pct >= 40 ? 'amber' : '';
-  return `<div class="row between mb-2"><div class="fw-semibold">Keyword match</div><div class="fw-bold">${a.pct}%</div></div>
+  return html`<div class="row between mb-2"><div class="fw-semibold">Keyword match</div><div class="fw-bold">${a.pct}%</div></div>
     ${meter(a.pct, tone)}
-    ${a.miss.length ? `<div class="t-foot text-3 mt-3 mb-1">Missing keywords. Add the ones that genuinely apply:</div>
-      <div class="rs-kws">${a.miss.slice(0, 18).map(k => `<span class="rs-kw miss">${esc(k)}</span>`).join('')}</div>` : ''}
-    ${a.hit.length ? `<div class="t-foot text-3 mt-3 mb-1">Matched:</div>
-      <div class="rs-kws">${a.hit.slice(0, 18).map(k => `<span class="rs-kw hit">${esc(k)}</span>`).join('')}</div>` : ''}`;
+    ${a.miss.length ? html`<div class="t-foot text-3 mt-3 mb-1">Missing keywords. Add the ones that genuinely apply:</div>
+      <div class="rs-kws">${a.miss.slice(0, 18).map(k => html`<span class="rs-kw miss">${k}</span>`)}</div>` : ''}
+    ${a.hit.length ? html`<div class="t-foot text-3 mt-3 mb-1">Matched:</div>
+      <div class="rs-kws">${a.hit.slice(0, 18).map(k => html`<span class="rs-kw hit">${k}</span>`)}</div>` : ''}`;
 }
 
 /* ---------- the resume "paper" ------------------------------------------- */
 function dates(a, b, cur) { return [a, cur ? 'Present' : b].filter(Boolean).join(' to '); }
-function bl(arr) { const i = (arr || []).filter(b => b && b.trim()); return i.length ? `<ul class="rp-ul">${i.map(b => `<li>${esc(b)}</li>`).join('')}</ul>` : ''; }
+function bl(arr) { const i = (arr || []).filter(b => b && b.trim()); return i.length ? html`<ul class="rp-ul">${i.map(b => html`<li>${b}</li>`)}</ul>` : ''; }
 function paperHTML(r) {
   const contact = [r.email, r.phone, r.location, r.linkedin, r.github, r.portfolio].filter(Boolean);
   const exp = (r.experience || []).filter(e => e.role || e.org || e.bullets.some(b => b && b.trim()));
@@ -138,28 +84,27 @@ function paperHTML(r) {
   const edu = (r.education || []).filter(e => e.degree || e.school);
   const sk = (r.skills || []).filter(s => s.items && s.items.trim());
   const ce = (r.certifications || []).filter(c => c.name && c.name.trim());
-  let h = `<div class="rp-name">${esc(r.name || 'Your Name')}</div>`;
-  if (r.title) h += `<div class="rp-title">${esc(r.title)}</div>`;
-  h += `<div class="rp-contact">${contact.length ? contact.map(c => `<span>${esc(c)}</span>`).join('') : '<span class="rp-empty">add your contact details</span>'}</div>`;
-  if (r.summary && r.summary.trim()) h += `<div class="rp-section"><div class="rp-h">Summary</div><div class="rp-summary">${esc(r.summary)}</div></div>`;
-  if (exp.length) h += `<div class="rp-section"><div class="rp-h">Experience</div>${exp.map(e => `
-    <div class="rp-item"><div class="rp-row">
-      <span><span class="rp-role">${esc(e.role || 'Role')}</span>${e.org ? `, <span class="rp-org">${esc(e.org)}</span>` : ''}</span>
-      <span class="rp-meta">${esc([e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · '))}</span>
-    </div>${bl(e.bullets)}</div>`).join('')}</div>`;
-  if (proj.length) h += `<div class="rp-section"><div class="rp-h">Projects</div>${proj.map(p => `
-    <div class="rp-item"><div class="rp-row">
-      <span class="rp-role">${esc(p.name || 'Project')}${p.tech ? ` <span class="rp-meta">· ${esc(p.tech)}</span>` : ''}</span>
-      ${p.link ? `<span class="rp-meta">${esc(p.link)}</span>` : ''}
-    </div>${bl(p.bullets)}</div>`).join('')}</div>`;
-  if (edu.length) h += `<div class="rp-section"><div class="rp-h">Education</div>${edu.map(e => `
-    <div class="rp-item"><div class="rp-row">
-      <span><span class="rp-role">${esc(e.degree || 'Degree')}</span>${e.school ? `, <span class="rp-org">${esc(e.school)}</span>` : ''}</span>
-      <span class="rp-meta">${esc([e.place, dates(e.start, e.end)].filter(Boolean).join(' · '))}</span>
-    </div>${e.detail ? `<div>${esc(e.detail)}</div>` : ''}</div>`).join('')}</div>`;
-  if (sk.length) h += `<div class="rp-section"><div class="rp-h">Skills</div>${sk.map(s => `<div class="rp-skline">${s.group ? `<b>${esc(s.group)}:</b> ` : ''}${esc(s.items)}</div>`).join('')}</div>`;
-  if (ce.length) h += `<div class="rp-section"><div class="rp-h">Certifications</div>${ce.map(c => `<div class="rp-skline">${esc(c.name)}${c.issuer ? `, ${esc(c.issuer)}` : ''}${c.year ? ` (${esc(c.year)})` : ''}</div>`).join('')}</div>`;
-  return h;
+  return html`<div class="rp-name">${r.name || 'Your Name'}</div>
+    ${r.title ? html`<div class="rp-title">${r.title}</div>` : ''}
+    <div class="rp-contact">${contact.length ? contact.map(c => html`<span>${c}</span>`) : html`<span class="rp-empty">add your contact details</span>`}</div>
+    ${r.summary && r.summary.trim() ? html`<div class="rp-section"><div class="rp-h">Summary</div><div class="rp-summary">${r.summary}</div></div>` : ''}
+    ${exp.length ? html`<div class="rp-section"><div class="rp-h">Experience</div>${exp.map(e => html`
+      <div class="rp-item"><div class="rp-row">
+        <span><span class="rp-role">${e.role || 'Role'}</span>${e.org ? html`, <span class="rp-org">${e.org}</span>` : ''}</span>
+        <span class="rp-meta">${[e.place, dates(e.start, e.end, e.current)].filter(Boolean).join(' · ')}</span>
+      </div>${bl(e.bullets)}</div>`)}</div>` : ''}
+    ${proj.length ? html`<div class="rp-section"><div class="rp-h">Projects</div>${proj.map(p => html`
+      <div class="rp-item"><div class="rp-row">
+        <span class="rp-role">${p.name || 'Project'}${p.tech ? html` <span class="rp-meta">· ${p.tech}</span>` : ''}</span>
+        ${p.link ? html`<span class="rp-meta">${p.link}</span>` : ''}
+      </div>${bl(p.bullets)}</div>`)}</div>` : ''}
+    ${edu.length ? html`<div class="rp-section"><div class="rp-h">Education</div>${edu.map(e => html`
+      <div class="rp-item"><div class="rp-row">
+        <span><span class="rp-role">${e.degree || 'Degree'}</span>${e.school ? html`, <span class="rp-org">${e.school}</span>` : ''}</span>
+        <span class="rp-meta">${[e.place, dates(e.start, e.end)].filter(Boolean).join(' · ')}</span>
+      </div>${e.detail ? html`<div>${e.detail}</div>` : ''}</div>`)}</div>` : ''}
+    ${sk.length ? html`<div class="rp-section"><div class="rp-h">Skills</div>${sk.map(s => html`<div class="rp-skline">${s.group ? html`<b>${s.group}:</b> ` : ''}${s.items}</div>`)}</div>` : ''}
+    ${ce.length ? html`<div class="rp-section"><div class="rp-h">Certifications</div>${ce.map(c => html`<div class="rp-skline">${c.name}${c.issuer ? ', ' + c.issuer : ''}${c.year ? ' (' + c.year + ')' : ''}</div>`)}</div>` : ''}`;
 }
 
 /* ---------- exports ------------------------------------------------------- */
@@ -200,86 +145,67 @@ function markdown(r) {
 const fname = ext => `${(R().name || 'resume').toLowerCase().replace(/\s+/g, '-')}-resume.${ext}`;
 
 /* ---------- live (focus-preserving) refresh ------------------------------ */
-let coachOpen = false, atsOpen = false;   // survive re-renders within the session
 function refreshDynamic() {
   const r = R();
   const p = qs('#rs-paper'); if (p) p.innerHTML = paperHTML(r);
   const s = qs('#rs-score'); if (s) s.innerHTML = scoreHTML(r);
   const a = qs('#rs-ats-result'); if (a) a.innerHTML = atsHTML(r);
-  const ss = qs('#rs-score-sum'); if (ss) ss.textContent = scoreData(r).score + '/100';
+  const ss = qs('#rs-score-sum'); if (ss) ss.textContent = scoreData(r) + '/100';
   const ad = atsData(r), as = qs('#rs-ats-sum'); if (as) as.textContent = ad ? ad.pct + '% match' : '';
 }
 
-/* ---------- form rendering helpers --------------------------------------- */
-const inp = (path, val, ph, type = 'text') => `<input class="input" data-rs="${path}" type="${type}" placeholder="${esc(ph)}" aria-label="${esc(ph)}" value="${esc(val || '')}" />`;
-const ta = (path, val, ph) => `<textarea class="textarea" data-rs="${path}" placeholder="${esc(ph)}" aria-label="${esc(ph)}">${esc(val || '')}</textarea>`;
-function delBtn(action, value) { return `<button class="rs-iconbtn" data-action="${action}" data-value="${value}" aria-label="Remove">${icon('trash-2')}</button>`; }
-function addBtn(action, value, label) { return `<button class="btn btn-ghost btn-sm" data-action="${action}" data-value="${value}">${icon('plus')} ${esc(label)}</button>`; }
+/* ---------- entry blocks -------------------------------------------------- */
+const { inp, ta, addBtn, groupHead, entryHead } = st;
 
 function expEntry(e, i) {
-  return `<div class="rs-entry">
-    <div class="rs-entry-head"><span class="t">EXPERIENCE ${i + 1}</span>${delBtn('rs-del-exp', i)}</div>
+  return html`<div class="rs-entry">
+    ${entryHead('EXPERIENCE ' + (i + 1), 'rs-del-exp', i)}
     <div class="rs-two">${inp(`exp.${i}.role`, e.role, 'Role / title')}${inp(`exp.${i}.org`, e.org, 'Organisation')}</div>
     <div class="rs-two mt-2">${inp(`exp.${i}.start`, e.start, 'Start (e.g. 2024)')}${inp(`exp.${i}.end`, e.end, 'End (e.g. 2025)')}</div>
     <div class="rs-two mt-2">${inp(`exp.${i}.place`, e.place, 'Location (optional)')}
       <label class="row-tight" style="padding-left:4px"><input type="checkbox" data-rs-check="exp.${i}.current" ${e.current ? 'checked' : ''}/> <span class="t-foot">Current</span></label></div>
-    <div class="mt-2">${(e.bullets || []).map((b, j) => `<div class="rs-bullet">${ta(`exp.${i}.b.${j}`, b, XYZ.formula)}${delBtn('rs-del-expb', i + '.' + j)}</div>`).join('')}</div>
+    <div class="mt-2">${(e.bullets || []).map((b, j) => html`<div class="rs-bullet">${ta(`exp.${i}.b.${j}`, b, XYZ.formula)}${st.delBtn('rs-del-expb', i + '.' + j)}</div>`)}</div>
     <div class="mt-2">${addBtn('rs-add-expb', i, 'Add bullet')}</div>
   </div>`;
 }
 function projEntry(p, i) {
-  return `<div class="rs-entry">
-    <div class="rs-entry-head"><span class="t">PROJECT ${i + 1}</span>${delBtn('rs-del-proj', i)}</div>
+  return html`<div class="rs-entry">
+    ${entryHead('PROJECT ' + (i + 1), 'rs-del-proj', i)}
     <div class="rs-two">${inp(`proj.${i}.name`, p.name, 'Project name')}${inp(`proj.${i}.tech`, p.tech, 'Tech / tools')}</div>
     <div class="mt-2">${inp(`proj.${i}.link`, p.link, 'Link (GitHub / demo)')}</div>
-    <div class="mt-2">${(p.bullets || []).map((b, j) => `<div class="rs-bullet">${ta(`proj.${i}.b.${j}`, b, 'What it does + the result')}${delBtn('rs-del-projb', i + '.' + j)}</div>`).join('')}</div>
+    <div class="mt-2">${(p.bullets || []).map((b, j) => html`<div class="rs-bullet">${ta(`proj.${i}.b.${j}`, b, 'What it does + the result')}${st.delBtn('rs-del-projb', i + '.' + j)}</div>`)}</div>
     <div class="mt-2">${addBtn('rs-add-projb', i, 'Add bullet')}</div>
   </div>`;
 }
 function eduEntry(e, i) {
-  return `<div class="rs-entry">
-    <div class="rs-entry-head"><span class="t">EDUCATION ${i + 1}</span>${delBtn('rs-del-edu', i)}</div>
+  return html`<div class="rs-entry">
+    ${entryHead('EDUCATION ' + (i + 1), 'rs-del-edu', i)}
     <div class="rs-two">${inp(`edu.${i}.degree`, e.degree, 'Degree')}${inp(`edu.${i}.school`, e.school, 'School')}</div>
     <div class="rs-two mt-2">${inp(`edu.${i}.start`, e.start, 'Start')}${inp(`edu.${i}.end`, e.end, 'End / expected')}</div>
     <div class="mt-2">${inp(`edu.${i}.detail`, e.detail, 'Highlight (optional: GPA, award, project)')}</div>
   </div>`;
 }
 function skillEntry(s, i) {
-  return `<div class="rs-entry"><div class="rs-entry-head"><span class="t">SKILL GROUP ${i + 1}</span>${delBtn('rs-del-skill', i)}</div>
+  return html`<div class="rs-entry">${entryHead('SKILL GROUP ' + (i + 1), 'rs-del-skill', i)}
     <div class="rs-two">${inp(`skill.${i}.group`, s.group, 'Group (e.g. Engineering)')}${inp(`skill.${i}.items`, s.items, 'SolidWorks, Python, Arduino…')}</div></div>`;
 }
 function certEntry(c, i) {
-  return `<div class="rs-entry"><div class="rs-entry-head"><span class="t">CERTIFICATION ${i + 1}</span>${delBtn('rs-del-cert', i)}</div>
+  return html`<div class="rs-entry">${entryHead('CERTIFICATION ' + (i + 1), 'rs-del-cert', i)}
     <div class="rs-two">${inp(`cert.${i}.name`, c.name, 'Name')}${inp(`cert.${i}.issuer`, c.issuer, 'Issuer')}</div>
     <div class="mt-2" style="max-width:140px">${inp(`cert.${i}.year`, c.year, 'Year')}</div></div>`;
-}
-function verbHelper() {
-  return `<details class="card" style="margin-top:10px"><summary class="fw-semibold" style="cursor:pointer">${icon('wand-sparkles')} Need a strong opener? Tap a verb</summary>
-    <p class="t-foot text-3 mt-2">It drops into the bullet you last tapped. ${esc(XYZ.formula)}</p>
-    ${ACTION_VERBS.map(g => `<div class="rs-verb-group">${g.group}</div><div class="rs-verbs">${g.verbs.map(v => `<button class="rs-verb" data-action="rs-verb" data-value="${v}">${v}</button>`).join('')}</div>`).join('')}
-  </details>`;
 }
 
 /* ---------- main render --------------------------------------------------- */
 function renderResume() {
   const r = R();
-  const groupHead = (label, action, addLabel) => `<div class="rs-group-h"><h3 class="section-label">${label}</h3>${addBtn(action, '', addLabel)}</div>`;
-
-  qs('#view-resume').innerHTML = `<div class="stagger">
+  qs('#view-resume').innerHTML = html`<div class="stagger">
     ${pageHeader('Build Studio', 'Resume Studio')}
     ${tip('resume-intro', 'Start small. Your name and one real thing you did is enough for today.', 'accent', 'mb-4')}
 
-    <div class="studio-toolbar">
-      <div class="segmented studio-toggle">
-        <button data-action="rs-panel" data-value="edit" data-rs-panel-btn="edit" class="is-on">Edit</button>
-        <button data-action="rs-panel" data-value="preview" data-rs-panel-btn="preview">Preview</button>
-      </div>
-      <div class="tb-actions">
-        <button class="btn btn-primary btn-sm" data-action="rs-print">${icon('printer')} Save PDF</button>
-        <button class="btn btn-ghost btn-sm" data-action="rs-export-txt">${icon('file-text')} .txt</button>
-        <button class="btn btn-ghost btn-sm" data-action="rs-export-md">${icon('download')} .md</button>
-      </div>
-    </div>
+    ${st.toolbar(html`
+      <button class="btn btn-primary btn-sm" data-action="rs-print">${icon('printer')} Save PDF</button>
+      <button class="btn btn-ghost btn-sm" data-action="rs-export-txt">${icon('file-text')} .txt</button>
+      <button class="btn btn-ghost btn-sm" data-action="rs-export-md">${icon('download')} .md</button>`)}
 
     <div class="studio" data-panel="edit">
       <div class="studio-edit">
@@ -300,40 +226,35 @@ function renderResume() {
 
         <div class="rs-group">
           ${groupHead('Experience', 'rs-add-exp', 'Add')}
-          ${(r.experience || []).map(expEntry).join('')}
-          ${verbHelper()}
+          ${(r.experience || []).map(expEntry)}
+          ${st.verbPicker('rs-verb', 'Need a strong opener? Tap a verb', html`It drops into the bullet you last tapped. ${XYZ.formula}`)}
         </div>
 
         <div class="rs-group">
           ${groupHead('Projects', 'rs-add-proj', 'Add')}
-          ${(r.projects || []).map(projEntry).join('')}
+          ${(r.projects || []).map(projEntry)}
         </div>
 
         <div class="rs-group">
           ${groupHead('Education', 'rs-add-edu', 'Add')}
-          ${(r.education || []).map(eduEntry).join('')}
+          ${(r.education || []).map(eduEntry)}
         </div>
 
         <div class="rs-group">
           ${groupHead('Skills', 'rs-add-skill', 'Add group')}
-          ${(r.skills || []).map(skillEntry).join('')}
+          ${(r.skills || []).map(skillEntry)}
         </div>
 
         <div class="rs-group">
           ${groupHead('Certifications', 'rs-add-cert', 'Add')}
-          ${(r.certifications || []).map(certEntry).join('')}
+          ${(r.certifications || []).map(certEntry)}
         </div>
 
-        <details class="card" id="rs-coach"${coachOpen ? ' open' : ''}>
-          <summary class="sum-row">${icon('sparkles')} Coach <span class="sum-val" id="rs-score-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
-          <div id="rs-score" class="mt-3"></div>
-        </details>
+        ${st.keep('coach', st.sumRow('sparkles', 'Coach', 'rs-score-sum'), html`<div id="rs-score" class="mt-3"></div>`)}
 
-        <details class="card" id="rs-ats"${atsOpen ? ' open' : ''}>
-          <summary class="sum-row">${icon('target')} ATS keyword match <span class="sum-val" id="rs-ats-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
+        ${st.keep('ats', st.sumRow('target', 'ATS keyword match', 'rs-ats-sum'), html`
           <div class="mt-3">${ta('targetJD', r.targetJD, 'Paste the job description you’re targeting…')}</div>
-          <div id="rs-ats-result" class="mt-3"></div>
-        </details>
+          <div id="rs-ats-result" class="mt-3"></div>`)}
       </div>
 
       <div class="studio-preview">
@@ -342,57 +263,42 @@ function renderResume() {
       </div>
     </div>
   </div>`;
-  const cd = qs('#rs-coach'); if (cd) cd.addEventListener('toggle', () => { coachOpen = cd.open; });
-  const at = qs('#rs-ats'); if (at) at.addEventListener('toggle', () => { atsOpen = at.open; });
+  st.wire();
   refreshDynamic();
   refreshIcons(qs('#view-resume'));
 }
 registerView('resume', renderResume);
 
-/* ---------- verb insert + actions ---------------------------------------- */
-function insertVerb(verb) {
-  if (lastField) {
-    const el = lastField, s = el.selectionStart ?? el.value.length, e = el.selectionEnd ?? s;
-    el.value = el.value.slice(0, s) + verb + ' ' + el.value.slice(e);
-    el.dispatchEvent(new window.Event('input', { bubbles: true }));
-    const pos = s + verb.length + 1;
-    try { el.focus(); el.setSelectionRange(pos, pos); } catch (_) {}
-    toast('Added “' + verb + '”', false);
-  } else { copyText(verb); }
-}
-function setPanel(p) {
-  const s = qs('#view-resume .studio'); if (s) s.dataset.panel = p;
-  qsa('#view-resume [data-rs-panel-btn]').forEach(b => b.classList.toggle('is-on', b.dataset.rsPanelBtn === p));
-}
-export function resumeAction(action, value) {
+/* ---------- actions ------------------------------------------------------- */
+registerInput('data-rs', st.input);
+registerChange('data-rs-check', st.input);
+registerActions('rs-', (action, value) => {
   const r = R();
   const reRender = () => { save(); renderResume(); };
-  const ask = () => (typeof confirm === 'undefined') || confirm('Remove this entry? This can’t be undone.');
-  const filled = o => o && Object.keys(o).some(k => k === 'bullets' ? o.bullets.some(b => b && b.trim()) : String(o[k] || '').trim());
   switch (action) {
-    case 'rs-panel': setPanel(value); break;
+    case 'rs-panel': st.setPanel(value); break;
     case 'rs-draft-summary': {
-      if (r.summary && r.summary.trim() && !((typeof confirm === 'undefined') || confirm('Replace your summary with a fresh starter draft?'))) break;
+      if (r.summary && r.summary.trim() && !st.ask('Replace your summary with a fresh starter draft?')) break;
       r.summary = draftSummary(r); reRender(); toast('Starter drafted. Now make it yours.', false); break;
     }
     case 'rs-add-exp': r.experience.push(emptyExp()); reRender(); break;
-    case 'rs-del-exp': { if (filled(r.experience[+value]) && !ask()) break; r.experience.splice(+value, 1); if (!r.experience.length) r.experience.push(emptyExp()); reRender(); break; }
+    case 'rs-del-exp': { if (st.filled(r.experience[+value]) && !st.ask()) break; r.experience.splice(+value, 1); if (!r.experience.length) r.experience.push(emptyExp()); reRender(); break; }
     case 'rs-add-expb': r.experience[+value].bullets.push(''); reRender(); break;
     case 'rs-del-expb': { const [i, j] = value.split('.').map(Number); r.experience[i].bullets.splice(j, 1); if (!r.experience[i].bullets.length) r.experience[i].bullets.push(''); reRender(); break; }
     case 'rs-add-proj': r.projects.push(emptyProj()); reRender(); break;
-    case 'rs-del-proj': { if (filled(r.projects[+value]) && !ask()) break; r.projects.splice(+value, 1); reRender(); break; }
+    case 'rs-del-proj': { if (st.filled(r.projects[+value]) && !st.ask()) break; r.projects.splice(+value, 1); reRender(); break; }
     case 'rs-add-projb': r.projects[+value].bullets.push(''); reRender(); break;
     case 'rs-del-projb': { const [i, j] = value.split('.').map(Number); r.projects[i].bullets.splice(j, 1); if (!r.projects[i].bullets.length) r.projects[i].bullets.push(''); reRender(); break; }
     case 'rs-add-edu': r.education.push(emptyEdu()); reRender(); break;
-    case 'rs-del-edu': { if (filled(r.education[+value]) && !ask()) break; r.education.splice(+value, 1); reRender(); break; }
+    case 'rs-del-edu': { if (st.filled(r.education[+value]) && !st.ask()) break; r.education.splice(+value, 1); reRender(); break; }
     case 'rs-add-skill': r.skills.push({ group: '', items: '' }); reRender(); break;
-    case 'rs-del-skill': { if (filled(r.skills[+value]) && !ask()) break; r.skills.splice(+value, 1); reRender(); break; }
+    case 'rs-del-skill': { if (st.filled(r.skills[+value]) && !st.ask()) break; r.skills.splice(+value, 1); reRender(); break; }
     case 'rs-add-cert': r.certifications.push({ name: '', issuer: '', year: '' }); reRender(); break;
-    case 'rs-del-cert': { if (filled(r.certifications[+value]) && !ask()) break; r.certifications.splice(+value, 1); reRender(); break; }
-    case 'rs-verb': insertVerb(value); break;
+    case 'rs-del-cert': { if (st.filled(r.certifications[+value]) && !st.ask()) break; r.certifications.splice(+value, 1); reRender(); break; }
+    case 'rs-verb': st.insertText(value); break;
     case 'rs-print': try { window.print(); } catch (_) {} break;
-    case 'rs-export-md': download(fname('md'), markdown(r)); toast('Markdown downloaded'); break;
-    case 'rs-export-txt': download(fname('txt'), plain(r), 'text/plain;charset=utf-8'); toast('Text downloaded'); break;
-    case 'rs-copy': copyText(plain(r)); break;
+    case 'rs-export-md': download(fname('md'), markdown(R())); toast('Markdown downloaded'); break;
+    case 'rs-export-txt': download(fname('txt'), plain(R()), 'text/plain;charset=utf-8'); toast('Text downloaded'); break;
+    case 'rs-copy': copyText(plain(R())); break;
   }
-}
+});
