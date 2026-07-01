@@ -142,6 +142,19 @@ A(maskedVal!==revealedVal && revealedVal===scfg.code,'reveal shows the real code
 click(document.querySelector('[data-action="sync-off"]')); await wait(15);
 A(!localStorage.getItem('engineeros.sync'),'turn off clears local sync config');
 
+// ---- In-app helpers ----
+A(document.querySelector('#eos-update'),'update bar injected');
+A(document.querySelector('#eos-helper'),'helper slot injected');
+const helpersMod = await import(pathToFileURL(BASE+'/src/core/helpers.js').href);
+const stateH = await import(pathToFileURL(BASE+'/src/core/state.js').href);
+stateH.store.s.flags.seenVersion='1.0';           // simulate an existing user on an older version
+helpersMod.refreshHelpers();
+A(document.querySelector('#eos-helper').textContent.includes('What\u2019s new'),'whats-new card shows for existing user');
+A(document.querySelector('#eos-helper [data-action="helper-do"][data-value="whatsnew"]'),'whats-new has a primary action');
+click(document.querySelector('#eos-helper [data-action="helper-skip"][data-value="whatsnew"]')); await wait(15);
+A(stateH.store.s.flags.seenVersion!=='1.0','dismiss stamps the version as seen');
+A(!document.querySelector('#eos-helper').textContent.includes('What\u2019s new'),'whats-new gone after dismiss');
+
 // progress
 click(document.querySelector('.tab[data-value="home"]')); await wait(6);
 click(document.querySelector('[data-action="open-progress"]')); await wait(8);

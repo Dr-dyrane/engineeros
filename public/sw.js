@@ -16,7 +16,7 @@ const PRECACHE = [
   '/styles/tokens.css', '/styles/base.css', '/styles/components.css', '/styles/studio.css', '/styles/animations.css', '/styles/print.css',
   '/src/main.js',
   '/src/core/state.js', '/src/core/dom.js', '/src/core/feedback.js', '/src/core/theme.js', '/src/core/router.js',
-  '/src/core/context.js', '/src/core/coach.js', '/src/core/push.js', '/src/core/push-context.js', '/src/core/sync.js',
+  '/src/core/context.js', '/src/core/coach.js', '/src/core/push.js', '/src/core/push-context.js', '/src/core/sync.js', '/src/core/helpers.js',
   '/src/data/journeys.js', '/src/data/resources.js', '/src/data/resume-assets.js', '/src/data/earn.js',
   '/src/ui/components.js',
   '/src/views/onboarding.js', '/src/views/home.js', '/src/views/journeys.js', '/src/views/mission.js',
@@ -25,12 +25,19 @@ const PRECACHE = [
 ];
 
 self.addEventListener('install', (e) => {
+  // Precache the shell, but do NOT skipWaiting: on an update the new worker stays
+  // in "waiting" so the app can show a calm "Update ready" prompt. It activates
+  // when the page sends SKIP_WAITING (the Refresh button), or when all tabs close.
   e.waitUntil(
     caches.open(CACHE)
       // addAll is all-or-nothing; add individually so one 404 can't fail the whole install.
       .then((cache) => Promise.all(PRECACHE.map((u) => cache.add(u).catch(() => null))))
-      .then(() => self.skipWaiting())
   );
+});
+
+/* The page asks us to activate a waiting update (from the "Refresh" prompt). */
+self.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {

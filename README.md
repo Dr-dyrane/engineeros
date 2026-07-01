@@ -46,6 +46,7 @@ Today's mission, Done checklist, Reflection, Mark complete.**
 - **Weekly Review** — a five-question Sunday ritual, saved locally.
 - **Resources** — real, curated links with Nigeria-specific picks.
 - **Installable PWA** — works offline and on weak connections via a service worker; add it to your phone's home screen.
+- **Guided helpers** — calm, in-app prompts: an "update ready" bar when a new version is waiting, an install prompt (with iPhone steps), a version-gated "What's new" card, and gentle one-at-a-time nudges to enable reminders, sync, or a backup. Frequency-capped, dismissable, never naggy.
 - **Light / Dark / System themes**, smooth Apple-HIG motion, reduced-motion support.
 - **Your data stays on your device** (browser `localStorage`). Export or import a JSON backup anytime.
 - **Cross-device sync (optional, end-to-end encrypted)** — turn it on for a secret sync code that encrypts your state on-device (PBKDF2 + AES-GCM). The server stores only ciphertext under an anonymous id, so it cannot read your progress or notes. Enter the code on another device and everything merges in, nothing already started is lost. Reuses the same Upstash Redis, no extra service.

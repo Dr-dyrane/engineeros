@@ -10,6 +10,7 @@ import { toast, celebrate, download, notify, haptic, enableNotifications, disabl
 import { subscribePush, unsubscribePush } from './core/push.js';
 import { syncPushContext } from './core/push-context.js';
 import { enableSync, linkDevice, disableSync, pullNow, scheduleSync, syncCode, syncOn } from './core/sync.js';
+import { initHelpers, refreshHelpers, snoozeNudge, hideUpdate, triggerInstall, applyUpdate, stampVersion, markExported } from './core/helpers.js';
 import { qs, refreshIcons } from './core/dom.js';
 
 import './views/onboarding.js';
@@ -39,6 +40,7 @@ function completeMission(id) {
     else if ([3, 7, 14, 30].indexOf(streak) !== -1) notify(streak + '-day streak', 'You showed up again. This is how a career gets built.');
     else toast('Today’s win saved');
     syncPushContext();   // refresh the on-device reminder summary
+    refreshHelpers();    // finishing missions can unlock a gentle nudge
   }
   setTimeout(() => {
     const tm = todaysMission();
@@ -48,7 +50,30 @@ function completeMission(id) {
   }, 950);
 }
 
-function exportJSON() { download('engineeros-progress.json', JSON.stringify(store.s, null, 2), 'application/json'); toast('Backup downloaded'); }
+function exportJSON() { download('engineeros-progress.json', JSON.stringify(store.s, null, 2), 'application/json'); toast('Backup downloaded'); markExported(); refreshHelpers(); }
+
+/* In-app helper cards: perform the offered action, then re-evaluate. */
+function doHelper(id) {
+  switch (id) {
+    case 'whatsnew': stampVersion(); refreshHelpers(); break;
+    case 'install': triggerInstall(); break;
+    case 'reminders':
+      enableNotifications().then(async (ok) => {
+        if (ok) { try { await subscribePush(); syncPushContext(); } catch (e) {} }
+        refreshHelpers();
+        if (currentView === 'settings') { renderSettings(); refreshIcons(qs('#view-settings')); }
+      });
+      break;
+    case 'sync':
+      enableSync().then(() => {
+        refreshHelpers(); toast('Sync on. Your code is in Settings.');
+        if (currentView === 'settings') { renderSettings(); refreshIcons(qs('#view-settings')); }
+      });
+      break;
+    case 'backup': exportJSON(); break;
+    default: refreshHelpers();
+  }
+}
 function openMail(subject, body) {
   window.location.href = 'mailto:halodyrane@gmail.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body + '\n\n');
 }
@@ -71,7 +96,7 @@ document.addEventListener('click', (e) => {
     case 'to-setup': go('setup'); break;
     case 'finish-setup': {
       const n = qs('#nameInput'); store.s.user.name = (n && n.value.trim()) || '';
-      store.s.onboarded = true; touchStreak(); saveNow(); go('home', null, { replace: true }); toast('Welcome aboard, ' + firstName());
+      store.s.onboarded = true; stampVersion(); touchStreak(); saveNow(); go('home', null, { replace: true }); toast('Welcome aboard, ' + firstName());
       break;
     }
     case 'nav': go(v); break;
@@ -92,13 +117,13 @@ document.addEventListener('click', (e) => {
       store.s.freeNav = !store.s.freeNav; save(); renderSettings(); refreshIcons(qs('#view-settings'));
       toast(store.s.freeNav ? 'All unlocked' : 'Guided mode', false); break;
     case 'toggle-notify':
-      if (store.s.flags.notify) { disableNotifications(); unsubscribePush(); renderSettings(); refreshIcons(qs('#view-settings')); }
-      else { enableNotifications().then(async (ok) => { if (ok) { try { await subscribePush(); syncPushContext(); } catch (e) {} } renderSettings(); refreshIcons(qs('#view-settings')); }); }
+      if (store.s.flags.notify) { disableNotifications(); unsubscribePush(); renderSettings(); refreshIcons(qs('#view-settings')); refreshHelpers(); }
+      else { enableNotifications().then(async (ok) => { if (ok) { try { await subscribePush(); syncPushContext(); } catch (e) {} } renderSettings(); refreshIcons(qs('#view-settings')); refreshHelpers(); }); }
       break;
     case 'send-feedback': openMail('EngineerOS feedback', 'What is working, what is not, and anything you wish it did:'); break;
     case 'suggest-feature': openMail('EngineerOS idea', 'I would love it if EngineerOS could:'); break;
     case 'sync-enable':
-      enableSync().then(() => { renderSettings(); refreshIcons(qs('#view-settings')); toast('Sync on. Save your code.'); });
+      enableSync().then(() => { renderSettings(); refreshIcons(qs('#view-settings')); refreshHelpers(); toast('Sync on. Save your code.'); });
       break;
     case 'sync-link': {
       const inp = qs('#sync-code-input'); const code = inp ? inp.value : '';
@@ -114,11 +139,15 @@ document.addEventListener('click', (e) => {
     }
     case 'sync-off':
       if (confirm('Turn off sync on this device? Your local data stays. The synced copy remains until overwritten.')) {
-        disableSync(); renderSettings(); refreshIcons(qs('#view-settings')); toast('Sync off on this device', false);
+        disableSync(); renderSettings(); refreshIcons(qs('#view-settings')); refreshHelpers(); toast('Sync off on this device', false);
       }
       break;
     case 'sync-reveal': toggleCodeReveal(); renderSettings(); refreshIcons(qs('#view-settings')); break;
     case 'sync-copy': copyText(syncCode()); break;
+    case 'helper-do': doHelper(v); break;
+    case 'helper-skip': snoozeNudge(v); break;
+    case 'helper-refresh': applyUpdate(); break;
+    case 'helper-hide-update': hideUpdate(); break;
   }
 });
 
@@ -159,14 +188,6 @@ if (importFile) importFile.addEventListener('change', (e) => {
 /* Hydrate icons once the Lucide CDN script has loaded. */
 window.addEventListener('load', () => refreshIcons());
 
-/* A gentle, one-time reminder to back up once there is progress worth keeping. */
-function maybeBackupNudge() {
-  if (store.s.onboarded && completedCount() >= 5 && !store.s.flags.backupNudged) {
-    store.s.flags.backupNudged = true; saveNow();
-    setTimeout(() => toast('Tip: export a backup in Settings to keep your progress safe', false), 1600);
-  }
-}
-
 /* On load, pull the latest synced state and merge it in, then refresh the view. */
 function pullOnLoad() {
   if (!syncOn()) return;
@@ -182,8 +203,8 @@ function init() {
   refreshIcons();
   onStateChange(scheduleSync);   // push local changes to the cloud (debounced) when sync is on
   initRouter();   // reads the URL hash, refresh-safe, deep-linkable, real Back
-  maybeBackupNudge();
   syncPushContext();   // stash today's summary for the reminder composer
+  initHelpers();       // PWA update/install prompts + gentle feature nudges
   pullOnLoad();
 }
 init();
