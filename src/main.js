@@ -8,6 +8,7 @@ import { go, back, initRouter } from './core/router.js';
 import { applyTheme, setTheme, cycleTheme, watchSystemTheme } from './core/theme.js';
 import { toast, celebrate, download, notify, haptic, enableNotifications, disableNotifications } from './core/feedback.js';
 import { subscribePush, unsubscribePush } from './core/push.js';
+import { syncPushContext } from './core/push-context.js';
 import { qs, refreshIcons } from './core/dom.js';
 
 import './views/onboarding.js';
@@ -36,6 +37,7 @@ function completeMission(id) {
     if (found && journeyComplete(found.ji)) notify('Journey complete', 'You finished ' + found.j.title + '. That is real, visible progress.');
     else if ([3, 7, 14, 30].indexOf(streak) !== -1) notify(streak + '-day streak', 'You showed up again. This is how a career gets built.');
     else toast('Today’s win saved');
+    syncPushContext();   // refresh the on-device reminder summary
   }
   setTimeout(() => {
     const tm = todaysMission();
@@ -90,7 +92,7 @@ document.addEventListener('click', (e) => {
       toast(store.s.freeNav ? 'All unlocked' : 'Guided mode', false); break;
     case 'toggle-notify':
       if (store.s.flags.notify) { disableNotifications(); unsubscribePush(); renderSettings(); refreshIcons(qs('#view-settings')); }
-      else { enableNotifications().then(async (ok) => { if (ok) { try { await subscribePush(); } catch (e) {} } renderSettings(); refreshIcons(qs('#view-settings')); }); }
+      else { enableNotifications().then(async (ok) => { if (ok) { try { await subscribePush(); syncPushContext(); } catch (e) {} } renderSettings(); refreshIcons(qs('#view-settings')); }); }
       break;
     case 'send-feedback': openMail('EngineerOS feedback', 'What is working, what is not, and anything you wish it did:'); break;
     case 'suggest-feature': openMail('EngineerOS idea', 'I would love it if EngineerOS could:'); break;
@@ -149,5 +151,6 @@ function init() {
   refreshIcons();
   initRouter();   // reads the URL hash, refresh-safe, deep-linkable, real Back
   maybeBackupNudge();
+  syncPushContext();   // stash today's summary for the reminder composer
 }
 init();

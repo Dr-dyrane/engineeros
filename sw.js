@@ -12,7 +12,7 @@ const CACHE = 'engineeros-v1';
 
 const PRECACHE = [
   '/', '/index.html', '/manifest.webmanifest',
-  '/favicon.svg', '/favicon-32.png', '/apple-touch-icon.png', '/icon-192.png', '/icon-512.png', '/og.png',
+  '/favicon.svg', '/favicon-32.png', '/badge-96.png', '/apple-touch-icon.png', '/icon-192.png', '/icon-512.png', '/og.png',
   '/styles/tokens.css', '/styles/base.css', '/styles/components.css', '/styles/studio.css', '/styles/animations.css', '/styles/print.css',
   '/src/main.js',
   '/src/core/state.js', '/src/core/dom.js', '/src/core/feedback.js', '/src/core/theme.js', '/src/core/router.js',
@@ -84,17 +84,74 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-/* Incoming push from the server: show the gentle nudge. */
+/* Incoming push. The server payload is only a trigger; the content is composed
+   here from the on-device summary the app stashed in IndexedDB, so the reminder
+   can name today's real mission without the server ever knowing it. */
 self.addEventListener('push', (e) => {
-  let data = {};
-  try { data = e.data ? e.data.json() : {}; } catch (_) { data = {}; }
-  const title = data.title || 'EngineerOS';
-  const body = data.body || 'One small win today keeps your streak alive.';
-  const url = data.url || '/';
-  e.waitUntil(self.registration.showNotification(title, {
-    body, icon: '/icon-192.png', badge: '/favicon-32.png', tag: 'engineeros-push', data: { url },
-  }));
+  e.waitUntil((async () => {
+    let data = {};
+    try { data = e.data ? e.data.json() : {}; } catch (_) { data = {}; }
+    const ctx = await readPushContext();
+    const n = composeNotification(ctx, data);
+    await self.registration.showNotification(n.title, n.options);
+  })());
 });
+
+/* Read the "today" summary the app wrote (db engineeros, store kv). */
+function readPushContext() {
+  return new Promise((resolve) => {
+    try {
+      const req = indexedDB.open('engineeros', 1);
+      req.onupgradeneeded = () => { try { req.result.createObjectStore('kv'); } catch (_) {} };
+      req.onsuccess = () => {
+        try {
+          const tx = req.result.transaction('kv', 'readonly');
+          const g = tx.objectStore('kv').get('push-context');
+          g.onsuccess = () => resolve(g.result || null);
+          g.onerror = () => resolve(null);
+        } catch (_) { resolve(null); }
+      };
+      req.onerror = () => resolve(null);
+    } catch (_) { resolve(null); }
+  });
+}
+
+/* Compose a calm, specific notification. Prefers on-device context, then the
+   server trigger's copy, then a gentle default. */
+function composeNotification(ctx, data) {
+  const base = {
+    icon: '/icon-192.png',
+    badge: '/badge-96.png',
+    tag: 'engineeros-daily',
+    renotify: true,
+    timestamp: Date.now(),
+    vibrate: [60, 40, 60],
+    lang: 'en',
+    dir: 'ltr',
+    data: { url: '/' },
+    actions: [{ action: 'open', title: 'Open today’s mission' }],
+  };
+  if (ctx && ctx.allDone) {
+    return { title: 'Every mission done', options: Object.assign({}, base, {
+      body: 'You built a real body of work. Polish your portfolio or start earning today.',
+      data: { url: '/#/build' },
+      actions: [{ action: 'open', title: 'Open Build Studio' }],
+    }) };
+  }
+  if (ctx && ctx.missionTitle) {
+    const streakLine = ctx.streak > 0
+      ? 'Day ' + ctx.streak + ' streak. One small win keeps it alive.'
+      : 'One small win gets your streak started.';
+    return { title: 'Today: ' + ctx.missionTitle, options: Object.assign({}, base, {
+      body: streakLine,
+      data: { url: ctx.missionId ? '/#/mission/' + ctx.missionId : '/' },
+    }) };
+  }
+  return { title: (data && data.title) || 'EngineerOS', options: Object.assign({}, base, {
+    body: (data && data.body) || 'One small win today keeps your streak alive.',
+    actions: [{ action: 'open', title: 'Open EngineerOS' }],
+  }) };
+}
 
 /* If the browser rotates the subscription, re-subscribe and re-register it. */
 self.addEventListener('pushsubscriptionchange', (e) => {
