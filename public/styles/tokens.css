@@ -86,7 +86,7 @@
   --fs-foot:     13px;  --lh-foot:    1.4;
   --fs-caption:  11.5px;--lh-caption: 1.35;   --tr-caption: 0.02em;
 
-  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 680; --fw-heavy: 760;
+  --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 600; --fw-heavy: 700; /* capped: 700 only on large text, crisp on low-DPI */
 
   /* ---- Motion ------------------------------------------------------------ */
   --ease-standard:  cubic-bezier(.4, 0, .2, 1);

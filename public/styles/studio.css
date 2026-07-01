@@ -58,11 +58,11 @@
 .resume-paper { background: #ffffff; color: #15171a; width: 100%; padding: 30px 34px;
   border-radius: 16px; box-shadow: var(--shadow-2);
   font-family: "Inter", Arial, Helvetica, sans-serif; font-size: 12.5px; line-height: 1.46; }
-.rp-name { font-size: 23px; font-weight: 800; letter-spacing: -0.01em; color: #0b0c0e; }
+.rp-name { font-size: 23px; font-weight: 700; letter-spacing: -0.01em; color: #0b0c0e; }
 .rp-title { font-size: 13px; font-weight: 600; color: #0a6ae0; margin-top: 2px; }
 .rp-contact { font-size: 11px; color: #50555c; margin-top: 7px; display: flex; flex-wrap: wrap; gap: 3px 12px; }
 .rp-section { margin-top: 16px; }
-.rp-h { font-size: 10.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: #0b0c0e;
+.rp-h { font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #0b0c0e;
   border-bottom: 1.5px solid #e2e5ea; padding-bottom: 3px; margin-bottom: 7px; }
 .rp-item { margin-bottom: 9px; }
 .rp-row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
@@ -81,11 +81,11 @@
 .pf-paper { background: #ffffff; color: #15171a; width: 100%; padding: 34px 38px;
   border-radius: 16px; box-shadow: var(--shadow-2);
   font-family: "Inter", Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.5; }
-.pf-name { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; color: #0b0c0e; }
+.pf-name { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: #0b0c0e; }
 .pf-title { font-size: 14px; font-weight: 600; color: #0a6ae0; margin-top: 2px; }
 .pf-tagline { font-size: 14px; color: #3a3f46; margin-top: 6px; }
 .pf-contact { font-size: 11.5px; color: #50555c; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 3px 12px; }
-.pf-h { font-size: 11px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: #0b0c0e;
+.pf-h { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #0b0c0e;
   border-bottom: 1.5px solid #e2e5ea; padding-bottom: 3px; margin: 18px 0 8px; }
 .pf-proj { margin-bottom: 13px; }
 .pf-proj-h { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
@@ -106,7 +106,7 @@
 .li-templates { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .li-preview { background: var(--surface-1); border-radius: var(--r-card); box-shadow: var(--shadow-1); padding: var(--s-5); overflow: hidden; }
 .li-pv-banner { height: 60px; border-radius: var(--r-md); background: linear-gradient(120deg, var(--accent), var(--accent-2)); }
-.li-pv-name { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; margin-top: 14px; }
+.li-pv-name { font-size: 19px; font-weight: 700; letter-spacing: -0.01em; margin-top: 14px; }
 .li-pv-role { color: var(--text-2); font-size: 13.5px; margin-top: 1px; }
 .li-pv-headline { color: var(--text); margin-top: 6px; font-size: 14.5px; line-height: 1.4; }
 .li-pv-h { font-size: var(--fs-foot); font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; margin: 18px 0 7px; }
