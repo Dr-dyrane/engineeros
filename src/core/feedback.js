@@ -81,21 +81,8 @@ export async function enableNotifications() {
   if (!notificationsSupported()) { toast('Notifications are not available here', false); return false; }
   try {
     const perm = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
-    if (perm === 'granted') { store.s.flags.notify = true; saveNow(); registerDailyReminder(); toast('Reminders are on'); return true; }
+    if (perm === 'granted') { store.s.flags.notify = true; saveNow(); toast('Reminders are on'); return true; }
     store.s.flags.notify = false; saveNow(); toast('Reminders stay off for now', false); return false;
   } catch (e) { return false; }
 }
 export function disableNotifications() { store.s.flags.notify = false; saveNow(); toast('Reminders are off', false); }
-
-/* Best-effort daily reminder via Periodic Background Sync (Chrome with the app
-   installed). Everywhere else this is a quiet no-op and the in-app streak nudge
-   does the job instead. */
-async function registerDailyReminder() {
-  try {
-    const reg = navigator.serviceWorker && await navigator.serviceWorker.ready;
-    if (reg && 'periodicSync' in reg) {
-      const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
-      if (status.state === 'granted') await reg.periodicSync.register('daily-nudge', { minInterval: 24 * 60 * 60 * 1000 });
-    }
-  } catch (e) {}
-}

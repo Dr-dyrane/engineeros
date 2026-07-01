@@ -7,6 +7,7 @@ import { store, save, saveNow, touchStreak, md, findMission, todaysMission, firs
 import { go, back, initRouter } from './core/router.js';
 import { applyTheme, setTheme, cycleTheme, watchSystemTheme } from './core/theme.js';
 import { toast, celebrate, download, notify, haptic, enableNotifications, disableNotifications } from './core/feedback.js';
+import { subscribePush, unsubscribePush } from './core/push.js';
 import { qs, refreshIcons } from './core/dom.js';
 
 import './views/onboarding.js';
@@ -88,8 +89,8 @@ document.addEventListener('click', (e) => {
       store.s.freeNav = !store.s.freeNav; save(); renderSettings(); refreshIcons(qs('#view-settings'));
       toast(store.s.freeNav ? 'All unlocked' : 'Guided mode', false); break;
     case 'toggle-notify':
-      if (store.s.flags.notify) { disableNotifications(); renderSettings(); refreshIcons(qs('#view-settings')); }
-      else { enableNotifications().then(() => { renderSettings(); refreshIcons(qs('#view-settings')); }); }
+      if (store.s.flags.notify) { disableNotifications(); unsubscribePush(); renderSettings(); refreshIcons(qs('#view-settings')); }
+      else { enableNotifications().then(async (ok) => { if (ok) { try { await subscribePush(); } catch (e) {} } renderSettings(); refreshIcons(qs('#view-settings')); }); }
       break;
     case 'send-feedback': openMail('EngineerOS feedback', 'What is working, what is not, and anything you wish it did:'); break;
     case 'suggest-feature': openMail('EngineerOS idea', 'I would love it if EngineerOS could:'); break;

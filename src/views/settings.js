@@ -33,13 +33,13 @@ export function renderSettings() {
     <h3 class="section-label mt-5">Reminders</h3>
     <div class="card">
       <div class="row between">
-        <div class="grow"><div class="fw-semibold">Win notifications</div>
-          <div class="t-foot text-3">A gentle alert when you finish a journey or keep a streak alive. Turn it off anytime.</div></div>
+        <div class="grow"><div class="fw-semibold">Daily reminder</div>
+          <div class="t-foot text-3">A gentle nudge once a day, plus a note when you finish a journey or keep a streak alive. Turn it off anytime.</div></div>
         <button class="switch ${store.s.flags.notify ? 'is-on' : ''}" data-action="toggle-notify" aria-label="Toggle reminders">
           <span class="knob"></span>
         </button>
       </div>
-      <p class="t-foot text-3 mt-3">Alerts when the app is fully closed need a server, which this app does not use. The surest nudge is to open EngineerOS once a day.</p>
+      <p class="t-foot text-3 mt-3">Works even when the app is closed. To send it, we store only an anonymous reminder token. Your name, progress, and notes never leave this device.</p>
     </div>
 
     <h3 class="section-label mt-5">Feedback</h3>
@@ -54,7 +54,7 @@ export function renderSettings() {
       <button class="btn btn-ghost" data-action="export-json">${icon('download')} Export progress (JSON)</button>
       <button class="btn btn-ghost mt-3" data-action="import-json">${icon('upload')} Import progress (JSON)</button>
       <button class="btn btn-ghost mt-3" data-action="reset" style="color:var(--red)">${icon('trash-2')} Reset everything</button>
-      <p class="t-foot text-3 mt-3">Everything lives only on this device. Export a backup before switching phones or browsers.</p>
+      <p class="t-foot text-3 mt-3">Your progress lives only on this device. Export a backup before switching phones or browsers.</p>
     </div>
 
     <p class="t-foot text-3 center mt-5">EngineerOS v1.0 · Dyrane Academy<br>One mission at a time.</p>

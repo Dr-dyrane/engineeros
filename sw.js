@@ -16,7 +16,7 @@ const PRECACHE = [
   '/styles/tokens.css', '/styles/base.css', '/styles/components.css', '/styles/studio.css', '/styles/animations.css', '/styles/print.css',
   '/src/main.js',
   '/src/core/state.js', '/src/core/dom.js', '/src/core/feedback.js', '/src/core/theme.js', '/src/core/router.js',
-  '/src/core/context.js', '/src/core/coach.js',
+  '/src/core/context.js', '/src/core/coach.js', '/src/core/push.js',
   '/src/data/journeys.js', '/src/data/resources.js', '/src/data/resume-assets.js', '/src/data/earn.js',
   '/src/ui/components.js',
   '/src/views/onboarding.js', '/src/views/home.js', '/src/views/journeys.js', '/src/views/mission.js',
@@ -84,22 +84,51 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
-/* Daily reminder, best-effort. Fires only where Periodic Background Sync is
-   supported (Chrome with the app installed); a quiet no-op everywhere else. */
-self.addEventListener('periodicsync', (e) => {
-  if (e.tag === 'daily-nudge') {
-    e.waitUntil(self.registration.showNotification('EngineerOS', {
-      body: 'One small win today keeps your streak alive.',
-      icon: '/icon-192.png', badge: '/favicon-32.png', tag: 'engineeros-daily',
-    }));
-  }
+/* Incoming push from the server: show the gentle nudge. */
+self.addEventListener('push', (e) => {
+  let data = {};
+  try { data = e.data ? e.data.json() : {}; } catch (_) { data = {}; }
+  const title = data.title || 'EngineerOS';
+  const body = data.body || 'One small win today keeps your streak alive.';
+  const url = data.url || '/';
+  e.waitUntil(self.registration.showNotification(title, {
+    body, icon: '/icon-192.png', badge: '/favicon-32.png', tag: 'engineeros-push', data: { url },
+  }));
 });
 
-/* Tapping a notification focuses the open app, or opens it if it is closed. */
+/* If the browser rotates the subscription, re-subscribe and re-register it. */
+self.addEventListener('pushsubscriptionchange', (e) => {
+  e.waitUntil((async () => {
+    try {
+      const res = await fetch('/api/push-key');
+      const { key } = await res.json();
+      if (!key) return;
+      const sub = await self.registration.pushManager.subscribe({
+        userVisibleOnly: true, applicationServerKey: urlB64ToUint8Array(key),
+      });
+      await fetch('/api/subscribe', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub }),
+      });
+    } catch (_) {}
+  })());
+});
+
+function urlB64ToUint8Array(base64) {
+  const padding = '='.repeat((4 - base64.length % 4) % 4);
+  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = atob(b64);
+  const out = new Uint8Array(raw.length);
+  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
+  return out;
+}
+
+/* Tapping a notification focuses the open app (or opens it), at the right view. */
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || '/';
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cs) => {
-    for (const c of cs) { if ('focus' in c) return c.focus(); }
-    if (self.clients.openWindow) return self.clients.openWindow('/');
+    for (const c of cs) { if ('focus' in c) { if (c.navigate) { try { c.navigate(url); } catch (_) {} } return c.focus(); } }
+    if (self.clients.openWindow) return self.clients.openWindow(url);
   }));
 });

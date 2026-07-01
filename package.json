@@ -1,0 +1,12 @@
+{
+  "name": "engineeros",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "EngineerOS by Dyrane Academy. Serverless functions for web push notifications. The app itself is buildless static; these dependencies are only for the /api functions.",
+  "dependencies": {
+    "@upstash/qstash": "^2.7.20",
+    "@upstash/redis": "^1.34.3",
+    "web-push": "^3.6.7"
+  }
+}
