@@ -60,31 +60,35 @@ Apple-HIG inspired, encoded as tokens in `styles/` (see [docs/DESIGN_SYSTEM.md](
 ## Project structure
 
 ```
-index.html              · shell, CDN + token wiring, SW registration
-sw.js                   · service worker: offline app shell + push handling
-manifest.webmanifest    · PWA manifest
-vercel.json             · static hosting + security headers
-api/                    · Vercel serverless functions (web push)
+api/                    · Vercel serverless functions (web push, mounted at /api)
    push-key.js          ·   serves the public VAPID key
    subscribe.js         ·   stores / removes a push subscription (Upstash Redis)
    send-reminders.js    ·   daily fan-out, verifies the QStash signature
-src/
-   main.js              · event wiring + boot
-   core/                · state · router · theme · dom · feedback · coach · context · push · push-context
-   data/                · journeys (61 missions) · resources · earn · resume-assets
-   ui/components.js      · reusable render helpers
-   views/               · one module per screen (Studios, progress, earn, settings, ...)
-styles/                 · tokens · base · components · studio · animations · print
+public/                 · the static site, served at the domain root
+   index.html           ·   shell, CDN + token wiring, SW registration
+   sw.js                ·   service worker: offline app shell + push handling
+   manifest.webmanifest ·   PWA manifest
+   favicon* · icon-* · og.png · badge-96.png   ·   app icons and share image
+   styles/              ·   tokens · base · components · studio · animations · print
+   src/
+      main.js           ·   event wiring + boot
+      core/             ·   state · router · theme · dom · feedback · coach · context · push · push-context
+      data/             ·   journeys (61 missions) · resources · earn · resume-assets
+      ui/components.js   ·   reusable render helpers
+      views/            ·   one module per screen (Studios, progress, earn, settings, ...)
 tests/dom.test.mjs      · jsdom harness (npm test)
 docs/                   · design system, push setup, build notes
+vercel.json             · outputDirectory: public, security headers
 ```
 
 ## Run locally
 
-The app is buildless. ES modules need to be served over http (opening the file directly
-with `file://` will not load the modules), so use any static server:
+The app is buildless and lives under `public/`. ES modules need to be served over http
+(opening the file directly with `file://` will not load the modules), so serve that folder
+with any static server:
 
 ```bash
+cd public
 python3 -m http.server 8000
 # then visit http://localhost:8000
 ```
@@ -109,7 +113,7 @@ The app is static; the `api/` functions deploy alongside it.
 
 1. Push this repo to GitHub.
 2. In **Vercel > Add New > Project**, import the repo.
-3. Framework preset: **Other**. No build command. Output directory: root. Vercel runs `npm install` for the `api/` functions automatically.
+3. Framework preset: **Other**. No build command. Output directory is `public` (set in `vercel.json`). Vercel runs `npm install` for the `api/` functions automatically.
 4. Deploy, then add `launch.dyrane.tech` under **Project > Settings > Domains**.
 5. For reminders, set the environment variables from [docs/PUSH_SETUP.md](docs/PUSH_SETUP.md).
 

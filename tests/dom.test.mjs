@@ -1,7 +1,8 @@
 import { JSDOM } from 'jsdom';
 import { pathToFileURL, fileURLToPath } from 'url';
 import fs from 'fs';
-const BASE = fileURLToPath(new URL('..', import.meta.url));
+const ROOT = fileURLToPath(new URL('..', import.meta.url));
+const BASE = fs.existsSync(ROOT + '/public/index.html') ? ROOT + '/public' : ROOT;
 const html = fs.readFileSync(BASE+'/index.html','utf8');
 const errors=[]; let downloads=0, copies=0;
 process.on('uncaughtException',e=>errors.push('UNCAUGHT: '+(e&&(e.stack||e.message))));
