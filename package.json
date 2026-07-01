@@ -3,10 +3,26 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "EngineerOS by Dyrane Academy. Serverless functions for web push notifications. The app itself is buildless static; these dependencies are only for the /api functions.",
+  "description": "EngineerOS by Dyrane Academy. A calm, self-guided career accelerator PWA. One day, one mission, one visible win.",
+  "homepage": "https://launch.dyrane.tech",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dr-dyrane/engineeros.git"
+  },
+  "author": "Dyrane Academy",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node tests/dom.test.mjs"
+  },
   "dependencies": {
     "@upstash/qstash": "^2.7.20",
     "@upstash/redis": "^1.34.3",
     "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1"
   }
 }

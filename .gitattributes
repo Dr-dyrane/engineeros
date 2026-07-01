@@ -1,0 +1,18 @@
+# Normalize line endings to LF on commit; auto-detect text vs binary.
+* text=auto eol=lf
+
+*.js          text eol=lf
+*.mjs         text eol=lf
+*.css         text eol=lf
+*.html        text eol=lf
+*.json        text eol=lf
+*.md          text eol=lf
+*.svg         text eol=lf
+*.webmanifest text eol=lf
+
+# Binary assets: never diffed or line-ending converted.
+*.png  binary
+*.ico  binary
+*.jpg  binary
+*.jpeg binary
+*.woff2 binary

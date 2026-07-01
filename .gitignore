@@ -17,7 +17,7 @@ desktop.ini
 # Vercel
 .vercel
 
-# Node (not used now, but safe for the future)
+# Node
 node_modules/
 npm-debug.log*
 yarn-error.log*
@@ -26,4 +26,7 @@ yarn-error.log*
 *.log
 tmp/
 
+# Local env — never commit secrets. Keep the template (.env.example).
 .env
+.env.*
+!.env.example
