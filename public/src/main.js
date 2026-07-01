@@ -3,12 +3,13 @@
    delegation and boots the app. */
 
 import { store, save, saveNow, touchStreak, md, findMission, todaysMission, firstName,
-         replaceState, resetState, completedCount, journeyComplete } from './core/state.js';
-import { go, back, initRouter } from './core/router.js';
+         replaceState, resetState, completedCount, journeyComplete, onStateChange } from './core/state.js';
+import { go, back, initRouter, currentView, getParam } from './core/router.js';
 import { applyTheme, setTheme, cycleTheme, watchSystemTheme } from './core/theme.js';
-import { toast, celebrate, download, notify, haptic, enableNotifications, disableNotifications } from './core/feedback.js';
+import { toast, celebrate, download, notify, haptic, enableNotifications, disableNotifications, copyText } from './core/feedback.js';
 import { subscribePush, unsubscribePush } from './core/push.js';
 import { syncPushContext } from './core/push-context.js';
+import { enableSync, linkDevice, disableSync, pullNow, scheduleSync, syncCode, syncOn } from './core/sync.js';
 import { qs, refreshIcons } from './core/dom.js';
 
 import './views/onboarding.js';
@@ -20,7 +21,7 @@ import './views/progress.js';
 import { saveReview } from './views/review.js';
 import { resourceSearch, resourceFilter } from './views/resources.js';
 import './views/earn.js';
-import { renderSettings } from './views/settings.js';
+import { renderSettings, toggleCodeReveal } from './views/settings.js';
 import { resumeInput, resumeAction } from './views/resume.js';
 import { portfolioInput, portfolioAction } from './views/portfolio.js';
 import { linkedinInput, linkedinAction } from './views/linkedin.js';
@@ -96,6 +97,28 @@ document.addEventListener('click', (e) => {
       break;
     case 'send-feedback': openMail('EngineerOS feedback', 'What is working, what is not, and anything you wish it did:'); break;
     case 'suggest-feature': openMail('EngineerOS idea', 'I would love it if EngineerOS could:'); break;
+    case 'sync-enable':
+      enableSync().then(() => { renderSettings(); refreshIcons(qs('#view-settings')); toast('Sync on. Save your code.'); });
+      break;
+    case 'sync-link': {
+      const inp = qs('#sync-code-input'); const code = inp ? inp.value : '';
+      linkDevice(code).then((res) => {
+        renderSettings(); refreshIcons(qs('#view-settings'));
+        if (res.ok && res.merged) { applyTheme(); toast('Linked. Your progress is synced.'); }
+        else if (res.ok) toast('Linked this device.');
+        else if (res.reason === 'wrong-code') toast('That code did not match any saved data', false);
+        else if (res.reason === 'short') toast('That code looks too short', false);
+        else toast('Could not reach sync. Check your connection.', false);
+      });
+      break;
+    }
+    case 'sync-off':
+      if (confirm('Turn off sync on this device? Your local data stays. The synced copy remains until overwritten.')) {
+        disableSync(); renderSettings(); refreshIcons(qs('#view-settings')); toast('Sync off on this device', false);
+      }
+      break;
+    case 'sync-reveal': toggleCodeReveal(); renderSettings(); refreshIcons(qs('#view-settings')); break;
+    case 'sync-copy': copyText(syncCode()); break;
   }
 });
 
@@ -144,13 +167,23 @@ function maybeBackupNudge() {
   }
 }
 
+/* On load, pull the latest synced state and merge it in, then refresh the view. */
+function pullOnLoad() {
+  if (!syncOn()) return;
+  pullNow().then((changed) => {
+    if (changed) { applyTheme(); syncPushContext(); go(currentView, getParam(), { replace: true }); }
+  });
+}
+
 /* ---- Boot ---------------------------------------------------------------- */
 function init() {
   applyTheme();
   watchSystemTheme();
   refreshIcons();
+  onStateChange(scheduleSync);   // push local changes to the cloud (debounced) when sync is on
   initRouter();   // reads the URL hash, refresh-safe, deep-linkable, real Back
   maybeBackupNudge();
   syncPushContext();   // stash today's summary for the reminder composer
+  pullOnLoad();
 }
 init();

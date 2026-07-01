@@ -48,6 +48,7 @@ Today's mission, Done checklist, Reflection, Mark complete.**
 - **Installable PWA** — works offline and on weak connections via a service worker; add it to your phone's home screen.
 - **Light / Dark / System themes**, smooth Apple-HIG motion, reduced-motion support.
 - **Your data stays on your device** (browser `localStorage`). Export or import a JSON backup anytime.
+- **Cross-device sync (optional, end-to-end encrypted)** — turn it on for a secret sync code that encrypts your state on-device (PBKDF2 + AES-GCM). The server stores only ciphertext under an anonymous id, so it cannot read your progress or notes. Enter the code on another device and everything merges in, nothing already started is lost. Reuses the same Upstash Redis, no extra service.
 
 ## Design system
 
@@ -120,9 +121,11 @@ The app is static; the `api/` functions deploy alongside it.
 ## Privacy
 
 No accounts, no tracking. All progress, reflections, and builder content live only in
-your browser on your device. The single thing that can ever leave the device is an
-anonymous push subscription token, and only if you turn reminders on. Everything else
-stays local.
+your browser on your device. Two things can optionally leave it, both privacy-preserving:
+an anonymous push subscription token if you enable reminders, and an end-to-end encrypted
+copy of your state if you enable cross-device sync. In the sync case the server only ever
+holds ciphertext under an anonymous id and cannot read your data; lose the sync code and
+that copy is unrecoverable by design. Everything else stays local.
 
 ## License
 

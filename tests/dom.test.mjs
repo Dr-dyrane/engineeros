@@ -125,6 +125,23 @@ stateMod.store.s.streak.last=stateMod.yesterdayStr();
 click(document.querySelector('.tab[data-value="journeys"]')); await wait(8); click(document.querySelector('.tab[data-value="home"]')); await wait(12);
 A(/keep it alive/.test(document.querySelector('#view-home').textContent),'at-risk streak shows keep-alive nudge');
 
+// ---- Encrypted sync (UI wiring; crypto+merge covered separately) ----
+window.location.hash='#/settings'; window.dispatchEvent(new window.Event('hashchange')); await wait(20);
+A(av()==='view-settings','settings open for sync');
+A(document.querySelector('#view-settings').textContent.includes('Encrypted sync'),'sync card renders (off state)');
+A(document.querySelector('[data-action="sync-enable"]'),'sync-enable control present');
+click(document.querySelector('[data-action="sync-enable"]')); await wait(80);
+const scfg=JSON.parse(localStorage.getItem('engineeros.sync')||'null');
+A(scfg && /^[0-9A-HJKMNP-TV-Z-]+$/.test(scfg.code||''),'enable writes a sync code');
+A(scfg && typeof scfg.salt==='string' && scfg.salt.length>0,'enable stores a salt');
+A(document.querySelector('#view-settings').textContent.includes('Sync is on'),'settings shows on-state after enable');
+const maskedVal=(document.querySelector('#sync-code')||{}).value||'';
+click(document.querySelector('[data-action="sync-reveal"]')); await wait(20);
+const revealedVal=(document.querySelector('#sync-code')||{}).value||'';
+A(maskedVal!==revealedVal && revealedVal===scfg.code,'reveal shows the real code');
+click(document.querySelector('[data-action="sync-off"]')); await wait(15);
+A(!localStorage.getItem('engineeros.sync'),'turn off clears local sync config');
+
 // progress
 click(document.querySelector('.tab[data-value="home"]')); await wait(6);
 click(document.querySelector('[data-action="open-progress"]')); await wait(8);

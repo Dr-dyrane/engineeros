@@ -16,7 +16,7 @@ const PRECACHE = [
   '/styles/tokens.css', '/styles/base.css', '/styles/components.css', '/styles/studio.css', '/styles/animations.css', '/styles/print.css',
   '/src/main.js',
   '/src/core/state.js', '/src/core/dom.js', '/src/core/feedback.js', '/src/core/theme.js', '/src/core/router.js',
-  '/src/core/context.js', '/src/core/coach.js', '/src/core/push.js',
+  '/src/core/context.js', '/src/core/coach.js', '/src/core/push.js', '/src/core/push-context.js', '/src/core/sync.js',
   '/src/data/journeys.js', '/src/data/resources.js', '/src/data/resume-assets.js', '/src/data/earn.js',
   '/src/ui/components.js',
   '/src/views/onboarding.js', '/src/views/home.js', '/src/views/journeys.js', '/src/views/mission.js',

@@ -8,7 +8,7 @@ const KEY = 'engineeros.v1';
 
 export function defaultState() {
   return {
-    version: 1, onboarded: false,
+    version: 1, updated: 0, onboarded: false,
     user: { name: '' },
     theme: 'system',          // system | light | dark
     freeNav: false,           // unlock everything
@@ -31,6 +31,7 @@ export function deepDefaults(p) {
   s.missionData = (p && p.missionData) || {};
   s.reviews = (p && p.reviews) || [];
   s.flags = Object.assign({}, (p && p.flags) || {});
+  s.updated = (p && p.updated) || 0;
   return s;
 }
 
@@ -42,12 +43,17 @@ function load() {
 export const store = { s: load() };
 
 let saveTimer = null;
+let changeHook = null;
+/* Register a callback fired after every persisted change (used by sync). */
+export function onStateChange(fn) { changeHook = fn; }
 export function save() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveNow, 120);
 }
 export function saveNow() {
+  store.s.updated = Date.now();
   try { localStorage.setItem(KEY, JSON.stringify(store.s)); } catch (e) {}
+  if (changeHook) { try { changeHook(); } catch (e) {} }
 }
 export function replaceState(next) { store.s = deepDefaults(next); saveNow(); }
 export function resetState() { const theme = store.s.theme; store.s = defaultState(); store.s.theme = theme; saveNow(); }
