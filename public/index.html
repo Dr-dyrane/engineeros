@@ -38,11 +38,7 @@
   } catch (e) {}
 </script>
 
-<!-- Fonts (Inter as cross-platform fallback; real SF is used on Apple devices) -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'" />
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" /></noscript>
+<!-- No webfont: text uses each platform native UI font (SF, Roboto, Segoe UI) for crisp, instant rendering on any screen and connection. -->
 
 <!-- Design system (order matters: tokens, base, components, motion) -->
 <link rel="stylesheet" href="./styles/tokens.css" />

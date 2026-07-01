@@ -57,7 +57,7 @@
 /* ---- The resume "paper" -------------------------------------------------- */
 .resume-paper { background: #ffffff; color: #15171a; width: 100%; padding: 30px 34px;
   border-radius: 16px; box-shadow: var(--shadow-2);
-  font-family: "Inter", Arial, Helvetica, sans-serif; font-size: 12.5px; line-height: 1.46; }
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 12.5px; line-height: 1.46; }
 .rp-name { font-size: 23px; font-weight: 700; letter-spacing: -0.01em; color: #0b0c0e; }
 .rp-title { font-size: 13px; font-weight: 600; color: #0a6ae0; margin-top: 2px; }
 .rp-contact { font-size: 11px; color: #50555c; margin-top: 7px; display: flex; flex-wrap: wrap; gap: 3px 12px; }
@@ -80,7 +80,7 @@
 /* ---- The portfolio "paper" (one-pager) ---------------------------------- */
 .pf-paper { background: #ffffff; color: #15171a; width: 100%; padding: 34px 38px;
   border-radius: 16px; box-shadow: var(--shadow-2);
-  font-family: "Inter", Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.5; }
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif; font-size: 13px; line-height: 1.5; }
 .pf-name { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; color: #0b0c0e; }
 .pf-title { font-size: 14px; font-weight: 600; color: #0a6ae0; margin-top: 2px; }
 .pf-tagline { font-size: 14px; color: #3a3f46; margin-top: 6px; }
