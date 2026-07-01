@@ -7,7 +7,7 @@ import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { copyText, download, toast } from '../core/feedback.js';
-import { pageHeader, strengthLabel } from '../ui/components.js';
+import { pageHeader, strengthLabel, tip } from '../ui/components.js';
 import { reviewLinkedin, draftHeadline, draftLinkedinAbout, draftPost } from '../core/coach.js';
 
 const LIMITS = { headline: 220, about: 2600, post: 3000 };
@@ -114,10 +114,12 @@ function sectionText(l, key) {
 }
 
 /* ---------- live refresh -------------------------------------------------- */
+let coachOpen = false;   // survives re-renders within the session
 function refreshDynamic() {
   const l = L();
   const pv = qs('#li-preview'); if (pv) pv.innerHTML = previewHTML(l);
   const sc = qs('#li-score'); if (sc) sc.innerHTML = scoreHTML(l);
+  const ss = qs('#li-score-sum'); if (ss) ss.textContent = scoreData(l).score + '/100';
   ['headline', 'about', 'post'].forEach(f => {
     const el = qs('#li-c-' + f); if (el) { const m = countMeta(f, l[f]); el.className = m.cls; el.textContent = m.text; }
   });
@@ -153,7 +155,7 @@ function renderLinkedIn() {
       </div>
     </div>
 
-    <div class="notice notice-accent mb-4">LinkedIn is filled block by block. Write each one here, then <b>Copy</b> and paste it in. Small, real updates beat a perfect profile you never publish.</div>
+    ${tip('linkedin-intro', 'Write each block here, then <b>Copy</b> it into LinkedIn.', 'accent', 'mb-4')}
 
     <div class="studio" data-panel="edit">
       <div class="studio-edit">
@@ -173,7 +175,6 @@ function renderLinkedIn() {
           <div class="row between"><h3 class="section-label" style="margin-top:0">About</h3><div class="row-tight" style="gap:6px"><button class="btn btn-ghost btn-sm" data-action="li-draft-about">${icon('wand-sparkles')} Draft</button>${copyBtn('about')}</div></div>
           ${ta('about', l.about, 'Start with one strong line (a hook). Then what you do and build, your skills, and what you’re looking for. End with how to reach you.', 6)}
           ${counter('about', l.about)}
-          <p class="hint">Hook, what you do, skills, a clear call to action.</p>
         </div>
 
         <div class="rs-group">
@@ -185,7 +186,7 @@ function renderLinkedIn() {
         <div class="card">
           <h3 class="section-label" style="margin-top:0">Skills</h3>
           ${inp('skills', l.skills, 'SolidWorks, Python, Robotics, ROS, Technical Writing…')}
-          <p class="hint">Comma-separated. LinkedIn allows up to 50, so list your strongest first.</p>
+          <p class="hint">LinkedIn allows up to 50, strongest first.</p>
         </div>
 
         <div class="card">
@@ -196,15 +197,19 @@ function renderLinkedIn() {
           <p class="hint">Sweet spot ≈ 1,300 characters. Tap a template to start.</p>
         </div>
 
-        <div class="card"><h3 class="section-label" style="margin-top:0">Coach</h3><div id="li-score"></div></div>
+        <details class="card" id="li-coach"${coachOpen ? ' open' : ''}>
+          <summary class="sum-row">${icon('sparkles')} Coach <span class="sum-val" id="li-score-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
+          <div id="li-score" class="mt-3"></div>
+        </details>
       </div>
 
       <div class="studio-preview">
         <div class="li-preview" id="li-preview"></div>
-        <p class="t-foot text-3 center mt-3 no-print">A rough preview of how your profile reads. Copy each block into LinkedIn when it feels right.</p>
+        <p class="t-foot text-3 center mt-3 no-print">A rough preview of how your profile reads.</p>
       </div>
     </div>
   </div>`;
+  const cd = qs('#li-coach'); if (cd) cd.addEventListener('toggle', () => { coachOpen = cd.open; });
   refreshDynamic();
   refreshIcons(qs('#view-linkedin'));
 }

@@ -16,7 +16,7 @@ registerView('welcome', () => {
       <div class="card">
         <div class="row">
           ${'<div class="chip chip-accent">' + icon('sparkles') + '</div>'}
-          <div><div class="fw-semibold">One mission at a time</div><div class="t-foot text-3">One day. One mission. One visible win.</div></div>
+          <div><div class="fw-semibold">One mission at a time</div><div class="t-foot text-3">One day, one visible win.</div></div>
         </div>
       </div>
       <div>

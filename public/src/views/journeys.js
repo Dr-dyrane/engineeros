@@ -33,7 +33,7 @@ registerView('journeys', () => {
   }).join('');
 
   qs('#view-journeys').innerHTML = `<div class="stagger">
-    ${pageHeader('The path', 'Journeys', 'Eight journeys, one at a time. Finish a journey to open the next.')}
+    ${pageHeader('The path', 'Journeys', 'One at a time. Finish a journey to open the next.')}
     <div class="auto-grid">${cards}</div>
   </div>`;
 });

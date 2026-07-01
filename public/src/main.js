@@ -146,6 +146,7 @@ document.addEventListener('click', (e) => {
       break;
     case 'sync-reveal': toggleCodeReveal(); renderSettings(); refreshIcons(qs('#view-settings')); break;
     case 'sync-copy': copyText(syncCode()); break;
+    case 'dismiss-tip': { store.s.flags['tip.' + v] = true; save(); const n = t.closest('.notice'); if (n) n.remove(); break; }
     case 'helper-do': doHelper(v); break;
     case 'helper-skip': snoozeNudge(v); break;
     case 'helper-refresh': applyUpdate(); break;

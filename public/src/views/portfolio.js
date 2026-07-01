@@ -6,7 +6,7 @@ import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { download, copyText, toast } from '../core/feedback.js';
-import { meter, pageHeader, strengthLabel } from '../ui/components.js';
+import { meter, pageHeader, strengthLabel, tip } from '../ui/components.js';
 import { ACTION_VERBS } from '../data/resume-assets.js';
 import { reviewPortfolio, draftAbout } from '../core/coach.js';
 
@@ -140,10 +140,12 @@ function htmlDoc(p) {
 const fname = ext => `${(P().name || 'portfolio').toLowerCase().replace(/\s+/g, '-')}-portfolio.${ext}`;
 
 /* ---------- live refresh -------------------------------------------------- */
+let coachOpen = false;   // survives re-renders within the session
 function refreshDynamic() {
   const p = P();
   const pp = qs('#pf-paper'); if (pp) pp.innerHTML = paperHTML(p);
   const s = qs('#pf-score'); if (s) s.innerHTML = scoreHTML(p);
+  const ss = qs('#pf-score-sum'); if (ss) ss.textContent = scoreData(p).score + '/100';
 }
 
 /* ---------- form helpers -------------------------------------------------- */
@@ -197,7 +199,7 @@ function renderPortfolio() {
       </div>
     </div>
 
-    <div class="notice notice-accent mb-4">Each project is a <b>case study</b>: Problem, Approach, Result. A number in the Result is what makes employers believe you.</div>
+    ${tip('portfolio-intro', 'Each project is a <b>case study</b>: Problem, Approach, Result, with a number in the Result.', 'accent', 'mb-4')}
 
     <div class="studio" data-panel="edit">
       <div class="studio-edit">
@@ -233,15 +235,19 @@ function renderPortfolio() {
           ${(p.certifications || []).map(certEntry).join('')}
         </div>
 
-        <div class="card"><h3 class="section-label" style="margin-top:0">Coach</h3><div id="pf-score"></div></div>
+        <details class="card" id="pf-coach"${coachOpen ? ' open' : ''}>
+          <summary class="sum-row">${icon('sparkles')} Coach <span class="sum-val" id="pf-score-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
+          <div id="pf-score" class="mt-3"></div>
+        </details>
       </div>
 
       <div class="studio-preview">
         <div class="pf-paper" id="pf-paper"></div>
-        <p class="t-foot text-3 center mt-3 no-print">“.html” exports a single self-contained file you can host (GitHub Pages, Netlify). “Save PDF”, choose <b>Save as PDF</b>.</p>
+        <p class="t-foot text-3 center mt-3 no-print">“.html” is a single file you can host (GitHub Pages, Netlify). “Save PDF”, then choose <b>Save as PDF</b>.</p>
       </div>
     </div>
   </div>`;
+  const cd = qs('#pf-coach'); if (cd) cd.addEventListener('toggle', () => { coachOpen = cd.open; });
   refreshDynamic();
   refreshIcons(qs('#view-portfolio'));
 }

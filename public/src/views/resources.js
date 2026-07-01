@@ -44,11 +44,11 @@ export function resourceFilter(value) {
 
 registerView('resources', () => {
   qs('#view-resources').innerHTML = `<div class="stagger">
-    ${pageHeader('Curated', 'Resources', 'Real tools and platforms. Global picks, plus a few made for Nigeria. Always check what AI tells you.')}
+    ${pageHeader('Curated', 'Resources', 'Global picks, plus a few made for Nigeria.')}
     <input class="input" data-res-search placeholder="Search resources" value="${esc(q)}" aria-label="Search resources" />
     <div class="row-tight mt-3" style="gap:8px; flex-wrap:wrap">${fchip('all', 'All')}${fchip('ng', 'Nigeria')}${fchip('free', 'Free')}</div>
     <div id="res-results" class="mt-2"></div>
-    <p class="t-foot text-3 center mt-5">Links open in a new tab. Some sites change. If one moves, search its name.</p>
+    <p class="t-foot text-3 center mt-5">Links open in a new tab. If one moves, search its name.</p>
   </div>`;
   paint();
 });

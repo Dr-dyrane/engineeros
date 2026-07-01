@@ -22,7 +22,7 @@ registerView('build', () => {
     </div>`).join('');
 
   qs('#view-build').innerHTML = `<div class="stagger">
-    ${pageHeader('Build Studio', 'Turn work into evidence.', 'Fill a little at a time. Everything exports when you’re ready.')}
+    ${pageHeader('Build Studio', 'Turn work into evidence.', 'Fill a little at a time. Everything exports.')}
     <div class="auto-grid">${tiles}</div>
   </div>`;
 });

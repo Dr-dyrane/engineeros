@@ -2,6 +2,15 @@
    Every surface here obeys the system: no borders, elevation + tint only. */
 
 import { esc, icon } from '../core/dom.js';
+import { store } from '../core/state.js';
+
+/* A one-time coaching notice. Renders until dismissed, then never again
+   (flag persisted in store.s.flags). Keeps recurring screens quiet. */
+export function tip(key, html, tone = 'accent', cls = '') {
+  if (store.s.flags['tip.' + key]) return '';
+  return `<div class="notice notice-${tone} notice-tip ${cls}"><span class="nt-body">${html}</span>
+    <button class="notice-x" data-action="dismiss-tip" data-value="${esc(key)}" aria-label="Dismiss">${icon('x')}</button></div>`;
+}
 
 export function pageHeader(eyebrow, title, sub = '') {
   return `<header class="mb-4">

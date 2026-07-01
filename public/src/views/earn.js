@@ -29,10 +29,10 @@ registerView('earn', () => {
   }).join('');
 
   qs('#view-earn').innerHTML = `<div class="stagger">
-    ${pageHeader('Money', 'Earn while you learn', 'Real ways to earn as you build your skills. The early money is modest, but it is real. It grows with you, and every gig becomes proof for employers.')}
+    ${pageHeader('Money', 'Earn while you learn', 'Real ways to earn as your skills grow, and every gig becomes proof for employers.')}
     <div class="notice notice-accent">${icon('wand-sparkles')} <b>For you.</b> ${esc(earnPicks(userProfile()))}</div>
-    <div class="notice notice-amber" style="margin-top:var(--s-3)">${icon('shield-alert')} <b>Never pay to get a job or a gig.</b> Real work pays <i>you</i>. If someone asks you to pay first, or it sounds too good to be true, walk away.</div>
+    <div class="notice notice-amber" style="margin-top:var(--s-3)">${icon('shield-alert')} <b>Never pay to get a job or a gig.</b> Real work pays <i>you</i>. If someone asks for money first, walk away.</div>
     ${groups}
-    <p class="t-foot text-3 center" style="margin-top:var(--s-6)">Start with one. Consistency beats intensity. A little every week adds up.</p>
+    <p class="t-foot text-3 center" style="margin-top:var(--s-6)">Start with one. A little every week adds up.</p>
   </div>`;
 });

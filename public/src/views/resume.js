@@ -6,7 +6,7 @@ import { store, save } from '../core/state.js';
 import { qs, qsa, esc, icon, refreshIcons } from '../core/dom.js';
 import { registerView } from '../core/router.js';
 import { download, copyText, toast } from '../core/feedback.js';
-import { meter, pageHeader, strengthLabel } from '../ui/components.js';
+import { meter, pageHeader, strengthLabel, tip } from '../ui/components.js';
 import { ACTION_VERBS, VERB_SET, XYZ, STOPWORDS, SKILL_HINTS } from '../data/resume-assets.js';
 import { reviewResume, draftSummary } from '../core/coach.js';
 
@@ -118,7 +118,7 @@ function atsData(r) {
 }
 function atsHTML(r) {
   const a = atsData(r);
-  if (!a) return `<p class="t-foot text-3">Paste a job description above to see how well your resume matches its keywords, and which ones to add honestly.</p>`;
+  if (!a) return `<p class="t-foot text-3">Paste a job description to see your keyword match.</p>`;
   const tone = a.pct >= 70 ? 'green' : a.pct >= 40 ? 'amber' : '';
   return `<div class="row between mb-2"><div class="fw-semibold">Keyword match</div><div class="fw-bold">${a.pct}%</div></div>
     ${meter(a.pct, tone)}
@@ -200,11 +200,14 @@ function markdown(r) {
 const fname = ext => `${(R().name || 'resume').toLowerCase().replace(/\s+/g, '-')}-resume.${ext}`;
 
 /* ---------- live (focus-preserving) refresh ------------------------------ */
+let coachOpen = false, atsOpen = false;   // survive re-renders within the session
 function refreshDynamic() {
   const r = R();
   const p = qs('#rs-paper'); if (p) p.innerHTML = paperHTML(r);
   const s = qs('#rs-score'); if (s) s.innerHTML = scoreHTML(r);
   const a = qs('#rs-ats-result'); if (a) a.innerHTML = atsHTML(r);
+  const ss = qs('#rs-score-sum'); if (ss) ss.textContent = scoreData(r).score + '/100';
+  const ad = atsData(r), as = qs('#rs-ats-sum'); if (as) as.textContent = ad ? ad.pct + '% match' : '';
 }
 
 /* ---------- form rendering helpers --------------------------------------- */
@@ -264,7 +267,7 @@ function renderResume() {
 
   qs('#view-resume').innerHTML = `<div class="stagger">
     ${pageHeader('Build Studio', 'Resume Studio')}
-    <div class="notice notice-accent mb-4">Start small. Your name and one real thing you did is enough for today. The score and tips are just guidance, not a test. You can improve it any time.</div>
+    ${tip('resume-intro', 'Start small. Your name and one real thing you did is enough for today.', 'accent', 'mb-4')}
 
     <div class="studio-toolbar">
       <div class="segmented studio-toggle">
@@ -321,22 +324,26 @@ function renderResume() {
           ${(r.certifications || []).map(certEntry).join('')}
         </div>
 
-        <div class="card"><h3 class="section-label" style="margin-top:0">Coach</h3><div id="rs-score"></div></div>
+        <details class="card" id="rs-coach"${coachOpen ? ' open' : ''}>
+          <summary class="sum-row">${icon('sparkles')} Coach <span class="sum-val" id="rs-score-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
+          <div id="rs-score" class="mt-3"></div>
+        </details>
 
-        <div class="card">
-          <h3 class="section-label" style="margin-top:0">ATS keyword match</h3>
-          <p class="t-foot text-3 mb-2">Paste the job description you’re targeting.</p>
-          ${ta('targetJD', r.targetJD, 'Paste a job post here…')}
+        <details class="card" id="rs-ats"${atsOpen ? ' open' : ''}>
+          <summary class="sum-row">${icon('target')} ATS keyword match <span class="sum-val" id="rs-ats-sum"></span>${icon('chevron-down', 'chev-d')}</summary>
+          <div class="mt-3">${ta('targetJD', r.targetJD, 'Paste the job description you’re targeting…')}</div>
           <div id="rs-ats-result" class="mt-3"></div>
-        </div>
+        </details>
       </div>
 
       <div class="studio-preview">
         <div class="resume-paper" id="rs-paper"></div>
-        <p class="t-foot text-3 center mt-3 no-print">“Save PDF” opens your browser’s print dialog. Choose <b>Save as PDF</b>. It prints as a single column, ready for an ATS.</p>
+        <p class="t-foot text-3 center mt-3 no-print">“Save PDF”, then pick <b>Save as PDF</b> in the print dialog. Single column, ATS-ready.</p>
       </div>
     </div>
   </div>`;
+  const cd = qs('#rs-coach'); if (cd) cd.addEventListener('toggle', () => { coachOpen = cd.open; });
+  const at = qs('#rs-ats'); if (at) at.addEventListener('toggle', () => { atsOpen = at.open; });
   refreshDynamic();
   refreshIcons(qs('#view-resume'));
 }

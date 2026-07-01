@@ -246,6 +246,21 @@
 .notice { background: var(--fill); border-radius: var(--r-md); padding: 13px 15px; font-size: var(--fs-callout); }
 .notice-accent { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 .notice-amber  { background: color-mix(in srgb, var(--amber) 12%, transparent); }
+.notice-tip { display: flex; align-items: flex-start; gap: 10px; }
+.notice-tip .nt-body { flex: 1; }
+.notice-x { flex: none; display: grid; place-items: center; width: 26px; height: 26px;
+  margin: -4px -6px -4px 0; border-radius: 50%; color: var(--text-3); }
+.notice-x:hover { background: color-mix(in srgb, var(--text-3) 14%, transparent); }
+.notice-x .lucide { width: 15px; height: 15px; }
+
+/* Collapsible cards (Coach / ATS): quiet by default, score at a glance. */
+.sum-row { display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
+  font-weight: var(--fw-semibold); }
+.sum-row::-webkit-details-marker { display: none; }
+.sum-row .sum-val { margin-left: auto; font-size: var(--fs-foot); color: var(--text-3);
+  font-weight: var(--fw-semibold); font-variant-numeric: tabular-nums; }
+.sum-row .chev-d { color: var(--text-3); transition: transform var(--dur-2) var(--ease-standard); }
+details[open] > .sum-row .chev-d { transform: rotate(180deg); }
 .empty { text-align: center; padding: var(--s-9) var(--s-5); color: var(--text-3); }
 .empty .chip { margin: 0 auto var(--s-3); width: 56px; height: 56px; }
 

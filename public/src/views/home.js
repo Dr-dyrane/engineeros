@@ -65,7 +65,7 @@ registerView('home', () => {
             <div class="row">
               <div class="chip chip-green">${icon('wallet')}</div>
               <div class="grow"><div class="t-headline">Earn while you learn</div>
-                <div class="t-foot text-2 mt-1">Real ways to make money as your skills grow: freelance gigs, AI tasks, and paid internships.</div></div>
+                <div class="t-foot text-2 mt-1">Freelance gigs, AI tasks, and paid internships.</div></div>
               <span class="chev text-3">${icon('chevron-right')}</span>
             </div>
           </div>
@@ -74,7 +74,7 @@ registerView('home', () => {
             <div class="row">
               <div class="chip chip-accent">${icon('rocket')}</div>
               <div class="grow"><div class="t-headline">Career Launchpad</div>
-                <div class="t-foot text-2 mt-1">Track job applications and prep for interviews using your own projects.</div></div>
+                <div class="t-foot text-2 mt-1">Track applications and prep interviews with your own projects.</div></div>
               <span class="chev text-3">${icon('chevron-right')}</span>
             </div>
           </div>
@@ -85,7 +85,7 @@ registerView('home', () => {
             ${statTile(done, 'Missions done')}
             ${statTile(streak + (streak > 0 ? ' 🔥' : ''), 'Day streak')}
           </div>
-          <div class="notice notice-accent">${esc(homeNudge(userProfile()))}</div>
+          ${streakBanner ? '' : `<div class="notice notice-accent">${esc(homeNudge(userProfile()))}</div>`}
           <div>
             <h3 class="section-label" style="margin-top:2px">Your readiness</h3>
             <div class="grid-2">

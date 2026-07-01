@@ -91,7 +91,7 @@ function interviewHTML() {
       <h3 class="section-label" style="margin-bottom:6px">${esc(g.group)}</h3>
       <div class="stack">${g.items.map(q => questionCard(q, projects)).join('')}</div>
     </section>`).join('');
-  return `<div class="notice notice-accent">${icon('mic')} ${answered} of ${INTERVIEW_QS.length} answered. Say each answer out loud once, not just in your head.</div>
+  return `<div class="notice notice-accent">${icon('mic')} ${answered} of ${INTERVIEW_QS.length} answered · practice out loud, not just in your head.</div>
     <div class="mt-3"><button class="btn btn-ghost" data-action="la-export">${icon('download')} Export prep sheet</button></div>
     ${groups}`;
 }

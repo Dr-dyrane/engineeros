@@ -34,7 +34,7 @@ export function renderSettings() {
     <div class="card">
       <div class="row between">
         <div class="grow"><div class="fw-semibold">Free navigation</div>
-          <div class="t-foot text-3">Unlock every journey and mission now, instead of one step at a time.</div></div>
+          <div class="t-foot text-3">Unlock every journey and mission now.</div></div>
         <button class="switch ${store.s.freeNav ? 'is-on' : ''}" data-action="toggle-freenav" aria-label="Toggle free navigation">
           <span class="knob"></span>
         </button>
@@ -45,19 +45,19 @@ export function renderSettings() {
     <div class="card">
       <div class="row between">
         <div class="grow"><div class="fw-semibold">Daily reminder</div>
-          <div class="t-foot text-3">A gentle nudge once a day, plus a note when you finish a journey or keep a streak alive. Turn it off anytime.</div></div>
+          <div class="t-foot text-3">One gentle nudge a day, plus journey and streak milestones.</div></div>
         <button class="switch ${store.s.flags.notify ? 'is-on' : ''}" data-action="toggle-notify" aria-label="Toggle reminders">
           <span class="knob"></span>
         </button>
       </div>
-      <p class="t-foot text-3 mt-3">Works even when the app is closed. To send it, we store only an anonymous reminder token. Your name, progress, and notes never leave this device.</p>
+      <p class="t-foot text-3 mt-3">Works even when the app is closed. We store only an anonymous token. Your progress and notes never leave this device.</p>
     </div>
 
     <h3 class="section-label mt-5">Feedback</h3>
     <div class="card">
       <button class="btn btn-ghost" data-action="send-feedback">${icon('message-circle')} Send feedback</button>
       <button class="btn btn-ghost mt-3" data-action="suggest-feature">${icon('lightbulb')} Suggest a feature</button>
-      <p class="t-foot text-3 mt-3">This opens your email app. Tell us what would make EngineerOS more useful.</p>
+      <p class="t-foot text-3 mt-3">Opens your email app.</p>
     </div>
 
     <h3 class="section-label mt-5">Your data</h3>
@@ -75,7 +75,7 @@ export function renderSettings() {
     <div class="card">
       <div class="row between">
         <div class="grow"><div class="fw-semibold">Encrypted sync</div>
-          <div class="t-foot text-3">Carry your progress to another device with a secret code. Everything is encrypted on this device, so we only ever store unreadable text and cannot read your progress or notes.</div></div>
+          <div class="t-foot text-3">Carry your progress to another device with a secret code. Encrypted end to end. We can never read it.</div></div>
         <button class="switch" data-action="sync-enable" aria-label="Turn on sync"><span class="knob"></span></button>
       </div>
       <details class="mt-3"><summary class="t-foot text-3" style="cursor:pointer">+ I already have a sync code</summary>
@@ -99,7 +99,7 @@ export function renderSettings() {
           <button class="btn btn-ghost btn-sm" data-action="sync-reveal" aria-label="Reveal code">${icon(codeRevealed ? 'eye-off' : 'eye')}</button>
           <button class="btn btn-ghost btn-sm" data-action="sync-copy" aria-label="Copy code">${icon('copy')}</button>
         </div>
-        <p class="t-foot text-3 mt-2">On another device, open Settings, tap “I already have a sync code,” and enter this. Save it somewhere safe: without it, the synced copy cannot be recovered.</p>
+        <p class="t-foot text-3 mt-2">Enter this in Settings on your other device. Save it somewhere safe. Without it, the synced copy can’t be recovered.</p>
       </div>
     </div>`;
     })()}
