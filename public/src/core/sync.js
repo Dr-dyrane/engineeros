@@ -84,6 +84,27 @@ function dedupeReviews(list) {
   for (const r of list) { const k = JSON.stringify(r); if (!seen.has(k)) { seen.add(k); out.push(r); } }
   return out;
 }
+function fullness(o) { try { return JSON.stringify(o).length; } catch (e) { return 0; } }
+function mergeApplications(l, r) {
+  const map = new Map();
+  for (const a of l) if (a && a.id) map.set(a.id, a);
+  for (const b of r) {
+    if (!b || !b.id) continue;
+    const a = map.get(b.id);
+    map.set(b.id, !a ? b : ((b.updated || 0) >= (a.updated || 0) ? b : a));   // newer wins per app
+  }
+  return Array.from(map.values());
+}
+function mergeAnswers(l, r) {
+  const out = {};
+  for (const id of new Set([...Object.keys(l), ...Object.keys(r)])) {
+    const a = l[id], b = r[id];
+    if (a && !b) { out[id] = a; continue; }
+    if (b && !a) { out[id] = b; continue; }
+    out[id] = fullness(a) >= fullness(b) ? a : b;    // keep the fuller answer
+  }
+  return out;
+}
 export function mergeState(local, remote) {
   const L = local || {}, R = remote || {};
   if (!remote || typeof remote !== 'object') return L;
@@ -102,6 +123,8 @@ export function mergeState(local, remote) {
   }
   out.missionData = mergeMissionData(L.missionData || {}, R.missionData || {});
   out.reviews = dedupeReviews([...(L.reviews || []), ...(R.reviews || [])]);
+  out.applications = mergeApplications(L.applications || [], R.applications || []);
+  out.interview = { answers: mergeAnswers((L.interview && L.interview.answers) || {}, (R.interview && R.interview.answers) || {}) };
   out.streak = {
     count: Math.max((L.streak && L.streak.count) || 0, (R.streak && R.streak.count) || 0),
     best: Math.max((L.streak && L.streak.best) || 0, (R.streak && R.streak.best) || 0),

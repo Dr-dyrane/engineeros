@@ -155,6 +155,29 @@ click(document.querySelector('#eos-helper [data-action="helper-skip"][data-value
 A(stateH.store.s.flags.seenVersion!=='1.0','dismiss stamps the version as seen');
 A(!document.querySelector('#eos-helper').textContent.includes('What\u2019s new'),'whats-new gone after dismiss');
 
+// ---- Career Launchpad ----
+window.location.hash='#/launchpad'; window.dispatchEvent(new window.Event('hashchange')); await wait(20);
+A(av()==='view-launchpad','launchpad opens');
+A(document.querySelector('[data-action="la-add"]'),'launchpad has add-application');
+click(document.querySelector('[data-action="la-add"]')); await wait(20);
+st=JSON.parse(localStorage.getItem('engineeros.v1'));
+A(st.applications.length===1,'application added to tracker');
+const compInput=document.querySelector('[data-la-field$=":company"]');
+compInput.value='Bosch'; compInput.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(200);
+st=JSON.parse(localStorage.getItem('engineeros.v1'));
+A(st.applications[0].company==='Bosch','company saved live');
+const appId=st.applications[0].id;
+click(document.querySelector('[data-action="la-status"][data-value="'+appId+':interview"]')); await wait(15);
+st=JSON.parse(localStorage.getItem('engineeros.v1'));
+A(st.applications[0].status==='interview','status change persists');
+A(document.querySelector('#view-launchpad').textContent.includes('Interviewing'),'app grouped under Interviewing');
+click(document.querySelector('[data-action="la-panel"][data-value="interview"]')); await wait(15);
+const starField=document.querySelector('[data-la-ans$=":a"]');
+A(starField,'STAR action field renders');
+starField.value='I wired the sensor and tuned the control loop.'; starField.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(200);
+st=JSON.parse(localStorage.getItem('engineeros.v1'));
+A(Object.values(st.interview.answers).some(x=>x.a && x.a.includes('sensor')),'STAR answer saved');
+
 // progress
 click(document.querySelector('.tab[data-value="home"]')); await wait(6);
 click(document.querySelector('[data-action="open-progress"]')); await wait(8);

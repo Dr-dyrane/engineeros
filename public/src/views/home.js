@@ -69,6 +69,15 @@ registerView('home', () => {
               <span class="chev text-3">${icon('chevron-right')}</span>
             </div>
           </div>
+          <div class="card tap" data-action="nav" data-value="launchpad"
+               style="background:linear-gradient(180deg, color-mix(in srgb,var(--accent) 12%, transparent), var(--surface-1))">
+            <div class="row">
+              <div class="chip chip-accent">${icon('rocket')}</div>
+              <div class="grow"><div class="t-headline">Career Launchpad</div>
+                <div class="t-foot text-2 mt-1">Track job applications and prep for interviews using your own projects.</div></div>
+              <span class="chev text-3">${icon('chevron-right')}</span>
+            </div>
+          </div>
         </div>
         <div class="stack">
           <div class="grid-3">

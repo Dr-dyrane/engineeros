@@ -181,3 +181,25 @@ export function earnPicks(profile) {
   return 'A good first step: AI-training tasks like Remotasks or DataAnnotation. They need no portfolio, just a laptop and consistency. As your skills grow, add freelance gigs.';
 }
 
+/* ---- Launchpad ------------------------------------------------------------ */
+/* A read on the job search based on the application pipeline. */
+export function launchpadInsight(apps) {
+  apps = apps || [];
+  const n = (s) => apps.filter(a => a && a.status === s).length;
+  if (!apps.length) return 'No applications yet. Add the first role you are eyeing, even a stretch one. A tracked search is a real search.';
+  if (n('offer')) return 'You have an offer in play. Take your time, ask questions, and keep one or two others warm.';
+  const iv = n('interview');
+  if (iv) return 'You have ' + iv + ' interview' + (iv > 1 ? 's' : '') + ' in progress. Open Interview prep and rehearse your STAR stories out loud.';
+  const applied = n('applied');
+  if (applied >= 5) return applied + ' applications out. Consistency wins. Follow up on anything older than a week.';
+  if (applied) return applied + ' out, a good start. Aim for a small weekly number you can keep, not a one-day sprint.';
+  return 'A few saved. Turn one into an application this week. Momentum beats perfect timing.';
+}
+
+/* Draft a STAR skeleton from a real portfolio project. Only uses entered text. */
+export function starDraft(p) {
+  if (!p || typeof p !== 'object') return null;
+  const g = (...keys) => { for (const k of keys) { if (p[k] && String(p[k]).trim()) return String(p[k]).trim(); } return ''; };
+  return { s: g('problem', 'challenge', 'context'), t: '', a: g('approach', 'action', 'build', 'what'), r: g('result', 'outcome', 'impact') };
+}
+

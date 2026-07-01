@@ -17,6 +17,8 @@ export function defaultState() {
     streak: { count: 0, best: 0, last: '' },
     builders: { portfolio: {}, resume: {}, linkedin: {} },
     reviews: [],              // [{date, done, learned, confused, built, next}]
+    applications: [],         // Launchpad: job search tracker
+    interview: { answers: {} }, // Launchpad: STAR / interview answers by question id
     flags: {}                 // one-time UI flags, e.g. backupNudged
   };
 }
@@ -30,6 +32,8 @@ export function deepDefaults(p) {
   s.completed = (p && p.completed) || {};
   s.missionData = (p && p.missionData) || {};
   s.reviews = (p && p.reviews) || [];
+  s.applications = (p && p.applications) || [];
+  s.interview = { answers: (p && p.interview && p.interview.answers) || {} };
   s.flags = Object.assign({}, (p && p.flags) || {});
   s.updated = (p && p.updated) || 0;
   return s;
