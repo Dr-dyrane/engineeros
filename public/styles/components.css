@@ -260,6 +260,10 @@
 .notice-x:hover { background: color-mix(in srgb, var(--text-3) 14%, transparent); }
 .notice-x .lucide { width: 15px; height: 15px; }
 
+/* 44pt hit areas for compact icon buttons, visual size unchanged (HIG). */
+.notice-x, .rs-iconbtn { position: relative; }
+.notice-x::after, .rs-iconbtn::after { content: ""; position: absolute; inset: -9px; }
+
 /* Collapsible cards (Coach / ATS): quiet by default, score at a glance. */
 .sum-row { display: flex; align-items: center; gap: 8px; list-style: none; cursor: pointer;
   font-weight: var(--fw-semibold); }
@@ -281,6 +285,21 @@ details[open] > .sum-row .chev-d { transform: rotate(180deg); }
 .tab .lucide { width: 22px; height: 22px; }
 .tab:active { transform: scale(.88); }
 .tab.is-active { color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
+.tab { min-height: var(--tap-min); }
+
+/* Search island: its own circular glass button beside the capsule (iOS 26). */
+.tab-search { pointer-events: auto; width: 54px; height: 54px; min-width: 54px; min-height: 54px;
+  padding: 0; display: grid; place-items: center; border-radius: var(--r-pill);
+  box-shadow: var(--shadow-2), inset 0 1px 0 var(--glass-edge), inset 0 -1.5px 1px var(--glass-shade); }
+.tab-search .lucide { width: 22px; height: 22px; }
+.tab-search.is-active { color: var(--accent); background: color-mix(in srgb, var(--accent) 13%, transparent); }
+
+/* Dock minimize: shrinks while scrolling down, restores on scroll-up / top. */
+#tabbar .tabbar-pill, #tabbar .tab-search {
+  transform-origin: 50% 100%;
+  transition: transform var(--dur-3) var(--ease-emphasized), box-shadow var(--dur-3);
+}
+#tabbar.is-mini .tabbar-pill, #tabbar.is-mini .tab-search { transform: translateY(6px) scale(.87); }
 
 /* ---- Toast + celebrate --------------------------------------------------- */
 #toast { position: fixed; left: 50%; bottom: calc(var(--tabbar-h) + 28px); transform: translate(-50%, 18px);

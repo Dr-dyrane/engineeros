@@ -4,6 +4,7 @@
   html, body { background: #ffffff !important; }
   body::before { display: none !important; }
   #topbar, #tabbar, #toast, #celebrate, .studio-toolbar, .studio-edit, .no-print { display: none !important; }
+  #app::after { display: none !important; }   /* bottom scroll-edge fade */
   /* Only the ACTIVE view prints (non-active views keep their base display:none). */
   #views { padding: 0 !important; margin: 0 !important; max-width: none !important; }
   .view { padding: 0 !important; margin: 0 !important; max-width: none !important; }

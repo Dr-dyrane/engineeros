@@ -104,6 +104,13 @@
   --topbar-h: 54px;
   --tabbar-h: 66px;
 
+  /* ---- Chrome geometry (iOS-26 capsule dock) ------------------------------
+     The dock is a floating capsule inset from the screen edges (HIG: 21pt),
+     never touching the home-indicator strip. Concentric rule for nesting:
+     child radius = parent radius minus the gap (capsule-in-capsule is automatic). */
+  --inset-dock: 21px;   /* capsule inset from left / right / bottom edges */
+  --tap-min: 44px;      /* minimum hit target (HIG 44×44pt) */
+
   /* ---- Z layers ---------------------------------------------------------- */
   --z-content: 1; --z-bar: 50; --z-toast: 90; --z-celebrate: 80; --z-sheet: 70;
 

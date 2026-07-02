@@ -306,6 +306,14 @@ A(document.querySelector('#rs-paper').textContent.includes('Ada & Bob <QA>'),'& 
 A(!document.body.innerHTML.includes('&amp;amp;') && !document.body.innerHTML.includes('&amp;lt;'),'no double-escaped entities anywhere in the DOM');
 nameEl.value='Ada Lovelace'; nameEl.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(25);
 
+// ---- iOS-26 dock: floating capsule + search island ----
+A(document.querySelectorAll('#tabbar .tabbar-pill .tab').length===4,'dock capsule holds 4 tabs');
+A(!!document.querySelector('#tabbar .tab-search[data-value="resources"]'),'search island is the fifth destination');
+A(document.querySelectorAll('#tabbar .tab').length===5,'all five destinations remain tappable');
+click(document.querySelector('#tabbar .tab-search')); await wait(12);
+A(av()==='view-resources','search island opens Resources');
+A(document.querySelector('#tabbar .tab-search').classList.contains('is-active'),'search island gets active state');
+
 console.log('\n==== RESULT ====');
 if(errors.length){ console.log('❌ '+errors.length+' issue(s):'); [...new Set(errors)].forEach(e=>console.log(' - '+e)); process.exit(1); }
 else console.log('✅ ALL MODULAR TESTS PASSED, missions:'+total);

@@ -89,15 +89,16 @@
     <section class="view" id="view-settings"></section>
   </main>
 
-  <!-- Tab bar -->
+  <!-- Dock: capsule of primary destinations + a separate search island
+       (Resources), following the iOS-26 floating tab bar pattern. -->
   <nav id="tabbar" aria-label="Primary">
     <div class="tabbar-pill material">
       <button class="tab" data-action="nav" data-value="home" aria-label="Today"><i data-lucide="house"></i><span>Today</span></button>
       <button class="tab" data-action="nav" data-value="journeys" aria-label="Journeys"><i data-lucide="route"></i><span>Journeys</span></button>
       <button class="tab" data-action="nav" data-value="build" aria-label="Build"><i data-lucide="hammer"></i><span>Build</span></button>
       <button class="tab" data-action="nav" data-value="review" aria-label="Review"><i data-lucide="calendar-check"></i><span>Review</span></button>
-      <button class="tab" data-action="nav" data-value="resources" aria-label="Resources"><i data-lucide="library"></i><span>Resources</span></button>
     </div>
+    <button class="tab tab-search material" data-action="nav" data-value="resources" aria-label="Resources"><i data-lucide="search"></i></button>
   </nav>
 </div>
 

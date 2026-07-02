@@ -8,7 +8,7 @@
    • Each route change sets document.title and moves focus to the heading (a11y). */
 
 import { store } from './state.js';
-import { qs, qsa, refreshIcons } from './dom.js';
+import { qs, qsa, refreshIcons, prefersReducedMotion } from './dom.js';
 
 const registry = {};
 export let currentView = 'welcome';
@@ -78,22 +78,35 @@ function render(view, param) {
   refreshIcons(el);
   try { window.scrollTo(0, 0); } catch (e) {}
   const tb = qs('#topbar'); if (tb) tb.classList.remove('is-scrolled');
+  const dk = qs('#tabbar'); if (dk) dk.classList.remove('is-mini');
   document.title = (TITLES[view] || 'EngineerOS') + ' · EngineerOS';
   const h = el.querySelector('h1');
   if (h) { h.setAttribute('tabindex', '-1'); try { h.focus({ preventScroll: true }); } catch (e) { try { h.focus(); } catch (_) {} } }
   updateChrome();
 }
 
+/* ---- view transitions -----------------------------------------------------
+   Native-feeling navigation: the browser crossfades between DOM states while
+   fixed chrome (topbar and dock, each with a view-transition-name) stays put.
+   Falls back to an instant swap on first render, reduced motion, or browsers
+   without the View Transitions API. */
+let booted = false;
+function withTransition(fn) {
+  if (booted && document.startViewTransition && !prefersReducedMotion()) document.startViewTransition(fn);
+  else fn();
+}
+
 /* ---- public navigation -------------------------------------------------- */
 export function go(view, param = null, opts = {}) {
   view = allowed(view);
   if (view === 'home') param = null;
-  render(view, param);
-  const url = '#' + routeFor(currentView, curParam);
+  const v = view, p = param;
+  withTransition(() => render(v, p));
+  const url = '#' + routeFor(v, p);
   try {
     if (opts.replace || window.location.hash === url) window.history.replaceState(null, '', url);
     else window.history.pushState(null, '', url);
-  } catch (e) { try { window.location.hash = routeFor(currentView, curParam); } catch (_) {} }
+  } catch (e) { try { window.location.hash = routeFor(v, p); } catch (_) {} }
 }
 
 /* In-app chevron: go up to the logical parent. */
@@ -109,10 +122,11 @@ export function updateChrome() {
 }
 
 /* ---- boot --------------------------------------------------------------- */
-function onHistoryNav() { const { view, param } = parseHash(); render(view, param); }
+function onHistoryNav() { const { view, param } = parseHash(); withTransition(() => render(view, param)); }
 export function initRouter() {
   const { view, param } = parseHash();
   render(view, param);
+  booted = true;   // transitions apply only after the first paint
   try { window.history.replaceState(null, '', '#' + routeFor(currentView, curParam)); } catch (e) {}
   window.addEventListener('popstate', onHistoryNav);
   window.addEventListener('hashchange', onHistoryNav);

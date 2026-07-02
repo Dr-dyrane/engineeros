@@ -168,8 +168,23 @@ document.addEventListener('input', (e) => {
   const sn = e.target.closest('#set-name'); if (sn) { store.s.user.name = sn.value; save(); }
 });
 
+/* Scroll behaviors:
+   - Topbar scroll-edge shadow: pure-CSS scroll-driven animation where
+     supported (see base.css); this JS path is the fallback only.
+   - Dock minimize: shrink while scrolling down, restore on scroll-up or near
+     the top (direction needs JS; scroll timelines track position, not
+     direction). */
+const cssScrollEdge = typeof CSS !== 'undefined' && CSS.supports && CSS.supports('animation-timeline: scroll()');
+let dockY = 0;
 window.addEventListener('scroll', () => {
-  const tb = qs('#topbar'); if (tb) tb.classList.toggle('is-scrolled', window.scrollY > 6);
+  const y = window.scrollY;
+  if (!cssScrollEdge) { const tb = qs('#topbar'); if (tb) tb.classList.toggle('is-scrolled', y > 6); }
+  const dock = qs('#tabbar');
+  if (dock) {
+    if (y > dockY + 6 && y > 140) dock.classList.add('is-mini');
+    else if (y < dockY - 6 || y <= 140) dock.classList.remove('is-mini');
+  }
+  dockY = y;
 }, { passive: true });
 
 const importFile = qs('#importFile');
