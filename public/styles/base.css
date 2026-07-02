@@ -57,11 +57,12 @@ img, svg { display: block; max-width: 100%; }
   background: var(--material);
   backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
   -webkit-backdrop-filter: saturate(var(--material-saturate)) blur(var(--material-blur));
-  /* separation from content is a soft shadow that appears on scroll, no line */
-  box-shadow: inset 0 -1px 0 var(--glass-edge-soft), 0 1px 0 rgba(0,0,0,0), 0 6px 20px rgba(0,0,0,0);
+  /* separation from content is a soft shadow that appears on scroll, no line
+     (transparent twin shadows below keep the transition interpolating) */
+  box-shadow: 0 1px 2px rgba(17,24,39,0), 0 4px 12px rgba(17,24,39,0);
   transition: box-shadow var(--dur-3) var(--ease-standard);
 }
-#topbar.is-scrolled { box-shadow: inset 0 -1px 0 var(--glass-edge-soft), 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent), var(--shadow-1); }
+#topbar.is-scrolled { box-shadow: var(--shadow-1); }
 
 /* Scroll-edge effect, compositor-thread version: where scroll-driven
    animations are supported, the topbar shadow tracks scroll position in pure
@@ -69,7 +70,7 @@ img, svg { display: block; max-width: 100%; }
 @supports (animation-timeline: scroll()) {
   #topbar { animation: topbarEdge linear both; animation-timeline: scroll(root); animation-range: 0px 80px; }
   @keyframes topbarEdge {
-    to { box-shadow: inset 0 -1px 0 var(--glass-edge-soft), 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent), var(--shadow-1); }
+    to { box-shadow: var(--shadow-1); }
   }
 }
 

@@ -28,7 +28,7 @@
 @media (prefers-reduced-transparency: reduce) {
   .material, #topbar, .tabbar-pill { background: var(--surface-1); backdrop-filter: none; -webkit-backdrop-filter: none; }
   .tabbar-pill { box-shadow: var(--shadow-2); }
-  #topbar { box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 8%, transparent); }
+  #topbar { box-shadow: var(--shadow-1); }
 }
 
 /* ---- Squircle: true continuous-curve mask for square decorative elements - */
