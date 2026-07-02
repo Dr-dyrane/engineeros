@@ -35,7 +35,7 @@ body::before {
   opacity: 0.92;
 }
 
-h1,h2,h3,h4,p { margin: 0; font-weight: inherit; }
+:where(h1,h2,h3,h4,p) { margin: 0; font-weight: inherit; }   /* zero-specificity: the rhythm backstop below can win ties */
 button { font: inherit; color: inherit; background: none; cursor: pointer; }
 a { color: var(--accent); text-decoration: none; }
 input, textarea, select { font: inherit; color: var(--text); }
@@ -75,6 +75,15 @@ img, svg { display: block; max-width: 100%; }
 }
 
 #views { flex: 1; width: 100%; }
+
+/* ---- Vertical rhythm ------------------------------------------------------
+   Any two adjacent blocks in a view sit one grid step apart by default, so a
+   missed utility can never collapse spacing to zero. :where() keeps this at
+   zero specificity: every .mt-*/.mb-* utility, component rule, and inline
+   style still wins, and block margins collapse so labeled gaps never double.
+   .hero spaces itself with flex gap and is excluded. */
+:where(.stagger:not(.hero)) > * + * { margin-top: var(--s-4); }
+:where(.studio-edit) > * + * { margin-top: var(--s-4); }
 
 /* Responsive container system, the measure adapts to BOTH the view type and the
    screen. Reading views stay comfortable; grid views and Studios use the room. */

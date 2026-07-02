@@ -53,8 +53,10 @@
 .mt-1{margin-top:var(--s-1);} .mt-2{margin-top:var(--s-2);} .mt-3{margin-top:var(--s-3);}
 .mt-4{margin-top:var(--s-4);} .mt-5{margin-top:var(--s-5);} .mt-6{margin-top:var(--s-6);}
 .mb-2{margin-bottom:var(--s-2);} .mb-3{margin-bottom:var(--s-3);} .mb-4{margin-bottom:var(--s-4);}
+/* Top margin stays 0 here so .mt-* utilities actually take effect (the old
+   shorthand, declared after the utilities, silently overrode them). */
 .section-label { font-size: var(--fs-foot); font-weight: var(--fw-bold); letter-spacing: 0.04em;
-                 text-transform: uppercase; color: var(--text-3); margin: var(--s-2) var(--s-1) var(--s-3); }
+                 text-transform: uppercase; color: var(--text-3); margin: 0 var(--s-1) var(--s-3); }
 
 /* ---- Buttons ------------------------------------------------------------- */
 .btn {
