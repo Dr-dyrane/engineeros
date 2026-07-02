@@ -52,6 +52,26 @@ Today's mission, Done checklist, Reflection, Mark complete.**
 - **Your data stays on your device** (browser `localStorage`). Export or import a JSON backup anytime.
 - **Cross-device sync (optional, end-to-end encrypted)** — turn it on for a secret sync code that encrypts your state on-device (PBKDF2 + AES-GCM). The server stores only ciphertext under an anonymous id, so it cannot read your progress or notes. Enter the code on another device and everything merges in, nothing already started is lost. Reuses the same Upstash Redis, no extra service.
 
+## Business Discovery (`/discover`)
+
+A second experience on the same design system: a calm, consultant-style assessment that
+helps a business owner describe how their business actually works: identity, products,
+customers, the real sales journey, operations, people, challenges, and growth, one
+question per screen, in their own words. Dyrane Academy uses the answers to design a
+digital transformation strategy; the platform is schema-driven
+(`src/discovery/schema.js`), so new industries are just new question packs.
+
+- **For the owner** — `launch.dyrane.tech/discover`. About 20-30 minutes, autosaves every
+  answer locally *and* to the server, resumable anytime, and a **continue code** picks the
+  assessment up on another device.
+- **For the reviewer** — `launch.dyrane.tech/discover#admin`, unlocked by
+  `DISCOVERY_ADMIN_KEY` (see [.env.example](.env.example)): live list of submissions
+  (including in-progress ones), full per-module answers, print, JSON export, delete.
+- **Privacy model is deliberately different from EngineerOS.** EngineerOS sync is
+  zero-knowledge; Discovery answers are readable by Dyrane Academy, and the welcome screen
+  says so in plain words. Storage is the same Upstash Redis (`discovery:*` keys,
+  `/api/discovery`), no extra service.
+
 ## Design system
 
 Apple-HIG inspired, encoded as tokens in `styles/` (see [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)):
@@ -63,23 +83,27 @@ Apple-HIG inspired, encoded as tokens in `styles/` (see [docs/DESIGN_SYSTEM.md](
 ## Project structure
 
 ```
-api/                    · Vercel serverless functions (web push, mounted at /api)
+api/                    · Vercel serverless functions (mounted at /api)
    push-key.js          ·   serves the public VAPID key
    subscribe.js         ·   stores / removes a push subscription (Upstash Redis)
    send-reminders.js    ·   daily fan-out, verifies the QStash signature
+   sync.js              ·   zero-knowledge encrypted state sync (EngineerOS)
+   discovery.js         ·   Business Discovery store + key-gated admin API
 public/                 · the static site, served at the domain root
    index.html           ·   shell, CDN + token wiring, SW registration
+   discover.html        ·   Business Discovery shell (same design system)
    sw.js                ·   service worker: offline app shell + push handling
    manifest.webmanifest ·   PWA manifest
    favicon* · icon-* · og.png · badge-96.png   ·   app icons and share image
-   styles/              ·   tokens · base · components · studio · animations · print
+   styles/              ·   tokens · base · components · studio · animations · print · discovery
    src/
       main.js           ·   event wiring + boot
       core/             ·   state · router · theme · dom · feedback · coach · context · push · push-context
       data/             ·   journeys (61 missions) · resources · earn · resume-assets
       ui/components.js   ·   reusable render helpers
       views/            ·   one module per screen (Studios, progress, earn, settings, ...)
-tests/dom.test.mjs      · jsdom harness (npm test)
+      discovery/        ·   Business Discovery: schema.js (question packs) + app.js (engine + admin)
+tests/                  · jsdom harnesses (npm test): dom.test.mjs · discovery.test.mjs
 docs/                   · design system, push setup, build notes
 vercel.json             · outputDirectory: public, security headers
 ```

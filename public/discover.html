@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0" />
+<meta name="theme-color" content="#eef0f4" media="(prefers-color-scheme: light)" />
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+<meta name="description" content="Business Discovery by Dyrane Academy. Tell us how your business works. We'll find the opportunities." />
+<meta name="robots" content="noindex" />
+<title>Business Discovery · Dyrane Academy</title>
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<!-- No-flash theme bootstrap: honor a theme saved by either app on this device. -->
+<script>
+  try {
+    var d = JSON.parse(localStorage.getItem('discovery.v1') || '{}');
+    var s = JSON.parse(localStorage.getItem('engineeros.v1') || '{}');
+    var t = d.theme || s.theme;
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+</script>
+
+<!-- Same design system as EngineerOS (order matters), plus the few discovery styles -->
+<link rel="stylesheet" href="./styles/tokens.css" />
+<link rel="stylesheet" href="./styles/base.css" />
+<link rel="stylesheet" href="./styles/components.css" />
+<link rel="stylesheet" href="./styles/animations.css" />
+<link rel="stylesheet" href="./styles/print.css" />
+<link rel="stylesheet" href="./styles/discovery.css" />
+
+<script src="https://unpkg.com/lucide@1.22.0/dist/umd/lucide.min.js" defer></script>
+</head>
+
+<body>
+<div id="app">
+
+  <header id="topbar">
+    <div class="col" style="line-height:1">
+      <span class="fw-bold" style="font-size:15px; letter-spacing:-0.02em">Business Discovery</span>
+      <span class="t-caption text-3 fw-semibold" style="text-transform:uppercase; letter-spacing:0.05em; margin-top:2px">Dyrane Academy</span>
+    </div>
+    <span class="grow"></span>
+    <div id="disc-status">
+      <span id="disc-saved" class="t-caption" role="status" aria-live="polite"></span>
+      <span id="disc-pct" class="t-caption fw-semibold"></span>
+    </div>
+  </header>
+
+  <div id="disc-progress" aria-hidden="true"><i></i></div>
+
+  <main id="views">
+    <section class="view is-active" id="view-disc"></section>
+  </main>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="celebrate" aria-hidden="true"></div>
+
+<script type="module" src="./src/discovery/app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+/* Dyrane Academy · Business Discovery · the few styles the assessment adds on
+   top of the design system. Tokens only; zero borders; one idea per screen. */
+
+/* ---- progress line (under the topbar) ------------------------------------ */
+#disc-progress { position: sticky; top: 0; z-index: 40; height: 3px; background: transparent; }
+#disc-progress i { display: block; height: 100%; width: 0%; background: var(--accent);
+  border-radius: 0 2px 2px 0; transition: width .45s var(--ease-out, ease); }
+
+/* ---- question screen ------------------------------------------------------ */
+.q-screen { max-width: 620px; margin: 0 auto; padding-top: clamp(16px, 6vh, 56px); }
+.q-kicker { display: flex; align-items: center; gap: 8px; margin-bottom: var(--s-4); }
+.q-title { text-wrap: balance; letter-spacing: -0.02em; }
+.q-help { color: var(--text-2); max-width: 52ch; margin-top: var(--s-2); }
+.q-body { margin-top: var(--s-6); }
+.q-screen .input, .q-screen .textarea { font-size: var(--fs-body); }
+.q-screen .textarea { min-height: 148px; }
+
+/* ---- option cards (single / yes-no) --------------------------------------- */
+.opt-grid { display: grid; gap: 10px; }
+.opt-card { display: flex; align-items: center; gap: var(--s-3); width: 100%; text-align: left;
+  padding: 16px 18px; border-radius: var(--r-card, 18px); background: var(--surface-1);
+  box-shadow: var(--shadow-1); color: var(--text); font-size: var(--fs-callout);
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease; }
+.opt-card:active { transform: scale(.98); }
+@media (hover: hover) { .opt-card:hover { background: var(--surface-2); box-shadow: var(--shadow-2); } }
+.opt-card .opt-dot { width: 24px; height: 24px; min-width: 24px; border-radius: 50%;
+  background: var(--fill-strong); display: grid; place-items: center; transition: background .18s ease; }
+.opt-card .opt-dot .lucide { width: 14px; height: 14px; color: var(--on-accent, #fff);
+  opacity: 0; transform: scale(.4); transition: all .18s ease; }
+.opt-card.is-on { background: var(--accent-tint, color-mix(in srgb, var(--accent) 14%, var(--surface-1))); }
+.opt-card.is-on .opt-dot { background: var(--accent); }
+.opt-card.is-on .opt-dot .lucide { opacity: 1; transform: scale(1); }
+.yesno { grid-template-columns: 1fr 1fr; }
+.yesno .opt-card { justify-content: center; padding: 22px 18px; font-weight: 600; }
+.yesno .opt-card .opt-dot { display: none; }
+
+/* ---- multi-select chips ---------------------------------------------------- */
+.chips-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+.chips-wrap .filter-chip { height: auto; min-height: 40px; padding: 9px 18px; white-space: normal; text-align: left; }
+
+/* ---- 1-5 scale -------------------------------------------------------------- */
+.scale-labels { display: flex; justify-content: space-between; gap: var(--s-4);
+  margin-top: var(--s-2); color: var(--text-3); }
+
+/* ---- "something else" reveal ------------------------------------------------ */
+.opt-other { margin-top: 10px; }
+
+/* ---- footer navigation ------------------------------------------------------ */
+.disc-foot { display: flex; align-items: center; gap: var(--s-3);
+  margin-top: var(--s-7); padding-bottom: calc(var(--s-6) + env(safe-area-inset-bottom, 0px)); }
+.disc-skip { color: var(--text-3); }
+
+/* ---- topbar status ----------------------------------------------------------- */
+#disc-status { display: flex; align-items: baseline; gap: 10px; }
+#disc-saved { color: var(--text-3); opacity: 0; transition: opacity .4s ease; }
+#disc-saved.is-shown { opacity: 1; }
+
+/* ---- welcome / intro / complete ---------------------------------------------- */
+.disc-hero { max-width: 560px; margin: 0 auto; text-align: center;
+  padding-top: clamp(24px, 10vh, 96px); }
+.disc-hero .chip { width: 64px; height: 64px; margin: 0 auto var(--s-5); }
+.disc-hero .chip .lucide { width: 30px; height: 30px; }
+.disc-meta { display: flex; justify-content: center; gap: var(--s-3); flex-wrap: wrap; margin-top: var(--s-5); }
+.disc-code { user-select: all; -webkit-user-select: all; word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--fs-caption);
+  background: var(--surface-sunken); border-radius: var(--r-field); padding: 10px 12px; }
+
+/* ---- admin -------------------------------------------------------------------- */
+.adm-row { cursor: pointer; }
+.adm-qa { padding: 10px 0; }
+.adm-qa .q { color: var(--text-2); }
+.adm-qa .a { margin-top: 3px; white-space: pre-wrap; }
+
+@media print {
+  #topbar, #disc-progress, .disc-foot, .btn, .iconbtn { display: none !important; }
+  .adm-qa { break-inside: avoid; }
+}

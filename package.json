@@ -15,7 +15,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node tests/dom.test.mjs",
+    "test": "node tests/dom.test.mjs && node tests/discovery.test.mjs",
     "typecheck": "tsc -p jsconfig.json"
   },
   "dependencies": {

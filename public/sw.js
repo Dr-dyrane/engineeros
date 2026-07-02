@@ -22,6 +22,7 @@ const PRECACHE = [
   '/src/views/onboarding.js', '/src/views/home.js', '/src/views/journeys.js', '/src/views/mission.js',
   '/src/views/build.js', '/src/views/resume.js', '/src/views/portfolio.js', '/src/views/linkedin.js',
   '/src/views/progress.js', '/src/views/review.js', '/src/views/resources.js', '/src/views/earn.js', '/src/views/launchpad.js', '/src/views/settings.js',
+  '/discover.html', '/styles/discovery.css', '/src/discovery/schema.js', '/src/discovery/app.js',
 ];
 
 self.addEventListener('install', (e) => {
@@ -53,12 +54,18 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
+  // Never cache API calls: always fresh (sync, discovery, push-key).
+  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
+
   // Navigations: network-first so deploys show up; offline, cached shell.
+  // Each page caches under its own shell key so /discover can't poison the
+  // EngineerOS shell (or the other way round).
   if (req.mode === 'navigate') {
+    const shell = url.pathname === '/discover' || url.pathname === '/discover.html' ? '/discover.html' : '/index.html';
     e.respondWith(
       fetch(req)
-        .then((r) => { const c = r.clone(); caches.open(CACHE).then((cache) => cache.put('/index.html', c)); return r; })
-        .catch(() => caches.match('/index.html').then((r) => r || caches.match('/')))
+        .then((r) => { const c = r.clone(); caches.open(CACHE).then((cache) => cache.put(shell, c)); return r; })
+        .catch(() => caches.match(shell).then((r) => r || caches.match('/index.html')).then((r) => r || caches.match('/')))
     );
     return;
   }
