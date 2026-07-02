@@ -1,11 +1,12 @@
-/* EngineerOS · Home dashboard */
+/* EngineerOS · Home. One intent: today's mission.
+   The hero carries the screen's only filled CTA; every other destination is a
+   quiet row. Stats and readiness live in Progress, where reflection belongs. */
 
 import { store, todaysMission, totalMissions, completedCount, overallPct,
-         liveStreak, resumeReady, linkedinReady, portfolioReady, githubReady, firstName,
-         todayStr, yesterdayStr } from '../core/state.js';
-import { qs, icon, html, raw } from '../core/dom.js';
+         liveStreak, firstName, todayStr, yesterdayStr } from '../core/state.js';
+import { qs, icon, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
-import { statTile, readyTile } from '../ui/components.js';
+import { chip, listRow } from '../ui/components.js';
 import { userProfile } from '../core/context.js';
 import { homeNudge } from '../core/coach.js';
 
@@ -16,17 +17,18 @@ registerView('home', () => {
   const greet = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const streak = liveStreak();
 
-  // A calm streak nudge: only once there is something to protect, and a mission left to do.
-  let streakBanner = '';
+  // One voice above the hero: the streak stakes when they exist, else the coach.
+  let banner = '';
   if (done > 0 && tm) {
     const last = store.s.streak.last;
-    if (last === yesterdayStr()) streakBanner = html`<div class="notice notice-amber">${icon('flame')} <b>${streak}-day streak.</b> Finish today’s mission to keep it alive.</div>`;
-    else if (last !== todayStr()) streakBanner = html`<div class="notice notice-accent">${icon('sparkles')} <b>Welcome back.</b> One mission today restarts your streak.</div>`;
+    if (last === yesterdayStr()) banner = html`<div class="notice notice-amber">${icon('flame')} <b>${streak}-day streak.</b> Finish today’s mission to keep it alive.</div>`;
+    else if (last !== todayStr()) banner = html`<div class="notice notice-accent">${icon('sparkles')} <b>Welcome back.</b> One mission today restarts your streak.</div>`;
   }
+  if (!banner) banner = html`<div class="notice notice-accent">${homeNudge(userProfile())}</div>`;
 
-  let todayCard;
+  let hero;
   if (tm) {
-    todayCard = html`
+    hero = html`
       <div class="card tap" data-action="open-mission" data-value="${tm.m.id}" data-from="home"
            style="background:linear-gradient(180deg, color-mix(in srgb,var(--amber) 14%,transparent), var(--surface-1))">
         <div class="row between mb-4">
@@ -39,7 +41,7 @@ registerView('home', () => {
         <button class="btn btn-amber mt-4" data-action="open-mission" data-value="${tm.m.id}" data-from="home">Start today’s win ${icon('arrow-right')}</button>
       </div>`;
   } else if (total > 0) {
-    todayCard = html`
+    hero = html`
       <div class="card center" style="background:linear-gradient(180deg, color-mix(in srgb,var(--green) 15%,transparent), var(--surface-1))">
         <div class="chip chip-green" style="margin:0 auto 12px; width:54px; height:54px">${icon('check')}</div>
         <h2 class="t-title1">Every mission complete.</h2>
@@ -47,7 +49,7 @@ registerView('home', () => {
         <button class="btn btn-primary mt-4" data-action="nav" data-value="build">Open Build Studio</button>
       </div>`;
   } else {
-    todayCard = html`<div class="empty"><div class="chip chip-accent">${icon('sparkles')}</div><p>Your missions are loading.</p></div>`;
+    hero = html`<div class="empty"><div class="chip chip-accent">${icon('sparkles')}</div><p>Your missions are loading.</p></div>`;
   }
 
   qs('#view-home').innerHTML = html`
@@ -56,52 +58,12 @@ registerView('home', () => {
         <div class="eyebrow">${greet}</div>
         <h1 class="t-display" style="margin-top:6px">${firstName()}.</h1>
       </header>
-      ${streakBanner}
-      <div class="home-grid">
-        <div class="stack">
-          ${todayCard}
-          <div class="card tap" data-action="nav" data-value="earn"
-               style="background:linear-gradient(180deg, color-mix(in srgb,var(--green) 14%, transparent), var(--surface-1))">
-            <div class="row">
-              <div class="chip chip-green">${icon('wallet')}</div>
-              <div class="grow"><div class="t-headline">Earn while you learn</div>
-                <div class="t-foot text-2 mt-1">Freelance gigs, AI tasks, and paid internships.</div></div>
-              <span class="chev text-3">${icon('chevron-right')}</span>
-            </div>
-          </div>
-          <div class="card tap" data-action="nav" data-value="launchpad"
-               style="background:linear-gradient(180deg, color-mix(in srgb,var(--accent) 12%, transparent), var(--surface-1))">
-            <div class="row">
-              <div class="chip chip-accent">${icon('rocket')}</div>
-              <div class="grow"><div class="t-headline">Career Launchpad</div>
-                <div class="t-foot text-2 mt-1">Track applications and prep interviews with your own projects.</div></div>
-              <span class="chev text-3">${icon('chevron-right')}</span>
-            </div>
-          </div>
-        </div>
-        <div class="stack">
-          <div class="grid-3">
-            ${statTile(raw(overallPct() + '<span style="font-size:15px">%</span>'), 'Progress')}
-            ${statTile(done, 'Missions done')}
-            ${statTile(streak + (streak > 0 ? ' 🔥' : ''), 'Day streak')}
-          </div>
-          ${streakBanner ? '' : html`<div class="notice notice-accent">${homeNudge(userProfile())}</div>`}
-          <div>
-            <h3 class="section-label" style="margin-top:2px">Your readiness</h3>
-            <div class="grid-2">
-              ${readyTile('Resume', resumeReady(), 'amber')}
-              ${readyTile('LinkedIn', linkedinReady(), '')}
-              ${readyTile('Portfolio', portfolioReady(), 'green')}
-              ${readyTile('GitHub', githubReady(), '')}
-            </div>
-          </div>
-          <div class="card tap" data-action="open-progress">
-            <div class="row between">
-              <div><div class="fw-semibold">See your full progress</div><div class="t-foot text-3">Journeys, streak and milestones</div></div>
-              <span class="chev text-3">${icon('chevron-right')}</span>
-            </div>
-          </div>
-        </div>
+      ${banner}
+      ${hero}
+      <div class="list" style="margin-top:var(--s-6)">
+        ${listRow({ leading: chip('wallet', 'chip-green'), t1: 'Earn while you learn', t2: 'Gigs, AI tasks, paid internships', action: 'nav', value: 'earn' })}
+        ${listRow({ leading: chip('rocket', 'chip-accent'), t1: 'Career Launchpad', t2: 'Applications and interview prep', action: 'nav', value: 'launchpad' })}
+        ${listRow({ leading: chip('compass', 'chip-accent'), t1: 'Your progress', t2: overallPct() + '% complete · ' + done + ' missions · ' + streak + '-day streak', action: 'open-progress' })}
       </div>
     </div>`;
 });

@@ -1,10 +1,11 @@
 /* EngineerOS · Progress */
 
 import { JOURNEYS } from '../data/journeys.js';
-import { store, totalMissions, completedCount, overallPct, liveStreak, journeyComplete, journeysDone } from '../core/state.js';
+import { store, totalMissions, completedCount, overallPct, liveStreak, journeyComplete, journeysDone,
+         resumeReady, linkedinReady, portfolioReady, githubReady } from '../core/state.js';
 import { qs, icon, html } from '../core/dom.js';
 import { registerView } from '../core/router.js';
-import { ring, statTile, meter, pageHeader } from '../ui/components.js';
+import { ring, statTile, meter, pageHeader, readyTile } from '../ui/components.js';
 import { userProfile } from '../core/context.js';
 import { progressInsight } from '../core/coach.js';
 
@@ -31,6 +32,13 @@ registerView('progress', () => {
       ${statTile(liveStreak(), 'Current streak')}
       ${statTile(store.s.streak.best || 0, 'Best streak')}
       ${statTile(journeysDone(), 'Journeys done')}
+    </div>
+    <h3 class="section-label mt-6">Career readiness</h3>
+    <div class="grid-2">
+      ${readyTile('Resume', resumeReady(), 'amber')}
+      ${readyTile('LinkedIn', linkedinReady(), '')}
+      ${readyTile('Portfolio', portfolioReady(), 'green')}
+      ${readyTile('GitHub', githubReady(), '')}
     </div>
     <h3 class="section-label mt-6">By journey</h3>
     <div class="list">${jlist}</div>

@@ -37,9 +37,9 @@ document.querySelector('#nameInput').value='Ada';
 click(document.querySelector('[data-action="finish-setup"]')); await wait(20);
 A(av()==='view-home','home after setup ('+av()+')');
 A(document.querySelector('#view-home').textContent.includes('Ada'),'name in greeting');
-A(document.querySelectorAll('#view-home .ready').length===4,'4 readiness tiles');
-A(document.querySelectorAll('#view-home .home-grid > .stack').length===2,'home dashboard is two columns (2 stack children)');
-A(document.querySelectorAll('#view-home .home-grid').length===1,'one home-grid');
+A(document.querySelectorAll('#view-home .btn-primary, #view-home .btn-amber').length===1,'home has exactly one filled CTA (the hero)');
+A(document.querySelectorAll('#view-home .list-row').length>=3,'secondary destinations are quiet rows');
+A(!document.querySelector('#view-home .ready'),'readiness tiles moved off home');
 A(/gap|great shape/.test(document.querySelector('#view-home').textContent),'home coach nudge present');
 
 for(const v of ['journeys','build','review','resources','home']){ click(document.querySelector('.tab[data-value="'+v+'"]')); await wait(10); A(av()==='view-'+v,'nav '+v+' ('+av()+')'); }
@@ -49,7 +49,13 @@ click(document.querySelector('[data-action="open-journey"][data-value="0"]')); a
 A(av()==='view-journey','journey opens');
 click(document.querySelector('#view-journey [data-action="open-mission"]')); await wait(10);
 A(av()==='view-mission','mission opens');
+// staged reveal: fresh mission starts with proof + reflection as collapsed beats and a quiet Complete
+A(!document.querySelector('#m-act-check').open,'checklist starts as a collapsed beat');
+A(!document.querySelector('#m-act-reflect').open,'reflection starts as a collapsed beat');
+A(document.querySelector('#m-complete').classList.contains('btn-ghost'),'complete starts quiet');
 const cb=document.querySelector('[data-check]'); cb.checked=true; cb.dispatchEvent(new window.Event('change',{bubbles:true}));
+A(document.querySelector('#m-act-reflect').open===true,'first checked item reveals reflection');
+A(document.querySelector('#m-complete').classList.contains('btn-primary'),'complete promotes to primary once started');
 const rt=document.querySelector('[data-reflect]'); rt.value='I got stuck on the wiring part today'; rt.dispatchEvent(new window.Event('input',{bubbles:true})); await wait(10);
 A(document.querySelector('#mission-coach') && document.querySelector('#mission-coach').textContent.length>0,'mission reflection coach replies');
 A(document.querySelector('#checkbar').style.width!=='0%','checklist meter moved');
@@ -182,6 +188,7 @@ A(Object.values(st.interview.answers).some(x=>x.a && x.a.includes('sensor')),'ST
 click(document.querySelector('.tab[data-value="home"]')); await wait(6);
 click(document.querySelector('[data-action="open-progress"]')); await wait(8);
 A(av()==='view-progress','progress opens'); A(document.querySelector('#view-progress .ring'),'ring rendered'); A(/Strongest|getting started|gap/.test(document.querySelector('#view-progress').textContent),'progress insight present');
+A(document.querySelectorAll('#view-progress .ready').length===4,'readiness tiles live in progress');
 
 
 // ---- Resume Studio ----

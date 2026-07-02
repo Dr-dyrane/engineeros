@@ -19,6 +19,14 @@ registerView('mission', (id) => {
   const data = md(m.id);
   const isDone = !!store.s.completed[m.id];
 
+  /* Staged reveal: the page is a story. Setup (why) and action (today) are
+     always open; proof and reflection sit as slim beats that expand as the
+     mission progresses. Nothing is ever locked, done missions open fully. */
+  const anyCheck = Object.keys(data.checks || {}).some(k => data.checks[k]);
+  const started = anyCheck || !!(data.reflection && data.reflection.trim());
+  const ckOpen = isDone || started;
+  const rfOpen = isDone || !!(data.reflection && data.reflection.trim());
+
   const checks = m.checklist.map((c, i) => html`
     <label class="check">
       <input type="checkbox" data-check="${m.id}:${i}" ${data.checks[i] ? 'checked' : ''} />
@@ -54,24 +62,24 @@ registerView('mission', (id) => {
         ${linkBtn}${gotoBtn}
       </div>
 
-      <div class="card">
-        <h3 class="section-label" style="margin-top:0">Done checklist</h3>
-        <div>${checks}</div>
+      <details class="card" id="m-act-check"${ckOpen ? ' open' : ''}>
+        <summary class="sum-row">${icon('list-checks')} Done checklist <span class="sum-val" id="m-check-sum">${checkPct(m, data)}%</span>${icon('chevron-down', 'chev-d')}</summary>
+        <div class="mt-3">${checks}</div>
         <div class="mt-3"><div class="meter green"><i id="checkbar" style="width:${checkPct(m, data)}%"></i></div></div>
-      </div>
+      </details>
 
-      <div class="card">
-        <h3 class="section-label" style="margin-top:0">Reflection</h3>
-        <p class="t-foot text-3 mb-2">${m.reflection}</p>
+      <details class="card" id="m-act-reflect"${rfOpen ? ' open' : ''}>
+        <summary class="sum-row">${icon('pen-line')} Reflection <span class="sum-val">a line or two</span>${icon('chevron-down', 'chev-d')}</summary>
+        <p class="t-foot text-3 mt-3 mb-2">${m.reflection}</p>
         <textarea class="textarea" data-reflect="${m.id}" placeholder="Write a sentence or two…">${data.reflection}</textarea>
         <div id="mission-coach"></div>
         <details class="mt-3"><summary class="t-foot text-3" style="cursor:pointer">+ Private notes</summary>
           <textarea class="textarea mt-2" data-notes="${m.id}" placeholder="Anything you want to remember…">${data.notes}</textarea>
         </details>
-      </div>
+      </details>
 
       <div class="mt-2">
-        <button class="btn ${isDone ? 'btn-ghost' : 'btn-primary'}" data-action="${isDone ? 'reopen-mission' : 'complete-mission'}" data-value="${m.id}">
+        <button class="btn ${isDone ? 'btn-ghost' : started ? 'btn-primary' : 'btn-ghost'}" id="m-complete" data-action="${isDone ? 'reopen-mission' : 'complete-mission'}" data-value="${m.id}">
           ${isDone ? 'Mark as not done' : 'Mark complete'}
         </button>
         <p class="t-foot text-3 center mt-3">Done beats perfect. You can improve it later.</p>

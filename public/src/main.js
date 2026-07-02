@@ -150,6 +150,18 @@ document.addEventListener('click', (e) => {
   }
 });
 
+/* Staged reveal on the mission page: progress in one act opens the next and
+   promotes Mark complete from quiet to primary. Never demotes a done mission. */
+function missionStageSync(d, justChecked) {
+  const startedNow = Object.keys(d.checks || {}).some(k => d.checks[k]) || !!(d.reflection && d.reflection.trim());
+  if (justChecked) { const ra = qs('#m-act-reflect'); if (ra) ra.open = true; }
+  const mc = qs('#m-complete');
+  if (mc && mc.dataset.action === 'complete-mission') {
+    mc.classList.toggle('btn-primary', startedNow);
+    mc.classList.toggle('btn-ghost', !startedNow);
+  }
+}
+
 document.addEventListener('change', (e) => {
   if (dispatchChange(e)) return;   // view-registered change handlers
   const c = e.target.closest('[data-check]');
@@ -157,13 +169,18 @@ document.addEventListener('change', (e) => {
     const [id, i] = c.dataset.check.split(':');
     const d = md(id); d.checks[i] = c.checked; save(); haptic(c.checked ? 10 : 6);
     const fm = findMission(id), bar = qs('#checkbar');
-    if (fm && bar) bar.style.width = checkPct(fm.m, d) + '%';
+    if (fm && bar) {
+      const pct = checkPct(fm.m, d);
+      bar.style.width = pct + '%';
+      const sum = qs('#m-check-sum'); if (sum) sum.textContent = pct + '%';
+    }
+    missionStageSync(d, c.checked);
   }
 });
 
 document.addEventListener('input', (e) => {
   if (dispatchInput(e)) return;   // view-registered input handlers (studios, launchpad, search…)
-  const r = e.target.closest('[data-reflect]'); if (r) { md(r.dataset.reflect).reflection = r.value; save(); onReflect(r.value); return; }
+  const r = e.target.closest('[data-reflect]'); if (r) { const d = md(r.dataset.reflect); d.reflection = r.value; save(); onReflect(r.value); missionStageSync(d, false); return; }
   const n = e.target.closest('[data-notes]'); if (n) { md(n.dataset.notes).notes = n.value; save(); return; }
   const sn = e.target.closest('#set-name'); if (sn) { store.s.user.name = sn.value; save(); }
 });
